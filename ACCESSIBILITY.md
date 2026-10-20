@@ -310,6 +310,9 @@ Both artefacts present data visually. The obligation here is specific:
   `<details>` block titled "Accessible equivalent".
 - Every data table has a `<caption>` and header cells carrying `scope` (`col` or `row`).
 - No information is conveyed by chart shape alone.
+- The **five-layer bars** in page one are marked `aria-hidden="true"`, because every layer's name,
+  position and description is real text beside the bar. Their relative widths are stated in the
+  prose to be an illustration, not a measurement.
 
 ---
 
@@ -317,9 +320,30 @@ Both artefacts present data visually. The obligation here is specific:
 
 ### SVG
 
-No SVG is used in either artefact. Decorative glyphs in page one (the `▸`/`▾` disclosure markers)
-are CSS-generated `content` on `<summary>` and are marked `aria-hidden="true"` where they appear
-in text.
+Page one uses **inline SVG only** — a coin-outcome figure in beat 1 and five disability
+pictograms. No external file, no font, no CDN: both pages stay self-contained and open from the
+filesystem.
+
+- The **coin figure** carries `role="img"` with `aria-labelledby` pointing at a `<title>` and a
+  `<desc>`, so it is announced as one described image rather than as scattered text nodes.
+- The **pictograms** are `aria-hidden="true"` and `focusable="false"`. The visible text label
+  beneath each one ("Vision", "Hearing", "Motor", "Cognitive", "Speech") carries the meaning, so
+  nothing depends on the drawing or on colour.
+- **SVG text does not scale with the reader's browser font-size setting.** This is a real
+  limitation, not a workaround-able one. It is mitigated two ways: label sizes are generous (15–17
+  px), and **no figure carries information the surrounding prose does not already state**. The
+  coin figure restates the doubling shown in the formula; the pictograms restate a list.
+- Both figures are measured in a real browser by `layout-check.mjs` — real width and height,
+  accessible name present, and no SVG label below 14 px. Present-in-DOM-but-collapsed is the
+  failure this guards, and it has happened in this project before.
+
+Decorative glyphs in page one (the `▸`/`▾` disclosure markers) are CSS-generated `content` on
+`<summary>` and are marked `aria-hidden="true"` where they appear in text.
+
+**The five-layer section** (accessible / best practice / WCAG 2.2 AA & EN 301 549 / what automation
+can test / what axe returns) advises the reader that its bar widths show *relative breadth only* —
+no tool or standards body publishes a tested percentage per layer, so the widths are an
+illustration and are labelled as one.
 
 ### Mermaid
 
@@ -396,6 +420,8 @@ Chosen by risk. Given the subject matter, these are the priority areas:
 | Reveal beats one at a time by keyboard | Medium | Programmatic activation | None | None | — | — |
 | Reveal all beats at once | Low | Programmatic activation | None | None | — | — |
 | Step through the full-screen six-beat intro | Medium | `deck-check.mjs` — real Chrome: open, advance by click and by arrow key, back, finish, both skip exits, no focus leak, background inert, reflow at 360 px | **Partial** — focus containment and background exposure measured in real Chrome; *not* checked with a screen reader | None | 2026-10-20 | `deck-check.mjs` |
+| Read the coin figure and disability pictograms | Low | `layout-check.mjs` — real Chrome: real size, accessible name, no label under 14 px | None | None | 2026-10-20 | `layout-check.mjs` |
+| Understand the five-layer distinction | Medium | `layout-check.mjs` — five layers render; text present in `page-one.mjs` | None | None | 2026-10-20 | `layout-check.mjs` |
 | Configure the run settings (quality, difficulty, persona) | Medium | `calib.mjs` | None | None | — | — |
 | Complete a full 30-step simulated journey | **High** | `verify.mjs`, 250 runs | None | None | — | — |
 | Interpret the population model tables | **High** | Table-population assertions | None | None | — | — |

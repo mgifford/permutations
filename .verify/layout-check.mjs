@@ -195,6 +195,44 @@ try {
   ok(all.rows.every(r => !r.hidden && r.box.h > 50), "reveal-all gives every beat real height");
   ok(all.strayCells === 0, "no stray cells after reveal-all");
 
+  /* --- figures must actually render -------------------------------------
+     Inline SVG can be present in the DOM and still collapse, clip or be
+     invisible — which is exactly what happened before with display:contents.
+     jsdom cannot see any of it. So the drawings are measured here. */
+  const figs = await evalJs(`(function(){
+    var out = { coin: null, pictos: [], layers: 0, smallText: null };
+    var coin = document.querySelector('.beatrow[data-beat="1"] figure.fig svg');
+    if (coin) {
+      var b = coin.getBoundingClientRect();
+      var cs = [].slice.call(coin.querySelectorAll('text'))
+        .map(function(t){ return parseFloat(getComputedStyle(t).fontSize); });
+      out.coin = { w: Math.round(b.width), h: Math.round(b.height),
+                   visible: b.top < window.innerHeight * 40 && b.width > 0,
+                   texts: cs.length,
+                   smallest: cs.length ? Math.min.apply(null, cs) : null,
+                   hasTitle: !!coin.querySelector('title'),
+                   hasDesc: !!coin.querySelector('desc'),
+                   labelled: !!coin.getAttribute('aria-labelledby') };
+    }
+    out.pictos = [].slice.call(document.querySelectorAll('.pictos svg')).map(function(s){
+      var b = s.getBoundingClientRect();
+      return { w: Math.round(b.width), h: Math.round(b.height) };
+    });
+    out.layers = document.querySelectorAll('.layers > li').length;
+    return out;
+  })()`);
+
+  ok(figs.coin && figs.coin.w > 200 && figs.coin.h > 80,
+     `the coin figure renders at a real size (${figs.coin ? figs.coin.w + "x" + figs.coin.h : "missing"})`);
+  ok(figs.coin && figs.coin.hasTitle && figs.coin.hasDesc && figs.coin.labelled,
+     "the coin figure is named and described for assistive technology");
+  ok(figs.coin && figs.coin.smallest >= 14,
+     `no SVG label is smaller than 14px (smallest ${figs.coin ? figs.coin.smallest : "?"}px)`);
+  ok(figs.pictos.length === 5, `all five disability pictograms render (got ${figs.pictos.length})`);
+  ok(figs.pictos.every(p => p.w > 30 && p.h > 30),
+     `every pictogram has real size (${JSON.stringify(figs.pictos)})`);
+  ok(figs.layers === 5, `the five-layer section renders five layers (got ${figs.layers})`);
+
   /* Narrow viewport: the row must reflow to a single column. */
   await send("Emulation.setDeviceMetricsOverride", {
     width: 360, height: 800, deviceScaleFactor: 2, mobile: true,

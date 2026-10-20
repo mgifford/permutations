@@ -231,9 +231,20 @@ Mechanically enforced, so it cannot drift back:
   the hinge idea is restated in the connective callouts rather than taught once by the beats.
 
 Current state: 6 beats, 12 cells. Every cell is **33–89 words**, longest sentence **28 words**,
-average Flesch-Kincaid grade **5.8**, average reading ease **71.4** (Flesch: 60+ is plain English).
+average Flesch-Kincaid grade **5.8**, average reading ease **71.2** (Flesch: 60+ is plain English).
 These are the numbers `readability.mjs` prints; if a change pushes them up, the change is wrong,
 not the threshold.
+
+**What the word budget counts — and what it does not.** `page-one.mjs` and `readability.mjs` both
+exclude `<svg>` and the `.pictos` label grid, because a drawing and a set of labels are not prose.
+A `<figcaption>` **is** counted: it is a sentence the reader reads, so the figure cannot be used to
+smuggle extra prose past the cap. The two harnesses use the same exclusion list deliberately — they
+disagreed once (98 words against 131 for the same cell) and the disagreement was the bug.
+
+**A figure is not an exemption from one idea per beat.** A drawing may restate the beat's one idea;
+it may not introduce a second one. Beat 1's coin figure restates the doubling already in the
+formula above it. If a figure needs a paragraph of its own to explain, it belongs in its own
+section below the beats, as the five-layer section does.
 
 **The rule applies to the prose around the beats, not only the beats.** An earlier revision ran
 186 words of preamble explaining an idea the beats were about to teach, plus a second callout

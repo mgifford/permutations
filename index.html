@@ -291,6 +291,72 @@
   }
   .deck-hint strong { color:var(--ink); }
 
+  /* ==================================================================
+     FIGURES
+     Inline SVG only. Each figure either carries a <title>/<desc> pair and
+     role="img", or is aria-hidden when the text beside it already says
+     everything it shows. Nothing here is fetched, so both pages stay
+     self-contained and work from the filesystem.
+     ================================================================== */
+  .fig { margin:.9rem 0 .2rem; }
+  /* width:100% with a max of 520px. min-width:0 and box-sizing keep the SVG
+     inside its cell at 360px, where it otherwise measured 8px wider than the
+     viewport and was silently clipped. */
+  .fig svg { display:block; width:100%; height:auto; max-width:520px; min-width:0; }
+  .fig-narrow svg { max-width:360px; }
+  .fig figcaption {
+    font-size:.84rem; color:var(--muted); margin-top:.45rem; max-width:52ch;
+  }
+
+  /* The coin figure sits in the mathematics column, so it borrows --l.
+     SVG text does NOT scale with the reader's browser font-size setting, so
+     these sizes are deliberately generous and the figure never carries
+     information the surrounding prose does not already state. */
+  .coin-line { stroke:var(--line); stroke-width:1.5; fill:none; }
+  .coin-face { fill:var(--l-bg); stroke:var(--l); stroke-width:1.5; }
+  .coin-txt { fill:var(--l); font-size:17px; font-weight:700; font-family:inherit; }
+  .coin-edge { stroke:var(--brand); stroke-width:2; fill:none; }
+  .coin-fade { fill:var(--brand); }
+  .coin-cap { fill:var(--muted); font-size:15px; font-family:inherit; }
+  .coin-cap-strong { fill:var(--ink); font-size:15px; font-weight:700; font-family:inherit; }
+
+  /* Disability pictograms. Text labels sit outside the SVG, so the drawings
+     can be decorative; the pair (drawing + label) carries the meaning. */
+  .pictos {
+    display:grid; gap:.8rem;
+    grid-template-columns:repeat(auto-fit, minmax(96px, 1fr));
+    list-style:none; margin:.9rem 0 .2rem; padding:0;
+  }
+  .pictos li {
+    text-align:center; border:1px solid var(--line); border-radius:12px;
+    padding:.7rem .5rem; background:var(--card);
+  }
+  .pictos svg { display:block; margin:0 auto .4rem; width:46px; height:46px; }
+  .pictos .p-name { display:block; font-weight:700; font-size:.85rem; }
+  .pictos .p-eg { display:block; color:var(--muted); font-size:.76rem; margin-top:.15rem; }
+  .pictos .stro { stroke:var(--r); stroke-width:1.8; fill:none; stroke-linecap:round; stroke-linejoin:round; }
+  .pictos .fillr { fill:var(--r); }
+
+  /* The five layers. Each row is a layer; the bar length is illustrative of
+     relative breadth only and is labelled as such, because no tool publishes
+     a tested fraction of each layer. */
+  .layers { list-style:none; margin:1rem 0 .2rem; padding:0; display:grid; gap:.75rem; }
+  .layers > li {
+    border:1px solid var(--line); border-radius:12px; padding:.8rem .9rem;
+    background:var(--card);
+  }
+  .layers .l-head { display:flex; align-items:baseline; gap:.55rem; flex-wrap:wrap; }
+  .layers .l-num {
+    font-weight:800; color:#fff; background:var(--ink);
+    width:1.5rem; height:1.5rem; border-radius:50%; flex:none;
+    display:inline-flex; align-items:center; justify-content:center; font-size:.85rem;
+  }
+  .layers .l-name { font-weight:750; font-size:1rem; }
+  .layers .l-bar { height:.5rem; border-radius:999px; background:#e7eaf0; margin:.6rem 0 .45rem; overflow:hidden; }
+  .layers .l-bar span { display:block; height:100%; background:var(--l); }
+  .layers .l-note { margin:.2rem 0 0; font-size:.87rem; color:var(--muted); }
+  .layers .l-note strong { color:var(--ink); }
+
   @media (max-width:760px) {
     .deck-body .beatrow { grid-template-columns:1fr; }
     .deck-body .beatrow > .cell-r { border-left:0; border-top:1px solid var(--line); padding-top:1.4rem; }
@@ -418,8 +484,55 @@
           <h3>Each new choice multiplies the possibilities</h3>
           <p>Flip two coins. Each can be heads or tails. How many outcomes are possible?</p>
           <p class="formula">2 coins × 2 outcomes = 4 outcomes</p>
-          <p>Add a third coin and you double it again: 8. A fourth: 16. Each new thing
-          <strong>multiplies</strong> the options — it never adds them.</p>
+
+          <!-- Four branches, then the same doubling carried on. The count is
+               arithmetic (2^n); nothing here is measured. -->
+          <figure class="fig">
+            <svg viewBox="0 0 520 190" role="img" aria-labelledby="coinf-t coinf-d">
+              <title id="coinf-t">Two coins make four outcomes, and each extra coin doubles the count</title>
+              <desc id="coinf-d">Two coins, each heads or tails, branch into four outcomes: heads-heads,
+                heads-tails, tails-heads, tails-tails. A third coin makes eight, a fourth sixteen, and by
+                thirty steps the count passes one billion.</desc>
+
+              <!-- coin 1 -->
+              <circle class="coin-face" cx="46" cy="34" r="18"/>
+              <text class="coin-txt" x="46" y="40" text-anchor="middle">H</text>
+              <circle class="coin-face" cx="46" cy="82" r="18"/>
+              <text class="coin-txt" x="46" y="88" text-anchor="middle">T</text>
+
+              <!-- coin 2 -->
+              <circle class="coin-face" cx="152" cy="20" r="18"/>
+              <text class="coin-txt" x="152" y="26" text-anchor="middle">H</text>
+              <circle class="coin-face" cx="152" cy="58" r="18"/>
+              <text class="coin-txt" x="152" y="64" text-anchor="middle">T</text>
+              <circle class="coin-face" cx="152" cy="96" r="18"/>
+              <text class="coin-txt" x="152" y="102" text-anchor="middle">H</text>
+              <circle class="coin-face" cx="152" cy="134" r="18"/>
+              <text class="coin-txt" x="152" y="140" text-anchor="middle">T</text>
+
+              <path class="coin-line" d="M64 34 L134 20 M64 34 L134 58 M64 82 L134 96 M64 82 L134 134"/>
+
+              <!-- the four outcomes -->
+              <text class="coin-cap" x="182" y="26">HH</text>
+              <text class="coin-cap" x="182" y="64">HT</text>
+              <text class="coin-cap" x="182" y="102">TH</text>
+              <text class="coin-cap" x="182" y="140">TT</text>
+              <text class="coin-cap" x="222" y="26">heads · heads</text>
+              <text class="coin-cap" x="222" y="64">heads · tails</text>
+              <text class="coin-cap" x="222" y="102">tails · heads</text>
+              <text class="coin-cap" x="222" y="140">tails · tails</text>
+
+              <!-- doubling carried on -->
+              <path class="coin-edge" d="M320 30 C356 78, 366 104, 392 118"/>
+              <text class="coin-cap-strong" x="400" y="122">3 coins → 8</text>
+              <text class="coin-cap" x="400" y="142">4 coins → 16</text>
+              <text class="coin-cap" x="400" y="162">30 coins → 1,073,741,824</text>
+            </svg>
+            <figcaption>
+              Each coin you add doubles the count. Nothing adds.
+            </figcaption>
+          </figure>
+
           <p>That is all a permutation is: <strong>the ways things can combine</strong>.</p>
         </div>
         <div class="cell-r">
@@ -427,6 +540,49 @@
           <h3>Accessibility is about people, not checkboxes</h3>
           <p>Digital accessibility means a service works for everyone who needs it. That includes
           people with disabilities.</p>
+
+          <!-- Decorative drawings; the visible text label under each carries
+               the meaning, so nothing here is colour- or shape-only. -->
+          <ul class="pictos">
+            <li>
+              <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <circle class="stro" cx="24" cy="24" r="9"/>
+                <path class="stro" d="M24 6v5M24 37v5M6 24h5M37 24h5M11 11l4 4M33 33l4 4M37 11l-4 4M15 33l-4 4"/>
+              </svg>
+              <span class="p-name">Vision</span>
+              <span class="p-eg">screen reader</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <path class="stro" d="M14 30c-3-2-5-5-5-9a15 15 0 0 1 30 0c0 4-2 7-5 9M14 30v8M34 30v8M18 38h12"/>
+              </svg>
+              <span class="p-name">Hearing</span>
+              <span class="p-eg">captions</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <path class="stro" d="M18 6v8M30 6v8M12 14h24v10a12 12 0 0 1-24 0zM24 36v6M18 42h12"/>
+              </svg>
+              <span class="p-name">Motor</span>
+              <span class="p-eg">keyboard, switch</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <path class="stro" d="M24 12a6 6 0 0 1 6 6v10a6 6 0 0 1-12 0V18a6 6 0 0 1 6-6zM36 10l-6 6M40 20l-8 2M34 34l-5-4"/>
+              </svg>
+              <span class="p-name">Cognitive</span>
+              <span class="p-eg">plain language</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+                <path class="stro" d="M18 26a10 10 0 0 1 12 0M14 32a16 16 0 0 1 20 0M24 8v4M11 14l3 3M37 14l-3 3"/>
+                <path class="fillr" d="M24 40a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/>
+              </svg>
+              <span class="p-name">Speech</span>
+              <span class="p-eg">not only by voice</span>
+            </li>
+          </ul>
+
           <p>About <strong>1 in 4 US adults</strong> has a disability. The US Census counts
           <strong>45.8 million people</strong> of all ages (ACS 2024).</p>
           <p>They are your users whether or not your analytics show them. A screen reader user. A
@@ -718,6 +874,97 @@
   </section>
 
   <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-layers">
+    <h2 id="h-layers">"99&nbsp;% accessible" — 99&nbsp;% of what?</h2>
+    <p>
+      A number like 99&nbsp;% sounds precise. It is only as good as the question it answers, and
+      five different questions get called "accessible". They are not the same thing, and no single
+      tool answers all of them.
+    </p>
+
+    <ol class="layers">
+      <li>
+        <div class="l-head">
+          <span class="l-num">1</span>
+          <span class="l-name">What is actually accessible</span>
+        </div>
+        <div class="l-bar" aria-hidden="true"><span style="width:100%"></span></div>
+        <p class="l-note">
+          Can a real person, using their own setup, finish the task? This is the only layer that is
+          about outcomes, and the hardest to measure. <strong>Nobody puts a percentage on this</strong>
+          — that absence is the reason this site exists.
+        </p>
+      </li>
+      <li>
+        <div class="l-head">
+          <span class="l-num">2</span>
+          <span class="l-name">Agreed best practice</span>
+        </div>
+        <div class="l-bar" aria-hidden="true"><span style="width:78%"></span></div>
+        <p class="l-note">
+          Advice from practitioners and design systems that is widely agreed to help but is not
+          required by any standard. Following it is good. It is not conformance.
+        </p>
+      </li>
+      <li>
+        <div class="l-head">
+          <span class="l-num">3</span>
+          <span class="l-name">What a standard requires — WCAG 2.2 AA, EN&nbsp;301&nbsp;549</span>
+        </div>
+        <div class="l-bar" aria-hidden="true"><span style="width:62%"></span></div>
+        <p class="l-note">
+          A defined set of testable success criteria. Meeting all Level A and AA criteria is what
+          "conforms to WCAG 2.2 AA" means. <strong>EN&nbsp;301&nbsp;549</strong> is the European
+          standard that adopts WCAG for public-sector and regulated procurement.
+        </p>
+      </li>
+      <li>
+        <div class="l-head">
+          <span class="l-num">4</span>
+          <span class="l-name">What automated testing can find at all</span>
+        </div>
+        <div class="l-bar" aria-hidden="true"><span style="width:34%"></span></div>
+        <p class="l-note">
+          Automation is good at mechanical checks — missing alternative text, contrast values,
+          duplicate IDs. <strong>GSA estimates around 30&nbsp;% of success criteria are fully
+          automatable.</strong> The rest need a person.
+        </p>
+      </li>
+      <li>
+        <div class="l-head">
+          <span class="l-num">5</span>
+          <span class="l-name">What axe actually returns today</span>
+        </div>
+        <div class="l-bar" aria-hidden="true"><span style="width:22%"></span></div>
+        <p class="l-note">
+          The most widely used testing engine. Crucially, <strong>axe deliberately reports only what
+          it can be certain about</strong> — it suppresses rules that would produce false positives.
+          That is the right engineering decision, and it makes the green tick narrower still.
+        </p>
+      </li>
+    </ol>
+
+    <p class="l-note" style="margin-top:.9rem">
+      The bar lengths show relative breadth only. No tool or standards body publishes a tested
+      percentage for each layer, so the widths are an illustration, not a measurement.
+    </p>
+
+    <details>
+      <summary>Why the top layer is the one that matters here</summary>
+      <p>
+        Layers 3 to 5 are all countable, which is why they end up in dashboards. Layer 1 is not, so
+        it usually goes unmeasured. A service can pass layer 5 completely, comply with layer 3 on
+        every criterion a scanner can reach, and still lose layer 1 for the people who needed it
+        most — and report a score that looks excellent.
+      </p>
+      <p class="muted">
+        This is the same distinction the simulation draws between a WCAG failure and a wall: they
+        overlap, but neither one contains the other.
+      </p>
+    </details>
+  </section>
+
+  <!-- ============================================================ -->
   <section class="panel" aria-labelledby="h-next">
     <h2 id="h-next">Where to go next</h2>
     <p>
@@ -746,6 +993,7 @@
       <li>Census ACS 1-year estimates / Pew Research 2023: disability prevalence 12&nbsp;% (18–64), 24&nbsp;% (65–74), 46&nbsp;% (75+).</li>
       <li>Microsoft Inclusive Design, Persona Spectrum: permanent, temporary, situational.</li>
       <li>W3C, WCAG 2.2 — the four POUR principles.</li>
+      <li>EN&nbsp;301&nbsp;549 — the European standard that adopts WCAG for public-sector and regulated procurement.</li>
       <li>GSA (≈30&nbsp;% of success criteria automatable) and Deque (≈40&nbsp;% of issues).</li>
       <li>WebAIM Million, 2026 (February 2026 crawl): 56.1 detectable errors per home page; 95.9&nbsp;% of home pages with detectable WCAG 2 failures; 1,437 page elements per page on average; pages with ARIA averaged 59.1 errors against 42.0 without.</li>
     </ul>

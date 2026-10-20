@@ -93,10 +93,35 @@ on GitHub Pages being available.
 Six beats, revealed one at a time, with a "reveal everything" control. **Nothing is withheld** —
 the content follows in order whether or not you press anything.
 
+The beats can also present as a **full-screen slide deck**, one beat per screen, with a click
+prompt and three ways out (Next/Back, "Skip to the full page", "Skip the intro"). The deck is
+progressive enhancement: the beats exist once in the markup and are moved into it and back, so the
+deck and the page cannot drift apart. With JavaScript unavailable the deck never opens and the page
+renders every beat in order.
+
 **One idea per column, per beat.** Each beat is deliberately small — 33 to 89 words — and written
 for a reader with no maths background. Depth lives in the running example and the simulation,
 both of which are optional; a reader who stops after the beats still has the whole argument.
 This is enforced by harnesses, not by intention (see `.verify/readability.mjs`).
+
+**Figures restate, they never introduce.** Beat 1 carries a coin-outcome diagram showing four
+outcomes branching, and five disability pictograms. Both are inline SVG — no external file, no
+font, no CDN. Neither carries information the surrounding prose does not already state, which
+matters because **SVG text does not scale with the reader's browser font-size setting**.
+
+Below the beats, a separate section answers the question the headline number invites:
+**"99 % accessible" — 99 % of what?** It separates five things that get called "accessible" and are
+not the same:
+
+1. what is actually accessible (the only outcome-shaped layer, and nobody puts a percentage on it);
+2. agreed best practice (helpful, not required);
+3. what a standard requires — WCAG 2.2 AA, EN 301 549;
+4. what automated testing can find at all (GSA: ≈ 30 % of success criteria);
+5. what axe actually returns today (it suppresses rules that would produce false positives).
+
+Layers 3–5 are countable, which is why they end up in dashboards; layer 1 is not, so it usually
+goes unmeasured. The bar widths are labelled in the page as an illustration of relative breadth,
+**not a measurement** — no tool or standards body publishes a tested fraction per layer.
 
 | Beat | Permutations — the mathematics | Digital accessibility — the domain |
 |---|---|---|
@@ -199,14 +224,19 @@ node page-one.mjs                                       # page-one reveal mechan
 node popmodel.mjs                                       # population numbers at each quality level
 node layout-check.mjs                                   # real browser: page-one layout geometry
 node run-example-check.mjs                              # real browser: the running example
+node deck-check.mjs                                     # real browser: the full-screen slide deck
+node a11y-gate.mjs                                      # real browser: axe-core gate
 ```
 
 `verify.mjs` drives the page's `boot()` explicitly, because jsdom's `runScripts: "outside-only"`
 mode never fires `DOMContentLoaded`.
 
-The last two need a Chrome or Chromium binary and drive it through the DevTools protocol; they
+The last four need a Chrome or Chromium binary and drive it through the DevTools protocol; they
 skip with a clear message if none is found. They exist because jsdom has no layout engine, and a
-previous reveal bug was green in jsdom while being broken in every real browser.
+previous reveal bug was green in jsdom while being broken in every real browser. `deck-check.mjs`
+also covers something axe cannot: it presses Tab twenty times while the deck is open and requires
+that focus never reaches the page hidden behind the overlay. That failed when the deck was first
+built — axe reported zero violations with the defect live.
 
 ---
 

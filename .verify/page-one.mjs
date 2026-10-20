@@ -81,7 +81,14 @@ ok(!rendered.includes("[object Object]"), "no object leak in rendered text");
   ["cell-l","cell-r"].forEach(side => {
     const cell = row.querySelector("." + side);
     if (!cell) return;
-    const words = cell.textContent.trim().split(/\s+/).length;
+    /* A drawing is not prose. `svg` is excluded because its labels are part of
+       the figure — assistive tech reads the figure's <title>/<desc>, not the
+       scattered text nodes. Same exclusions as readability.mjs's teachText, so
+       the two harnesses cannot disagree about how long a cell is. The
+       <figcaption> stays in, because that IS a sentence the reader reads. */
+    const clone = cell.cloneNode(true);
+    clone.querySelectorAll("script, style, svg, .beat, h3, h4, .formula, .pour, table, .pictos").forEach(n => n.remove());
+    const words = clone.textContent.trim().split(/\s+/).length;
     ok(words <= 95, `beat ${beatNo} ${side} is short enough to read at a glance (${words} words)`);
     // one lead idea only: a single h3, and at most one callout
     ok(cell.querySelectorAll("h3").length === 1,

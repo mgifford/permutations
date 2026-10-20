@@ -68,6 +68,7 @@ Performance Criteria group rather than reporting a single disability share.
 | Reference | Where used |
 |---|---|
 | [WCAG 2.2](https://www.w3.org/TR/WCAG22/) | The target standard for both artefacts, and the source of every SC citation in the defect registry. |
+| [EN 301 549](https://www.etsi.org/deliver/etsi_en/301500_301599/301549/) | The European standard that adopts WCAG for public-sector and regulated procurement. Named in page one's five-layer section as the layer a standard defines — distinct from best practice and from what a tool can test. Not modelled directly. |
 | SC 1.1.1 Non-text Content | Image alternatives; discussed in the defects. |
 | SC 1.3.1 Info and Relationships | Fieldset/legend, table headers, structure. |
 | SC 1.4.3 Contrast (Minimum) | The archetypal **degrader** — real, reportable, stops nobody. |

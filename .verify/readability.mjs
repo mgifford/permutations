@@ -32,7 +32,11 @@ const d = dom.window.document;
    not a sentence, and including it distorts sentence-length statistics. */
 function teachText(cell) {
   const clone = cell.cloneNode(true);
-  clone.querySelectorAll("script, style, .beat, h3, h4, .formula, .pour, table").forEach(n => n.remove());
+  /* <svg> is removed because its labels belong to the drawing. Assistive tech
+     reads the figure's <title>/<desc>, not the scattered text nodes, so counting
+     them here manufactured a fake 41-word "sentence" out of coin labels. The
+     <figcaption> stays in, because that is a sentence the reader reads. */
+  clone.querySelectorAll("script, style, svg, .beat, h3, h4, .formula, .pour, table, .pictos").forEach(n => n.remove());
   return clone.textContent.replace(/\s+/g, " ").trim();
 }
 
