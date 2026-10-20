@@ -206,12 +206,19 @@ Mechanically enforced, so it cannot drift back:
 - `page-one.mjs` fails a beat cell over 95 words, or carrying more than one heading, more than one
   aside, or a data table.
 - `readability.mjs` fails a sentence over 45 words or a cell under 25 words, and reports the
-  Flesch-Kincaid grade per cell.
+  Flesch-Kincaid grade per cell. It also caps the orientation preamble at 70 words, and fails if
+  the hinge idea is restated in the connective callouts rather than taught once by the beats.
 
 Current state: 6 beats, 12 cells. Every cell is **33–89 words**, longest sentence **28 words**,
 average Flesch-Kincaid grade **5.8**, average reading ease **71.4** (Flesch: 60+ is plain English).
 These are the numbers `readability.mjs` prints; if a change pushes them up, the change is wrong,
 not the threshold.
+
+**The rule applies to the prose around the beats, not only the beats.** An earlier revision ran
+186 words of preamble explaining an idea the beats were about to teach, plus a second callout
+restating it afterwards, plus a heading in beat 6 that taught it a third time. Four statements of
+one idea, taught once. The cap on the preamble and the ban on restating the hinge idea in the
+connective prose exist because of that specific regression.
 
 Depth beyond one idea belongs in the running example or the simulation, both of which are
 *optional* — a reader who stops after the beats should still have the whole argument.

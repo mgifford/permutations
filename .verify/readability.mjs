@@ -107,6 +107,32 @@ const worst = rows.slice().sort((a, b) => b.longestLen - a.longestLen).slice(0, 
 console.log("\nlongest sentences (rewrite candidates):");
 worst.forEach(r => console.log(`  beat ${r.beat} ${r.side} (${r.longestLen}w): ${r.longest.slice(0, 150)}`));
 
+/* ---------------------------------------------------------------- preamble
+   The beats are capped at 95 words each, and that rule was added because the
+   beats had become walls. The same failure mode applies to the prose AROUND
+   them: an earlier revision ran 186 words of preamble explaining an idea the
+   beats were about to teach, plus a second callout restating it after them.
+   The reader met the punchline three times before reaching the running example.
+
+   So the furniture is measured too. The orientation section must be short
+   enough to read in one glance, and the hinge idea must not be restated in the
+   connective prose — the beats exist to teach it once. */
+const startSec = d.querySelector('section[aria-labelledby="h-start"]');
+if (startSec) {
+  const t = startSec.cloneNode(true);
+  t.querySelectorAll("script,style,.btn,.btn-row,#revealStatus,h2").forEach(n => n.remove());
+  const w = t.textContent.replace(/\s+/g," ").trim().split(/\s+/).filter(x=>/[a-zA-Z]/.test(x)).length;
+  console.log(`\npreamble ("What this page is for") ${w} words`);
+  ok(w <= 70, `preamble is ${w} words; it must stay <= 70 so the first screen is not a wall`);
+  ok(w >= 25, `preamble is only ${w} words; too thin to orient a reader`);
+}
+
+/* The hinge claim, stated once by beat 6. It must not also appear in the
+   connective callouts, where it reads as repetition rather than teaching. */
+const connective = [...d.querySelectorAll("section > .callout p")].map(p => p.textContent).join(" ");
+ok(!/one arithmetic|two vocabularies|same arithmetic in different clothes/i.test(connective),
+   "the hinge idea is taught by the beats, not restated in the connective prose");
+
 console.log(fails === 0 ? "\nREADABILITY THRESHOLDS PASSED" : `\n${fails} READABILITY FAILURES:`);
 [...msgs].forEach(m => console.log("  -", m));
 if (fails) process.exitCode = 1;

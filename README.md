@@ -107,10 +107,10 @@ This is enforced by harnesses, not by intention (see `.verify/readability.mjs`).
 | 5 | Not every failure is a wall: three kinds of harm | Tools check only 30–40 % of the job |
 | 6 | Both columns are the same arithmetic | A 99 % score can fail a quarter of your users |
 
-Beat 2 is the hinge. "Two independent things must both happen" and "POUR's four principles must
-all hold" are the same logical shape. Once a reader accepts that, everything after is
-bookkeeping — and the claim "99 % isn't good enough" stops being an opinion and becomes a
-consequence.
+Beat 2 is load-bearing. "Two independent things must both happen" and "POUR's four principles must
+all hold" are the same logical shape, and a reader who accepts it has the whole method. Beat 6 then
+names the identity outright — the two columns were the same arithmetic all along — at which point
+"99 % isn't good enough" stops being an opinion and becomes a consequence.
 
 After the beats, **the running example** lets a reader click through an eight-step journey at 1 %
 per step and watch the risk accumulate. It states plainly that the 1 % and the eight steps are
