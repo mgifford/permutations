@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+.verify/node_modules/
+
+# npm lockfile for the local verification harness
+# (regenerate with `cd .verify && npm install`)
+.verify/package-lock.json
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log

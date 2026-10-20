@@ -1,0 +1,3064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cumulative Accessibility Risk Simulator — Emergency Heating Assistance Benefit</title>
+<style>
+  :root {
+    --ink: #12161c;
+    --ink-2: #333b47;
+    --muted: #5b6472;
+    --line: #b9c0cb;
+    --line-soft: #d8dde4;
+    --bg: #f3f5f8;
+    --panel: #ffffff;
+    --panel-2: #eef1f5;
+    --brand: #143a68;
+    --brand-2: #1d5ea8;
+    --warn: #8a4b00;
+    --warn-bg: #fff4e0;
+    --danger: #97122a;
+    --danger-bg: #fdeef1;
+    --ok: #0d5c33;
+    --ok-bg: #e8f5ee;
+    --focus: #0b5cad;
+    --radius: 10px;
+    --shadow: 0 1px 2px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.08);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    padding: 0 0 4rem;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 { line-height: 1.25; margin: 0 0 .5rem; text-wrap: balance; }
+  h1 { font-size: clamp(1.5rem, 1.1rem + 1.6vw, 2.1rem); }
+  h2 { font-size: clamp(1.2rem, 1rem + .8vw, 1.5rem); }
+  h3 { font-size: 1.1rem; }
+  h4 { font-size: 1rem; }
+  p { margin: 0 0 .8rem; }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: .92em; }
+
+  a { color: var(--brand-2); }
+  a:focus-visible, button:focus-visible, summary:focus-visible,
+  input:focus-visible, [tabindex]:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .skip {
+    position: absolute; left: -9999px; top: 0; z-index: 60;
+    background: var(--panel); color: var(--brand); padding: .7rem 1rem;
+    border: 2px solid var(--brand); border-radius: 6px; font-weight: 700;
+  }
+  .skip:focus { left: .75rem; top: .75rem; }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 1.1rem; }
+
+  header.masthead {
+    background: linear-gradient(180deg, #102b4d, var(--brand));
+    color: #fff;
+    padding: 2.2rem 0 1.8rem;
+    border-bottom: 4px solid var(--brand-2);
+  }
+  header.masthead p.sub { color: #d5e1f0; max-width: 62ch; margin-bottom: .4rem; }
+  .kicker {
+    text-transform: uppercase; letter-spacing: .12em; font-size: .75rem;
+    font-weight: 700; color: #a8c6e8; margin-bottom: .35rem;
+  }
+  .masthead-badges { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1rem; padding: 0; list-style: none; }
+  .masthead-badges li {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.3);
+    border-radius: 999px; padding: .2rem .7rem; font-size: .8rem; color: #e6eefb;
+  }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--line-soft);
+    border-radius: var(--radius); padding: 1.25rem 1.35rem; margin: 1.1rem 0;
+    box-shadow: var(--shadow);
+  }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .grid-2 { display: grid; gap: 1.1rem; grid-template-columns: 1fr; }
+  @media (min-width: 820px) { .grid-2 { grid-template-columns: 1fr 1fr; align-items: start; } }
+
+  .persona-card { background: var(--panel-2); border-left: 5px solid var(--brand-2); }
+  .persona-card dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: .35rem .8rem; }
+  .persona-card dt { font-weight: 700; color: var(--ink-2); }
+  .persona-card dd { margin: 0; }
+
+  .tag {
+    display: inline-block; font-size: .78rem; font-weight: 700;
+    padding: .12rem .55rem; border-radius: 999px; border: 1px solid;
+    white-space: nowrap;
+  }
+  .tag-perm { background: #ece7fa; color: #43269b; border-color: #b3a2e6; }
+  .tag-temp { background: var(--warn-bg); color: var(--warn); border-color: #e0b273; }
+  .tag-sit  { background: #e3f0fb; color: #0f4c7d; border-color: #9cc6e8; }
+  .tag-none { background: var(--panel-2); color: var(--muted); border-color: var(--line); }
+
+  .metrics { display: grid; grid-template-columns: 1fr; gap: .8rem; margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 620px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+  .metric {
+    border: 1px solid var(--line-soft); border-radius: 8px; padding: .7rem .85rem;
+    background: var(--panel-2);
+  }
+  .metric .label { font-size: .82rem; color: var(--muted); display: block; }
+  .metric .value { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--brand); }
+  .metric .note { font-size: .8rem; color: var(--muted); }
+
+  .controls { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+  button {
+    font: inherit; font-weight: 700; cursor: pointer;
+    border-radius: 8px; border: 2px solid transparent;
+    padding: .6rem 1.05rem; background: var(--brand); color: #fff;
+    min-height: 44px;
+  }
+  button.secondary { background: var(--panel); color: var(--brand); border-color: var(--brand); }
+  button.ghost { background: var(--panel); color: var(--ink-2); border-color: var(--line); }
+  button:hover { filter: brightness(1.08); }
+  button[disabled] { opacity: .45; cursor: not-allowed; filter: none; }
+
+  /* Journey rail */
+  .rail { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+  .rail li {
+    display: grid; grid-template-columns: 3.2rem 1fr auto;
+    gap: .75rem; align-items: center;
+    border: 1px solid var(--line-soft); border-radius: 8px;
+    padding: .45rem .6rem; background: var(--panel);
+  }
+  .rail .n {
+    font-weight: 800; font-variant-numeric: tabular-nums; color: var(--muted);
+    text-align: right; font-size: .92rem;
+  }
+  .rail .name { font-size: .95rem; }
+  .rail .name .elem { display: block; color: var(--muted); font-size: .82rem; }
+  .rail .status { font-size: .78rem; font-weight: 700; }
+  .rail li[data-state="pending"] { opacity: .55; }
+  .rail li[data-state="pass"] .n { color: var(--ok); }
+  .rail li[data-state="pass"] .status { color: var(--ok); }
+  .rail li[data-state="block"] { border-color: var(--danger); background: var(--danger-bg); }
+  .rail li[data-state="block"] .status { color: var(--danger); }
+  .rail li[data-state="block"] .n { color: var(--danger); }
+  .rail li[data-state="skipped"] { opacity: .45; border-style: dashed; }
+  .rail .stage-chip {
+    grid-column: 1 / -1; font-size: .74rem; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--brand-2);
+  }
+
+  /* Readout columns */
+  .readout { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+  @media (min-width: 720px) { .readout { grid-template-columns: 1fr 1fr; } }
+  .readout .box { border: 1px solid var(--line-soft); border-radius: 8px; padding: .85rem 1rem; background: var(--panel-2); }
+  .readout .box.all { background: var(--ok-bg); border-color: #a9d5bd; }
+  .readout .box.persona { background: #eef4fd; border-color: #a9c5e6; }
+  .readout h4 { margin-bottom: .35rem; }
+  .big-num { font-size: 1.9rem; font-weight: 800; font-variant-numeric: tabular-nums; display: block; }
+  .box.all .big-num { color: var(--ok); }
+  .box.persona .big-num { color: var(--brand-2); }
+
+  /* Bar chart */
+  .chart { display: grid; gap: .35rem; margin-top: .7rem; }
+  .bar-row { display: grid; grid-template-columns: 6.5rem 1fr 4.2rem; gap: .55rem; align-items: center; font-size: .85rem; }
+  .bar-track { background: var(--panel-2); border: 1px solid var(--line-soft); border-radius: 4px; height: 18px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--brand-2); }
+  .bar-fill.persona { background: var(--danger); }
+  .bar-val { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+
+  /* Failure record */
+  .record {
+    border: 2px solid var(--danger); border-left-width: 8px; border-radius: var(--radius);
+    background: var(--panel); padding: 1rem 1.15rem;
+  }
+  .record h3 { color: var(--danger); }
+  .record .stamp {
+    background: var(--danger-bg); color: var(--danger); border: 1px solid #e7a8b5;
+    border-radius: 6px; padding: .2rem .6rem; font-weight: 700; font-size: .82rem;
+    display: inline-block; margin-bottom: .6rem;
+  }
+  .record .quote {
+    border-left: 4px solid var(--brand-2); background: #f6f9fd;
+    padding: .75rem 1rem; margin: .6rem 0 0; font-style: italic;
+  }
+  .defect-dl { display: grid; grid-template-columns: auto 1fr; gap: .3rem .8rem; margin: .6rem 0; }
+  .defect-dl dt { font-weight: 700; color: var(--ink-2); }
+  .defect-dl dd { margin: 0; }
+
+  .verdict { border-radius: 8px; padding: .6rem .85rem; font-weight: 600; border: 1px solid; margin-top: .5rem; }
+  .verdict.flag { background: var(--danger-bg); border-color: #e7a8b5; color: var(--danger); }
+  .verdict.green { background: var(--ok-bg); border-color: #a9d5bd; color: var(--ok); }
+  .verdict.partial { background: var(--warn-bg); border-color: #e0b273; color: var(--warn); }
+
+  .table-scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+  caption { text-align: left; font-weight: 700; padding-bottom: .5rem; color: var(--ink-2); }
+  th, td { border: 1px solid var(--line-soft); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  thead th { background: var(--panel-2); }
+  tbody th { background: #f8fafc; font-weight: 600; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.hit td, tr.hit th { background: var(--danger-bg); }
+  tr.milestone th { color: var(--brand); }
+
+  .ledger { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+  .ledger li { border-left: 4px solid var(--brand-2); background: var(--panel-2); padding: .5rem .7rem; font-size: .9rem; border-radius: 0 6px 6px 0; }
+  .ledger .where { font-weight: 700; display: block; }
+  .ledger .meta { color: var(--muted); font-size: .82rem; }
+  .ledger li.ledger-empty { border-left-color: var(--line); opacity: .75; }
+  .ledger li.mech-terminal { border-left-color: var(--danger); background: var(--danger-bg); }
+  .ledger li.mech-spoon { border-left-color: var(--warn); background: var(--warn-bg); }
+  .ledger li.mech-effort { border-left-color: #5a3fa8; background: #f2eefc; }
+  .ledger li.mech-friction { border-left-color: var(--line); background: var(--panel); }
+
+  /* Mechanics + obligation source tags */
+  .tag.mech-terminal { background: var(--danger-bg); color: var(--danger); border-color: #e7a8b5; }
+  .tag.mech-spoon    { background: var(--warn-bg); color: var(--warn); border-color: #e0b273; }
+  .tag.mech-effort   { background: #f2eefc; color: #4a2f96; border-color: #b3a2e6; }
+  .tag.mech-friction { background: var(--panel-2); color: var(--ink-2); border-color: var(--line); }
+  .tag.src-wcag  { background: #e8f0fa; color: #103a68; border-color: #8fb4de; }
+  .tag.src-act   { background: #eaf3ea; color: #1c4d24; border-color: #93c096; }
+  .tag.src-fpc   { background: #fdf0e6; color: #7a3d09; border-color: #e5b48a; }
+  .tag.src-sys   { background: #f7ecf6; color: #6c1865; border-color: #d3a0ce; }
+  .tag.src-other { background: #f0f0f2; color: #3c4250; border-color: #c0c4cc; }
+
+  /* Records tinted by mechanic */
+  .record.mech-terminal { border-color: var(--danger); }
+  .record.mech-terminal h3 { color: var(--danger); }
+  .record.mech-terminal .stamp { background: var(--danger-bg); color: var(--danger); border-color: #e7a8b5; }
+  .record.mech-spoon { border-color: var(--warn); }
+  .record.mech-spoon h3 { color: var(--warn); }
+  .record.mech-spoon .stamp { background: var(--warn-bg); color: var(--warn); border-color: #e0b273; }
+  .record.mech-effort { border-color: #5a3fa8; }
+  .record.mech-effort h3 { color: #4a2f96; }
+  .record.mech-effort .stamp { background: #f2eefc; color: #4a2f96; border-color: #b3a2e6; }
+  .record.mech-friction { border-color: var(--line); }
+  .record.mech-friction h3 { color: var(--ink-2); }
+  .record.mech-friction .stamp { background: var(--panel-2); color: var(--ink-2); border-color: var(--line); }
+
+  /* Run settings fieldset */
+  fieldset.setup {
+    border: 1px solid var(--line-soft); border-radius: 8px; background: var(--panel-2);
+    margin: 1rem 0 0; padding: .85rem 1rem 1rem;
+  }
+  fieldset.setup legend { font-weight: 700; font-size: .9rem; color: var(--brand); padding: 0 .4rem; }
+  .setup-row { display: grid; grid-template-columns: 1fr; gap: .2rem; margin-bottom: .6rem; }
+  @media (min-width: 560px) {
+    .setup-row { grid-template-columns: 11.5rem 1fr; align-items: center; gap: .2rem .7rem; }
+  }
+  .setup-row label { font-size: .88rem; font-weight: 600; color: var(--ink-2); }
+  .setup-row select { font: inherit; padding: .4rem .5rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); min-height: 40px; }
+  .setup-note { font-size: .84rem; color: var(--muted); margin: .3rem 0 .8rem; }
+  .setup-actions { margin-top: .3rem; }
+
+  /* Run-state card */
+  .run-state { border: 1px solid var(--line-soft); border-radius: 8px; padding: .9rem 1rem; background: var(--panel); margin-top: 1rem; }
+  .run-state h3 { font-size: 1rem; }
+  .run-state-intro { font-size: .85rem; color: var(--muted); }
+  .metrics.compact { grid-template-columns: repeat(2, 1fr); }
+  .bar-track.small { display: block; height: 8px; margin-top: .3rem; }
+  .bar-fill.spoon { background: var(--warn); }
+
+  /* End banner */
+  .end-banner { border-radius: var(--radius); padding: .85rem 1.1rem; font-weight: 600; margin-top: 1rem; border: 2px solid; }
+  .end-banner.ok { background: var(--ok-bg); border-color: #a9d5bd; color: var(--ok); }
+  .end-banner.spent { background: var(--warn-bg); border-color: #e0b273; color: var(--warn); }
+  .end-banner.blocked { background: var(--danger-bg); border-color: #e7a8b5; color: var(--danger); }
+
+  .legend-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; margin-top: 1.1rem; }
+  @media (min-width: 820px) { .legend-grid { grid-template-columns: 1fr 1fr; } }
+  .legend { border: 1px solid var(--line-soft); border-radius: 8px; padding: .8rem 1rem; background: var(--panel-2); }
+  .legend h3 { font-size: .98rem; }
+  .legend-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .55rem; font-size: .88rem; }
+  .legend-list li { padding-left: 0; }
+
+  .callout { border-left: 5px solid var(--brand-2); background: #f6f9fd; padding: .85rem 1rem; border-radius: 0 8px 8px 0; }
+  .callout.warn { border-left-color: var(--warn); background: var(--warn-bg); }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  ol.formula { list-style: decimal; padding-left: 1.4rem; }
+  ol.formula li { margin-bottom: .5rem; }
+
+  details.notes { border: 1px solid var(--line-soft); border-radius: 8px; padding: .4rem .8rem; background: var(--panel); }
+  details.notes summary { cursor: pointer; font-weight: 700; padding: .3rem 0; }
+  details.notes[open] summary { border-bottom: 1px dashed var(--line); margin-bottom: .6rem; }
+
+  footer.foot { color: var(--muted); font-size: .88rem; margin-top: 2rem; }
+
+  @media print {
+    body { background: #fff; }
+    .controls, .skip { display: none !important; }
+    .panel, .record { box-shadow: none; break-inside: avoid; }
+    a[href^="http"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #444; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to simulation</a>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker">Service Design Evidence Artefact</p>
+    <h1>Cumulative Accessibility Risk Simulator</h1>
+    <p class="sub">
+      An interactive, step-by-step journey model of a critical public service:
+      <strong>Applying for an Emergency Heating Assistance Benefit</strong> on a state/provincial portal.
+      30 discrete interactions, 4 sequential stages, one citizen, one 99&nbsp;% accessible build.
+    </p>
+    <ul class="masthead-badges">
+      <li>Microsoft Persona Spectrum</li>
+      <li>WCAG 2.2</li>
+      <li>W3C ACT Rules</li>
+      <li>Section 508 / EN 301 549 FPC</li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <section class="panel" aria-labelledby="h-brief">
+    <h2 id="h-brief">The proposition under test</h2>
+    <p>
+      A monitoring dashboard reports the portal is <strong>99&nbsp;% accessible</strong>. Every page tripod
+      check for Lighthouse and axe-core returns a perfect 100. The press release says the service now
+      "meets WCAG 2.2 AA."
+    </p>
+    <div class="callout warn">
+      <p><strong>The question this simulator answers:</strong> what is the probability that a single citizen
+      completes the <em>whole</em> 30-step task — not one page, the entire journey?</p>
+      <p style="margin-bottom:0">Because a journey is a <strong>serial system</strong>, component reliability multiplies.
+      A per-step pass rate of <span class="mono">p&nbsp;=&nbsp;0.99</span> yields <span class="mono">0.99³⁰ ≈ 73.97&nbsp;%</span> end-to-end
+      completion. Hiding inside that headline percentage is a concrete injury to at least one person.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-persona">
+    <h2 id="h-persona">1. Citizen persona (assigned at random)</h2>
+    <p>
+      Each run draws one capability from each of the four Persona Spectrum domains, then one
+      severity level — Permanent, Temporary, or Situational. A persona with more than one active
+      constraint experiences <em>compounding</em> risk, not additive risk.
+    </p>
+
+    <div class="grid-2">
+      <div>
+        <div id="personaCard" class="panel persona-card" aria-live="polite">
+          <p class="tag tag-none">Not yet generated</p>
+        </div>
+      </div>
+      <div>
+        <div class="controls">
+          <button type="button" id="startBtn">Run simulation</button>
+          <button type="button" id="stepBtn" class="secondary" disabled>Advance 1 step</button>
+          <button type="button" id="runAllBtn" class="ghost" disabled>Run to completion</button>
+          <button type="button" id="resetBtn" class="ghost" disabled>Reset</button>
+        </div>
+
+        <fieldset class="setup">
+          <legend>Run settings — random by default, override any axis</legend>
+
+          <div class="setup-row">
+            <label for="qualitySelect">Component quality (per interaction)</label>
+            <select id="qualitySelect">
+              <option value="0.999">99.9 % per component (excellent)</option>
+              <option value="0.99" selected>99 % per component (the brief's baseline)</option>
+              <option value="0.97">97 % per component (typical complex service)</option>
+              <option value="0.95">95 % per component (pre-remediation)</option>
+            </select>
+          </div>
+
+          <div class="setup-row">
+            <label for="difficultySelect">Recovery difficulty</label>
+            <select id="difficultySelect">
+              <option value="forgiving">Forgiving — good support, easy retries (0.5× cost)</option>
+              <option value="standard" selected>Standard — web form, no help offered (1.0× cost)</option>
+              <option value="hostile">Hostile — deadline pressure, no channel (1.6× cost)</option>
+            </select>
+          </div>
+
+          <p class="setup-note" id="personaStatus">
+            Persona axes are drawn at random. Pin any of them below to run a specific citizen —
+            unpinned axes stay random. Pinning chooses <em>who</em> meets the build's defects; it does
+            not change which defects the build has.
+          </p>
+
+          <div class="setup-row" data-domain="vision">
+            <label for="ovVision">Vision</label>
+            <select id="ovVision" data-override="vision">
+              <option value="">Random</option>
+              <option value="Permanent">Permanent — blind</option>
+              <option value="Temporary">Temporary — low vision after treatment</option>
+              <option value="Situational">Situational — screen glare</option>
+            </select>
+          </div>
+          <div class="setup-row" data-domain="motor">
+            <label for="ovMotor">Motor / touch</label>
+            <select id="ovMotor" data-override="motor">
+              <option value="">Random</option>
+              <option value="Permanent">Permanent — keyboard-only</option>
+              <option value="Temporary">Temporary — one-handed injury</option>
+              <option value="Situational">Situational — holding a toddler</option>
+            </select>
+          </div>
+          <div class="setup-row" data-domain="cognition">
+            <label for="ovCognition">Cognition</label>
+            <select id="ovCognition" data-override="cognition">
+              <option value="">Random</option>
+              <option value="Permanent">Permanent — executive function</option>
+              <option value="Temporary">Temporary — migraine</option>
+              <option value="Situational">Situational — crisis and time pressure</option>
+            </select>
+          </div>
+          <div class="setup-row" data-domain="hearing">
+            <label for="ovHearing">Hearing / speech</label>
+            <select id="ovHearing" data-override="hearing">
+              <option value="">Random</option>
+              <option value="Permanent">Permanent — Deaf</option>
+              <option value="Temporary">Temporary — laryngitis</option>
+              <option value="Situational">Situational — noisy transit</option>
+            </select>
+          </div>
+
+          <div class="setup-actions">
+            <button type="button" id="randomBtn" class="ghost">Clear overrides — go random</button>
+          </div>
+        </fieldset>
+
+        <p class="sr-only" id="progressLive" aria-live="polite"></p>
+        <ul class="metrics" style="margin-top:1rem">
+          <li class="metric">
+            <span class="label">Current step</span>
+            <span class="value" id="mStep">0 / 30</span>
+            <span class="note" id="mStage">Not started</span>
+          </li>
+          <li class="metric">
+            <span class="label">P(journey failure) — general user</span>
+            <span class="value" id="mAll">0.00 %</span>
+            <span class="note">1 − (1 − p)ⁿ</span>
+          </li>
+          <li class="metric">
+            <span class="label">P(journey failure) — this persona</span>
+            <span class="value" id="mPersona">0.00 %</span>
+            <span class="note" id="mPersonaNote">multi-domain compounding applied</span>
+          </li>
+          <li class="metric">
+            <span class="label">Defects revealed</span>
+            <span class="value" id="mBlocks">0</span>
+            <span class="note" id="mBlockNote">no defects revealed yet</span>
+          </li>
+        </ul>
+
+        <div id="runStateCard" class="run-state">
+          <h3 id="runStateHeading">Run state — the citizen's finite capacity</h3>
+          <p class="run-state-intro">
+            Spoon Theory: a citizen starts with a finite pool of capacity. Each barrier draws it down.
+            Nothing "fails" them — they run out, and then they stop, which is a different ending.
+          </p>
+          <ul class="metrics compact">
+            <li class="metric">
+              <span class="label">Spoons remaining</span>
+              <span class="value" id="mSpoons">100 / 100</span>
+              <span class="bar-track small"><span class="bar-fill spoon" id="mSpoonsBar" style="width:100%"></span></span>
+            </li>
+            <li class="metric">
+              <span class="label">Confidence in the service</span>
+              <span class="value" id="mConfidence">100 %</span>
+              <span class="bar-track small"><span class="bar-fill persona" id="mConfidenceBar" style="width:100%"></span></span>
+            </li>
+            <li class="metric">
+              <span class="label">Time spent</span>
+              <span class="value" id="mTime">0 min</span>
+              <span class="note">friction and retries only</span>
+            </li>
+            <li class="metric">
+              <span class="label">Interaction attempts</span>
+              <span class="value" id="mAttempts">0</span>
+              <span class="note">steps plus retries</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="endBanner" class="end-banner" role="status" hidden>
+      <p id="endBannerText" style="margin:0"></p>
+    </div>
+
+    <div class="legend-grid">
+      <section class="legend" aria-labelledby="legend-mech">
+        <h3 id="legend-mech">Four ways a defect can treat a citizen</h3>
+        <ul id="mechLegend" class="legend-list">
+          <li><span class="tag mech-terminal">TERMINAL</span> Pass or fail. One roll, the journey is over.
+            Example: a drag-only upload with no keyboard path.</li>
+          <li><span class="tag mech-spoon">SPOON COST</span> No wall at all. Each encounter drains a finite
+            energy pool. Enough of them and the citizen gives up — an ending no conformance report records.</li>
+          <li><span class="tag mech-effort">EFFORT</span> Recoverable, at a price: extra attempts, minutes,
+            and confidence spent on working around the service instead of using it.</li>
+          <li><span class="tag mech-friction">FRICTION</span> A genuine violation that stops nobody.
+            Real, reportable, and not the reason anyone fails.</li>
+        </ul>
+      </section>
+      <section class="legend" aria-labelledby="legend-origin">
+        <h3 id="legend-origin">Five places the obligation comes from</h3>
+        <ul id="originLegend" class="legend-list">
+          <li><span class="tag src-wcag">WCAG 2.2</span> A success criterion is failed.</li>
+          <li><span class="tag src-act">ACT RULE</span> The standardised test surface — and where it
+            silently passes.</li>
+          <li><span class="tag src-fpc">FPC</span> Section 508 / EN 301 549 functional performance criteria,
+            which describe the citizen rather than the code.</li>
+          <li><span class="tag src-sys">SYSTEMIC</span> A barrier entirely outside WCAG 2.2 — a policy,
+            channel, device, language, or identity-proofing exclusion. No SC is violated and the citizen
+            is still stopped.</li>
+          <li><span class="tag src-other">LAW / POLICY</span> A statutory or business rule with no
+            rendering requirement attached.</li>
+        </ul>
+      </section>
+    </div>
+
+    <div class="chart" role="img" aria-labelledby="chartCaption">
+      <p id="chartCaption" class="sr-only">
+        Bar chart of cumulative journey failure probability under two models: the general
+        component model (p = 0.01) and the persona-weighted multi-domain model.
+        The data table immediately below the chart is the accessible equivalent.
+      </p>
+      <div class="bar-row">
+        <span>General users</span>
+        <span class="bar-track"><span class="bar-fill" id="barAll" style="width:0%"></span></span>
+        <span class="bar-val" id="barAllVal">0 %</span>
+      </div>
+      <div class="bar-row">
+        <span>This persona</span>
+        <span class="bar-track"><span class="bar-fill persona" id="barPersona" style="width:0%"></span></span>
+        <span class="bar-val" id="barPersonaVal">0 %</span>
+      </div>
+    </div>
+
+    <details class="notes" style="margin-top:.8rem">
+      <summary>Accessible equivalent: cumulative completion data table</summary>
+      <div class="table-scroll">
+        <table id="completionTable">
+          <caption>Journey completion probability by step count, general model (p = 0.01)</caption>
+          <thead>
+            <tr>
+              <th scope="col">Steps completed (n)</th>
+              <th scope="col" class="num">P(failure) general</th>
+              <th scope="col" class="num">P(completion) general</th>
+              <th scope="col" class="num">P(failure) persona</th>
+            </tr>
+          </thead>
+          <tbody id="completionBody"></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details class="notes" style="margin-top:.6rem">
+      <summary>How the persona-weighted probability is calculated</summary>
+      <ol class="formula">
+        <li><strong>Component model.</strong> Baseline defect rate <span class="mono">p = 0.01</span> (99&nbsp;% component-level accessibility).</li>
+        <li><strong>Defect clustering.</strong> Accessibility defects are not uniformly distributed. Automated
+          tooling concentrates on the ~30&nbsp;% of WCAG 2.2 A/AA criteria it can decide; defects concentrate in
+          semantic structure, keyboard/focus management, and pointer interactions.</li>
+        <li><strong>Conditional exposure.</strong> For persona <span class="mono">i</span> with sensitivity
+          <span class="mono">R<sub>i</sub></span> to the affected criterion families:
+          <br><span class="mono">p<sub>i</sub> = min(0.14, p × R<sub>i</sub>)</span></li>
+        <li><strong>Multi-domain compounding.</strong> A persona constrained in
+          <span class="mono">k</span> domains carries <span class="mono">p<sub>i</sub> = min(0.14, 0.002 × ΣR<sub>d</sub>)</span>.</li>
+        <li><strong>Journey model.</strong> <span class="mono">P(failure) = 1 − (1 − p<sub>i</sub>)ⁿ</span> —
+          mathematically identical to hardware serial/availability reliability.</li>
+        <li><strong>Bound.</strong> Defects that are not merely <em>friction</em> but true task
+          <strong>blockers</strong> (e.g. no keyboard path to a control) have <span class="mono">p<sub>i</sub> = 1.00</span>.
+          For those, no probability reduces: the journey ends at that step, deterministically.</li>
+      </ol>
+      <p style="margin-bottom:0"><em>R<sub>i</sub> denotes relative exposure to the defect families that
+      matter for that domain — it is an explanatory weighting for the reliability curve, not a per-person
+      clinical prediction.</em></p>
+    </details>
+  </section>
+
+  <section class="panel" aria-labelledby="h-population">
+    <h2 id="h-population">3. The defensible calculation — population-level, deterministic</h2>
+    <p>
+      Everything above this point depends on how a persona is drawn. That is fine for illustration and
+      useless for argument. This section contains <strong>no random draw at all</strong>: every figure is
+      either a published statistic or a labelled assumption, and re-running it gives the same answer.
+      If you disagree with the result, the disagreement belongs at the inputs — which are stated.
+    </p>
+
+    <h3>Three severities, not one</h3>
+    <p>"Accessibility error" is not a single thing. The model separates three outcomes, because they
+    have nothing in common mathematically:</p>
+    <ul>
+      <li><span class="tag mech-terminal">TOTAL BLOCKER</span> No path exists. Removes 100&nbsp;% of the
+        affected Functional Performance Criteria group from the journey. Example: drag-only upload with no
+        keyboard alternative, where SC 2.5.7 has <em>no published ACT rule</em>.</li>
+      <li><span class="tag mech-spoon">PARTIAL BLOCKER</span> A path exists for <em>part</em> of the group.
+        Removes the share with no alternative route — a figure taken from survey data where one exists,
+        and labelled as an assumption where none does. Example: pointer-only date-picker, which excludes
+        the 60.4&nbsp;% of low-vision respondents who navigate by keyboard.</li>
+      <li><span class="tag mech-friction">DEGRADER</span> Blocks no one. Raises error and abandonment rate,
+        which compounds over 30 steps. Example: low contrast, the single most-reported failure on the web.</li>
+    </ul>
+
+    <div class="callout warn">
+      <p style="margin:0"><strong>There are no published numbers for partial-blocker fractions.</strong>
+      This is a genuine gap in the evidence base, not an oversight here. No standards body publishes the
+      share of a disability group that has no alternative path to a given widget. Every such figure in
+      this model is therefore stated as an explicit assumption with a range, is listed in the assumptions
+      table below, and is marked <em>assumption</em> in the defect record. The total blockers need no such
+      assumption: the absence of a path is observable.</p>
+    </div>
+
+    <h3>Inputs and their sources</h3>
+    <div class="table-scroll">
+      <table id="popInputsTable">
+        <caption>Population model inputs — published figures carry a citation; assumptions carry a range</caption>
+        <thead>
+          <tr>
+            <th scope="col">Input</th>
+            <th scope="col">Value</th>
+            <th scope="col" class="num">Source</th>
+            <th scope="col">Kind</th>
+          </tr>
+        </thead>
+        <tbody id="popInputsBody"></tbody>
+      </table>
+    </div>
+
+    <h3>Result — completion by population group</h3>
+    <p>
+      This is the number that matters. Note that it is <em>not</em> the vendor's figure, and that it
+      barely moves when component quality improves, because the dominant losses are unrecoverable walls
+      rather than the friction that quality improvements address.
+    </p>
+    <div class="table-scroll">
+      <table id="popResultTable">
+        <caption>Journey completion by Functional Performance Criteria group and by component quality</caption>
+        <thead>
+          <tr>
+            <th scope="col">FPC group</th>
+            <th scope="col" class="num">US adult prevalence</th>
+            <th scope="col" class="num">Loss to blockers</th>
+            <th scope="col" class="num">Group completion</th>
+            <th scope="col">Primary cause</th>
+          </tr>
+        </thead>
+        <tbody id="popResultBody"></tbody>
+      </table>
+    </div>
+
+    <h3>Population completion across the quality dial</h3>
+    <p>
+      The row marked <em>unaided users</em> is the number a compliance dashboard reports. The rows below
+      it are the population, and the gap between them is the false assurance. The spread across
+      automated-catch-rate assumptions is shown so the extrapolation is visible rather than implied.
+    </p>
+    <div class="table-scroll">
+      <table id="popQualityTable">
+        <caption>Population completion at each component quality setting, across three automated-catch-rate assumptions</caption>
+        <thead>
+          <tr>
+            <th scope="col">Component quality</th>
+            <th scope="col" class="num">Unaided users only (vendor figure)</th>
+            <th scope="col" class="num">Population @ 30 % auto-catch</th>
+            <th scope="col" class="num">Population @ 40 % auto-catch</th>
+            <th scope="col" class="num">Population @ 50 % auto-catch</th>
+          </tr>
+        </thead>
+        <tbody id="popQualityBody"></tbody>
+      </table>
+    </div>
+
+    <div class="callout" id="popSummary">
+      <p style="margin:0" id="popSummaryText"></p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-journey">
+    <h2 id="h-journey">4. The 30-interaction journey</h2>
+    <p>
+      Milestone steps (1, 5, 10, 20, 30) carry full narrative treatment as the run advances.
+      Blocking defects are seeded at published rates and revealed live.
+    </p>
+    <ol class="rail" id="rail"></ol>
+  </section>
+
+  <section class="panel" aria-labelledby="h-readout">
+    <h2 id="h-readout">5. Live probabilistic readout</h2>
+    <div class="readout">
+      <div class="box all">
+        <h4>The general journey</h4>
+        <span class="big-num" id="roAll">0.00 %</span>
+        <p style="margin:0"><span class="mono" id="roAllFormula">1 − (0.99)^0 = 0.00 %</span></p>
+        <p style="margin:.3rem 0 0; font-size:.85rem">
+          The number the vendor publishes when they average their component checks: 99&nbsp;% each,
+          73.97&nbsp;% for the whole form.
+        </p>
+      </div>
+      <div class="box persona">
+        <h4>This citizen's journey</h4>
+        <span class="big-num" id="roPersona">0.00 %</span>
+        <p style="margin:0"><span class="mono" id="roPersonaFormula">p = 0.0100, n = 0</span></p>
+        <p style="margin:.3rem 0 0; font-size:.85rem" id="roPersonaNote">
+          Weighted for combined domain constraints.
+        </p>
+      </div>
+    </div>
+    <p id="milestoneOut" class="callout" style="margin-top:1rem" hidden></p>
+  </section>
+
+  <section class="panel" aria-labelledby="h-record">
+    <h2 id="h-record">6. Defect record</h2>
+    <div id="recordOut" aria-live="polite">
+      <p style="margin:0">No defect has manifested yet. Run the simulation to reveal the first
+      barrier the citizen meets — with its mechanic, obligation source, WCAG/ACT/FPC citation,
+      first-person account, and an automated-scanner verdict.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-ledger">
+    <h2 id="h-ledger">7. Journey defect ledger</h2>
+    <p>Every barrier this run has revealed, in order of occurrence, tagged by mechanic and
+    obligation source. Note how few of them are walls — and how many are not conformance
+    failures at all.</p>
+    <ol class="ledger" id="ledgerOut">
+      <li class="ledger-empty"><span class="where">Empty ledger</span><span class="meta">No defects revealed yet.</span></li>
+    </ol>
+
+    <div id="sysLedgerWrap" hidden>
+      <h3 style="margin-top:1.2rem">Non-WCAG systemic barriers</h3>
+      <p>Barriers that stop citizens cold while violating no success criterion. They are the
+      clearest demonstration that conformance and access are not the same measurement.</p>
+      <ol class="ledger" id="sysLedger">
+        <li class="ledger-empty"><span class="where">Empty ledger</span><span class="meta">No non-WCAG barriers triggered yet.</span></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-scanner">
+    <h2 id="h-scanner">8. Why automated scanners report green</h2>
+    <p>
+      Deque's own published position, and the U.S. General Services Administration's testing guidance,
+      both state that automated testing detects roughly 30–40&nbsp;% of WCAG 2.2 A/AA success criteria
+      (GSA's figure is closer to 30&nbsp;%; Deque reports ~40&nbsp;% of issues). The residual 60&nbsp;%+ requires
+      human judgment and assistive technology. The average vendor audit in the WebAIM Million corpus of
+      the top one million home pages (2025) still finds 51 accessibility errors per home page, despite
+      years of automated monitoring.
+    </p>
+    <p>
+      Every defect in this run's ledger is one a crawler cannot decide. The scanner tests the
+      <em>DOM at load</em>. It does not test the <em>journey through time</em>.
+    </p>
+  </section>
+
+  <section class="panel" id="execSummary" aria-labelledby="h-exec" hidden>
+    <h2 id="h-exec">9. Executive summary</h2>
+    <div id="execBody"></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-method">
+    <h2 id="h-method">Method notes, sources, and limits</h2>
+    <details class="notes" open>
+      <summary>What the mathematical model does and does not claim</summary>
+      <ul>
+        <li>The <strong>product-of-reliabilities</strong> result — <span class="mono">1 − (1−p)ⁿ</span> — follows
+          directly from treating independent steps as a serial system. It is exact arithmetic, not a heuristic.</li>
+        <li>Step independence is a <strong>modelling simplification for explanatory purposes</strong>.
+          Real automated tests are strongly correlated: a widget library that ships one broken pattern breaks
+          every instance of it. Correlation narrows the variance around the mean; it does not eliminate
+          the expected loss of task completion.</li>
+        <li>The <strong>recovery term</strong>. Because defects are not uniformly fatal, the live run separates
+          two kinds: friction defects (which the citizen may work around, at cost) and deterministic
+          <strong>blockers</strong> (which end the task). Only blockers stop the run. This prevents the
+          simulator from overstating the loss and keeps the arithmetic honest.</li>
+        <li><strong>R<sub>i</sub> weightings are illustrative.</strong> They express relative exposure by
+          capability domain and should be calibrated with real task-completion data before being quoted
+          as a forecast for any specific population.</li>
+        <li>The <strong>99&nbsp;% baseline is a stipulation</strong>, generously granted for the sake of argument.
+          Published government benchmarking for complex multi-step services sits far below it.</li>
+      </ul>
+    </details>
+    <details class="notes">
+      <summary>Standards, rules, and sources referenced in this artefact</summary>
+      <ul>
+        <li><strong>WCAG 2.2</strong> — W3C Recommendation. Success Criteria cited here: 1.1.1 Non-text Content;
+          1.3.1 Info and Relationships; 1.3.2 Meaningful Sequence; 1.4.1 Use of Color; 2.1.1 Keyboard;
+          2.2.1 Timing Adjustable; 2.4.3 Focus Order; 2.4.4 Link Purpose (In Context); 2.4.6 Headings and Labels;
+          2.4.7 Focus Visible; 2.4.11 Focus Not Obscured (Minimum); 2.5.1 Pointer Gestures; 2.5.7 Dragging Movements;
+          2.5.8 Target Size (Minimum); 3.2.2 On Input; 3.3.1 Error Identification; 3.3.2 Labels or Instructions;
+          3.3.3 Error Suggestion; 3.3.7 Redundant Entry; 4.1.2 Name, Role, Value; 4.1.3 Status Messages.</li>
+        <li><strong>W3C ACT Rules</strong> — <span class="mono">c487ae</span> Link has non-empty accessible name;
+          <span class="mono">97a4e1</span> Button has non-empty accessible name;
+          <span class="mono">e086e5</span> Form field has non-empty accessible name;
+          <span class="mono">cc0f0a</span> Form field label is descriptive (proposed);
+          <span class="mono">2779a5</span> HTML page has non-empty title;
+          <span class="mono">c4a8a4</span> HTML page title is descriptive;
+          <span class="mono">d0f69e</span> Table header cell has assigned cells (proposed);
+          <span class="mono">80af7b</span> Focusable element has no keyboard trap (proposed);
+          <span class="mono">bc4a75</span> ARIA required owned elements;
+          <span class="mono">ff89c9</span> ARIA required context role;
+          <span class="mono">b4f0c3</span> Meta viewport allows for zoom.
+          Note: WCAG 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum) and 2.4.11 have
+          <em>no ACT rule yet</em> — a structural gap in the standardised test surface.</li>
+        <li><strong>Section 508 / EN 301 549 Functional Performance Criteria</strong> (the Chapter 3 / Clause 4
+          statement set): 302.1 / 4.2.1 Without Vision; 302.2 / 4.2.2 With Limited Vision;
+          302.3 / 4.2.3 Without Perception of Colour; 302.4 / 4.2.4 Without Hearing;
+          302.5 / 4.2.5 With Limited Hearing; 302.6 / 4.2.6 Without Speech;
+          302.7 / 4.2.7 With Limited Manipulation; 302.8 / 4.2.8 With Limited Reach and Strength;
+          302.9 / 4.2.9 With Limited Language, Cognitive, and Learning Abilities.</li>
+        <li><strong>Microsoft Inclusive Design</strong> — the Persona Spectrum: Permanent, Temporary,
+          Situational, applied across Vision, Motor/Touch, Cognition, and Hearing/Speech.</li>
+        <li><strong>Automated coverage evidence</strong> — Deque Systems (~40&nbsp;% of issues detectable by
+          automation); GSA Section 508 testing guidance (~30&nbsp;% of success criteria);
+          WebAIM Million 2025 (51 errors per home page average).</li>
+        <li><strong>Journey mapping practice</strong> — Government of Canada CSPS Journey Map job aid;
+          UK GDS design notes on user journey mapping; Ontario Digital Service journey mapping guide.</li>
+      </ul>
+    </details>
+    <details class="notes">
+      <summary>Scope and disclaimer</summary>
+      <p style="margin-bottom:0">
+        This artefact is a teaching and advocacy model, not a conformance claim, not a legal opinion,
+        and not a substitute for manual testing with assistive technology. It is designed to be quoted
+        carefully: quote the arithmetic and the standards citations, not the illustrative weightings,
+        which require calibration against real completion data.
+      </p>
+    </details>
+  </section>
+
+  <footer class="foot">
+    <p>Single-file artefact. No network requests, no external fonts, no tracking. Keyboard-operable end to end;
+    status changes are announced through ARIA live regions; charts have data-table equivalents; motion is
+    limited to a status pulse.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ------------------------------------------------------------------ *
+   * 0. Model constants
+   * ------------------------------------------------------------------ */
+  var P_BASE = 0.01;          // default 99% component-level accessibility
+  var N      = 30;
+
+  /* Three failure mechanics. Each defect declares which one it uses.
+     This is the heart of the model: a defect is not automatically a wall. */
+  var MECHANIC = {
+    TERMINAL: "terminal",   // pass/fail: one roll, the journey is over
+    SPOON:    "spoon",      // no wall, but each attempt drains finite energy
+    EFFORT:   "effort",     // retryable; costs an attempt, time and confidence
+    FRICTION: "friction"    // never stops progress; costs comfort and confidence
+  };
+
+  /* Obligation source: where the barrier's authority comes from.
+     Not every barrier is a WCAG conformance failure — and not every WCAG
+     failure is a barrier. These are two orthogonal axes. */
+  var ORIGIN = {
+    WCAG:     { id: "wcag",     label: "WCAG 2.2 Success Criterion", cls: "src-wcag" },
+    ACT:      { id: "act",      label: "W3C ACT Rule",                cls: "src-act" },
+    FPC:      { id: "fpc",      label: "Section 508 / EN 301 549 FPC", cls: "src-fpc" },
+    SYSTEMIC: { id: "systemic", label: "Systemic barrier — outside WCAG 2.2", cls: "src-sys" },
+    OTHER:    { id: "other",    label: "Law / policy / platform barrier", cls: "src-other" }
+  };
+
+  /* Default component quality options, selectable by the user. */
+  var QUALITY = [
+    { id: "0.999", label: "99.9 % per component (excellent)", p: 0.001 },
+    { id: "0.99",  label: "99 % per component (the brief's baseline)", p: 0.01 },
+    { id: "0.97",  label: "97 % per component (typical complex service)", p: 0.03 },
+    { id: "0.95",  label: "95 % per component (pre-remediation)", p: 0.05 }
+  ];
+
+  /* Recovery difficulty: multiplies the spoon/effort cost of every defect. */
+  var DIFFICULTY = [
+    { id: "forgiving", label: "Forgiving — good support, easy retries", mult: 0.5 },
+    { id: "standard",  label: "Standard — web form, no help offered",    mult: 1.0 },
+    { id: "hostile",   label: "Hostile — deadline pressure, no channel", mult: 1.6 }
+  ];
+
+  var STAGES = [
+    { id: 1, name: "Eligibility Screener" },
+    { id: 2, name: "Identity & Authentication" },
+    { id: 3, name: "Financial Details & File Upload" },
+    { id: 4, name: "Declaration, Signature & Confirmation" }
+  ];
+
+  /* 30 interactions across 4 sequential stages. */
+  var STEPS = [
+    // Stage 1 — 5 interactions
+    { n: 1,  s: 1, name: "Privacy notice accordion",           elem: "Expandable panel (details/summary)" },
+    { n: 2,  s: 1, name: "Household size radio group",         elem: "Radio group (fieldset/legend)" },
+    { n: 3,  s: 1, name: "Primary heat source select",         elem: "Native select" },
+    { n: 4,  s: 1, name: "Income threshold explanatory link",  elem: "Inline link to policy page" },
+    { n: 5,  s: 1, name: "Start application button",           elem: "Primary action button" },
+    // Stage 2 — 8 interactions
+    { n: 6,  s: 2, name: "Legal name text inputs",             elem: "Text inputs + autocomplete" },
+    { n: 7,  s: 2, name: "Date of birth input mask",           elem: "Masked text input" },
+    { n: 8,  s: 2, name: "Government ID number field",         elem: "Numeric input" },
+    { n: 9,  s: 2, name: "ID format validation error",         elem: "Inline error summary" },
+    { n: 10, s: 2, name: "Two-factor authentication prompt",   elem: "Modal dialog + OTP entry" },
+    { n: 11, s: 2, name: "OTP resend countdown link",          elem: "Timed control + link" },
+    { n: 12, s: 2, name: "Session-expiry warning modal",       elem: "Auto-triggered dialog" },
+    { n: 13, s: 2, name: "Continue to financial details",      elem: "Submit button" },
+    // Stage 3 — 12 interactions
+    { n: 14, s: 3, name: "Household income data table",        elem: "Data table, header association" },
+    { n: 15, s: 3, name: "Table pagination controls",          elem: "Pagination buttons" },
+    { n: 16, s: 3, name: "Month selector",                     elem: "Custom listbox dropdown" },
+    { n: 17, s: 3, name: "Applicant birth date",               elem: "Custom date-picker input" },
+    { n: 18, s: 3, name: "Proof-of-income upload zone",        elem: "Drag-and-drop file upload" },
+    { n: 19, s: 3, name: "Upload progress indicator",          elem: "Progress bar (role=progressbar)" },
+    { n: 20, s: 3, name: "Bank statement file upload",         elem: "Drag-and-drop file upload" },
+    { n: 21, s: 3, name: "Upload size validation alert",       elem: "Alert banner (role=alert)" },
+    { n: 22, s: 3, name: "Income amount currency fields",      elem: "Currency inputs" },
+    { n: 23, s: 3, name: "Benefit amount live estimate",       elem: "Live-updating status text" },
+    { n: 24, s: 3, name: "Save draft and return later",        elem: "Save control + confirmation" },
+    { n: 25, s: 3, name: "Uploaded documents review list",     elem: "Summary list of files" },
+    // Stage 4 — 5 interactions
+    { n: 26, s: 4, name: "Declaration review accordion",       elem: "Expandable panel" },
+    { n: 27, s: 4, name: "Signature canvas",                   elem: "Canvas draw signature" },
+    { n: 28, s: 4, name: "Attestation checkbox",               elem: "Checkbox with label" },
+    { n: 29, s: 4, name: "Final declaration submit",           elem: "Final submit button" },
+    { n: 30, s: 4, name: "Acknowledgement page",               elem: "Confirmation page / reference ID" }
+  ];
+
+  /* ------------------------------------------------------------------ *
+   * 1. Persona Spectrum data
+   * ------------------------------------------------------------------ */
+  var DOMAINS = {
+    vision: {
+      label: "Vision",
+      levels: [
+        { level: "Permanent",  tag: "tag-perm", name: "Blind / low vision screen reader user",
+          note: "Navigates by heading, landmark, form label, and announced state — never by layout." },
+        { level: "Temporary",  tag: "tag-temp", name: "Dilated pupils after a medical eye exam",
+          note: "Blurred vision, extreme light sensitivity, reduced contrast tolerance for 4–6 hours." },
+        { level: "Situational", tag: "tag-sit", name: "Severe screen glare in direct sunlight",
+          note: "Waiting at a bus stop with an 8-year-old phone and no usable contrast." }
+      ]
+    },
+    motor: {
+      label: "Motor / Touch",
+      levels: [
+        { level: "Permanent",  tag: "tag-perm", name: "Cerebral palsy, keyboard-only user",
+          note: "No reliable fine pointer control. Operates every control by keyboard, including drag-and-drop." },
+        { level: "Temporary",  tag: "tag-temp", name: "Sprained dominant wrist",
+          note: "One-handed pointer use, reduced precision, early fatigue on long forms." },
+        { level: "Situational", tag: "tag-sit", name: "Holding a toddler with one arm",
+          note: "One thumb in use, intermittent attention, movement that defeats hover states." }
+      ]
+    },
+    cognition: {
+      label: "Cognition",
+      levels: [
+        { level: "Permanent",  tag: "tag-perm", name: "ADHD with dyscalculia",
+          note: "Working memory and number handling impacted; multi-step forms lose continuity without persistence." },
+        { level: "Temporary",  tag: "tag-temp", name: "Severe migraine, sleep-deprived",
+          note: "Motion and auto-updating regions trigger pain; sustained attention collapses in minutes." },
+        { level: "Situational", tag: "tag-sit", name: "High-stress crisis financial emergency",
+          note: "Filling the form in a cold flat with a disconnection notice on the table." }
+      ]
+    },
+    hearing: {
+      label: "Hearing / Speech",
+      levels: [
+        { level: "Permanent",  tag: "tag-perm", name: "Deaf, non-vocal",
+          note: "No audio channel: no IVR, no voice verification, no telephone support path." },
+        { level: "Temporary",  tag: "tag-temp", name: "Ear infection and laryngitis",
+          note: "Cannot hear audio cues and cannot speak on a support call if the form fails." },
+        { level: "Situational", tag: "tag-sit", name: "Noisy public transit station",
+          note: "Ambient noise defeats audio instructions and voice assistance entirely." }
+      ]
+    }
+  };
+
+  /* Relative exposure to defect families that matter for each domain.
+     Illustrative weightings — see Method notes. */
+  var REL_EXPOSURE = {
+    vision:    1.9,
+    motor:     1.6,
+    cognition: 1.2,
+    hearing:   0.8
+  };
+
+  /* FPC + WCAG + ACT + scanner flags per domain, used to compose the defect record. */
+  var DOMAIN_EVIDENCE = {
+    vision: {
+      fpc: "302.1 Without Vision / 302.2 With Limited Vision",
+      fpc500: "500.3 / 502.3 interoperability with assistive technology",
+      criteria: "WCAG 2.2 SC 1.3.1 Info and Relationships (A); SC 4.1.2 Name, Role, Value (A); SC 1.3.2 Meaningful Sequence (A)",
+      act: "ACT rule e086e5 (Form field has non-empty accessible name) or 97a4e1 (Button has non-empty accessible name)",
+      actGap: "No ACT rule exists for SC 4.1.3 Status Messages on dynamically inserted content",
+      scanner: "green",
+      scannerText: "axe-core cannot decide the association. The control markup may already carry an accessible name from a placeholder or a preceding stray label, so axe returns zero violations. Lighthouse reports Accessibility 100. The page is marked passing."
+    },
+    motor: {
+      fpc: "302.7 With Limited Manipulation / 302.8 With Limited Reach and Strength",
+      fpc500: "503.2 / 504.2 keyboard access to all functionality",
+      criteria: "WCAG 2.2 SC 2.1.1 Keyboard (A); SC 2.5.7 Dragging Movements (AA); SC 2.4.7 Focus Visible (AA); SC 2.5.8 Target Size (Minimum) (AA)",
+      act: "ACT rule 80af7b (Focusable element has no keyboard trap) applies only partially; no ACT rule exists for 2.5.7 or 2.5.8",
+      actGap: "SC 2.5.7 Dragging Movements and SC 2.5.8 Target Size (Minimum) have no ACT rule published — a structural gap in the standardised test surface",
+      scanner: "green",
+      scannerText: "Targets are visually large and the drag handlers are attached to a styled div, which axe does not treat as an interactive widget. Automated rules that require simulated pointer movement or authenticated multi-step state cannot run at all. Reported as passing."
+    },
+    cognition: {
+      fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+      fpc500: "501.2 / 503.3",
+      criteria: "WCAG 2.2 SC 3.3.1 Error Identification (A); SC 3.3.3 Error Suggestion (AA); SC 3.2.2 On Input (A); SC 3.3.7 Redundant Entry (A); SC 2.2.1 Timing Adjustable (A)",
+      act: "No ACT rule can determine whether an error message is understandable or whether a 30-minute timeout is reasonable under crisis conditions",
+      actGap: "The judgment-shaped criteria (2.4.6, 2.4.4, 3.2.3, 3.2.4) and error-comprehension criteria require human ratification",
+      scanner: "partial",
+      scannerText: "Partial flag at most. A scanner can read the character count of an error string, never its clarity. If the error is present in the DOM at all, the check passes. Message quality is invisible to the crawler."
+    },
+    hearing: {
+      fpc: "302.4 Without Hearing / 302.5 With Limited Hearing / 302.6 Without Speech",
+      fpc500: "503.4 / 504.4 audio and speech alternatives",
+      criteria: "WCAG 2.2 SC 1.2.1 Audio-only and Video-only (A); SC 1.2.2 Captions (A); SC 1.1.1 Non-text Content (A)",
+      act: "ACT rule 23a2a8 (Image has non-empty accessible name) would fire only on a completed <img> element, not a decorative icon behind a visual-only gate",
+      actGap: "Absent caption tracks cannot be forced backwards through an authenticated 2FA gate by any crawler",
+      scanner: "green",
+      scannerText: "The interactive step is never reached by an unauthenticated crawl, so the missing alternative is never evaluated. Green everywhere — including on the page that excludes this citizen."
+    }
+  };
+
+  /* ------------------------------------------------------------------ *
+   * THE DEFECT REGISTRY
+   *
+   * Every defect declares:
+   *   mech    — how it fails the citizen (terminal / spoon / effort / friction)
+   *   origin  — the source of the obligation (WCAG SC, ACT, FPC, or SYSTEMIC)
+   *   domain  — which capability spectrum it primarily burdens
+   *   spoon   — energy cost when mech is "spoon" or "effort"
+   *   catchable — can an automated scanner decide it?
+   *
+   * Two orthogonal axes run through this table:
+   *   1. A WCAG failure is not necessarily a wall (contrast hurts, it doesn't stop).
+   *   2. A wall is not necessarily a WCAG failure (a phone-only channel has no SC).
+   * ------------------------------------------------------------------ */
+  var DEFECTS = {
+    1: { mech: "friction", origin: "WCAG", domain: "vision", spoon: 1, catchable: false,
+         title: "Accordion summary announces a generic name",
+         crit: "WCAG 2.2 SC 4.1.2 Name, Role, Value (A); SC 2.4.7 Focus Visible (AA)",
+         act: "2t702h Summary element has non-empty accessible name — satisfied, name is non-empty",
+         fpc: "302.1 Without Vision; 302.2 With Limited Vision",
+         scanner: "green",
+         scannerText: "ACT rule 2t702h passes because the accessible name is non-empty. A scanner cannot judge whether the name is useful. Lighthouse reports Accessibility 100." },
+
+    2: { mech: "spoon", origin: "FPC", domain: "vision", spoon: 18, catchable: false,
+         title: "Radio group has no fieldset or legend; the question is never announced",
+         crit: "WCAG 2.2 SC 1.3.1 Info and Relationships (A); SC 3.3.2 Labels or Instructions (A)",
+         act: "e086e5 Form field has non-empty accessible name — each radio has a name, the GROUP does not",
+         fpc: "302.1 Without Vision — cannot determine what is being asked",
+         scanner: "green",
+         scannerText: "Each individual radio has a non-empty accessible name, so ACT rule e086e5 passes. The missing group semantics is a relationship axe does not check by default." },
+
+    3: { mech: "spoon", origin: "WCAG", domain: "cognition", spoon: 6, catchable: true,
+         title: "Select has no visible label; only a placeholder option",
+         crit: "WCAG 2.2 SC 3.3.2 Labels or Instructions (A); SC 1.3.1 Info and Relationships (A)",
+         act: "e086e5 Form field has non-empty accessible name (this one genuinely fails if no label element)",
+         fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+         scanner: "flag",
+         scannerText: "This is one of the ~30% of checks automation CAN decide. axe flags 'Form elements must have labels'. The citizen is still blocked, but at least the dashboard notices." },
+
+    4: { mech: "friction", origin: "WCAG", domain: "vision", spoon: 1, catchable: true,
+         title: "Link text reads 'click here' in isolation",
+         crit: "WCAG 2.2 SC 2.4.4 Link Purpose (In Context) (A)",
+         act: "c487ae Link has non-empty accessible name — satisfied, 'click here' is non-empty",
+         fpc: "302.1 Without Vision",
+         scanner: "green",
+         scannerText: "The link HAS a name, so c487ae passes. Judging whether 'click here' is descriptive is exactly the judgment-shaped work scanners cannot do (ACT rule c4a8a4 covers titles, not link purpose)." },
+
+    5: { mech: "spoon", origin: "WCAG", domain: "motor", spoon: 5, catchable: false,
+         title: "Primary button is 20 x 20 CSS pixels",
+         crit: "WCAG 2.2 SC 2.5.8 Target Size (Minimum) (AA)",
+         act: "No ACT rule exists for SC 2.5.8 — a structural gap in the standardised test surface",
+         fpc: "302.7 With Limited Manipulation; 302.8 With Limited Reach and Strength",
+         scanner: "green",
+         scannerText: "SC 2.5.8 has no published ACT rule. Even where an implementation exists, it requires a rendered viewport with auth state. Reported as passing." },
+
+    6: { mech: "spoon", origin: "WCAG", domain: "vision", spoon: 8, catchable: false,
+         title: "Name inputs rely on placeholder text instead of persistent labels",
+         crit: "WCAG 2.2 SC 3.3.2 Labels or Instructions (A); SC 1.3.1 Info and Relationships (A)",
+         act: "e086e5 passes — the placeholder supplies the accessible name",
+         fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+         scanner: "green",
+         scannerText: "A placeholder satisfies the accessible-name computation, so axe stays silent. The label vanishes as soon as the citizen types, which is invisible to a load-time crawl." },
+
+    7: { mech: "effort", origin: "WCAG", domain: "cognition", spoon: 9, catchable: false,
+         title: "Date-of-birth mask rejects valid input with an unexplained error",
+         crit: "WCAG 2.2 SC 3.3.1 Error Identification (A); SC 3.3.3 Error Suggestion (AA)",
+         act: "No ACT rule can determine whether an error message is intelligible",
+         fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+         scanner: "partial",
+         scannerText: "A scanner can confirm an error string exists in the DOM. It cannot judge whether 'Invalid input' tells the citizen what to do. Message quality is invisible." },
+
+    8: { mech: "spoon", origin: "OTHER", domain: "motor", spoon: 7, catchable: false,
+         title: "ID field requests a full 9-digit number with no partial-save option",
+         crit: "No specific SC; the burden is on working memory and persistence",
+         act: "n/a — no rule addresses cognitive load or persistence",
+         fpc: "302.9; also a Section 508 503.4 obligation on the service, not the page",
+         scanner: "green",
+         scannerText: "Fully compliant markup. The barrier is that the citizen must retrieve and hold a number they may not have to hand. No automation models memory." },
+
+    9: { mech: "effort", origin: "WCAG", domain: "cognition", spoon: 12, catchable: false,
+         title: "Error summary does not name the field or suggest a fix",
+         crit: "WCAG 2.2 SC 3.3.1 Error Identification (A); SC 3.3.3 Error Suggestion (AA)",
+         act: "No ACT rule covers error-message adequacy",
+         fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+         scanner: "partial",
+         scannerText: "The alert has role='alert' and is announced, so automated checks pass. Whether it helps the citizen recover is a human judgment." },
+
+    10: { mech: "spoon", origin: "FPC", domain: "hearing", spoon: 20, catchable: false,
+          title: "Verification code delivered by audio call only; text fallback is unlabelled",
+          crit: "WCAG 2.2 SC 1.2.1 Audio-only and Video-only (A); SC 1.1.1 Non-text Content (A)",
+          act: "23a2a8 Image has non-empty accessible name — would fire only on a completed img, not a decorative icon",
+          fpc: "302.4 Without Hearing; 302.6 Without Speech",
+          scanner: "green",
+          scannerText: "This step is behind authentication and is never reached by an unauthenticated crawl. Green everywhere, including on the page that excludes this citizen entirely." },
+
+    11: { mech: "failure-policy", origin: "OTHER", domain: "cognition", spoon: 10, catchable: false,
+          title: "Resend countdown runs below 20 seconds and the code expires in 2 minutes",
+          crit: "WCAG 2.2 SC 2.2.1 Timing Adjustable (A) — arguably applies, but never enforced on OTP windows",
+          act: "No ACT rule addresses OTP expiry or an unreasonably short resend window",
+          fpc: "302.9; service-level obligation",
+          scanner: "green",
+          scannerText: "Timing behaviour is state-dependent and auth-gated. No crawl waits two minutes to watch a code expire." },
+
+    12: { mech: "spoon", origin: "WCAG", domain: "cognition", spoon: 15, catchable: false,
+          title: "Session expires mid-form with a warning that cannot be extended",
+          crit: "WCAG 2.2 SC 2.2.1 Timing Adjustable (A); SC 3.3.7 Redundant Entry (A)",
+          act: "No ACT rule models session timeout or data loss across a multi-step form",
+          fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+          scanner: "green",
+          scannerText: "Requires an authenticated multi-minute session to observe. Crawlers score the login page and leave." },
+
+    13: { mech: "friction", origin: "WCAG", domain: "motor", spoon: 2, catchable: true,
+          title: "Submit button is a styled div with no button role",
+          crit: "WCAG 2.2 SC 4.1.2 Name, Role, Value (A); SC 2.1.1 Keyboard (A)",
+          act: "97a4e1 Button has non-empty accessible name — does not apply, the element has no button role",
+          fpc: "302.7 With Limited Manipulation",
+          scanner: "flag",
+          scannerText: "axe flags 'elements with click handlers must have a role'. Automation catches this one — it is in the visible 30%." },
+
+    14: { mech: "spoon", origin: "FPC", domain: "vision", spoon: 16, catchable: false,
+          title: "Table header cells are not associated with their data cells",
+          crit: "WCAG 2.2 SC 1.3.1 Info and Relationships (A); SC 1.3.2 Meaningful Sequence (A)",
+          act: "d0f69e Table header cell has assigned cells (proposed) — not widely implemented",
+          fpc: "302.1 Without Vision — the citizen cannot determine which column a figure belongs to",
+          scanner: "green",
+          scannerText: "The table has th elements, so most implementations pass it. Verifying per-cell header association is a proposed ACT rule with almost no tooling behind it." },
+
+    15: { mech: "spoon", origin: "WCAG", domain: "vision", spoon: 6, catchable: false,
+          title: "Pagination controls all announce the same name",
+          crit: "WCAG 2.2 SC 2.4.4 Link Purpose (In Context) (A); SC 4.1.2 Name, Role, Value (A)",
+          act: "c487ae and 97a4e1 both pass — every control has a non-empty name",
+          fpc: "302.1 Without Vision",
+          scanner: "green",
+          scannerText: "Names exist and are non-empty. That five controls share one name is a distinctness problem no ACT rule measures." },
+
+    16: { mech: "effort", origin: "WCAG", domain: "motor", spoon: 8, catchable: false,
+          title: "Custom listbox loses its value when focus moves",
+          crit: "WCAG 2.2 SC 3.2.2 On Input (A); SC 2.1.1 Keyboard (A)",
+          act: "bc4a75 ARIA required owned elements; ff89c9 ARIA required context role — structure may pass while behaviour fails",
+          fpc: "302.7 With Limited Manipulation",
+          scanner: "green",
+          scannerText: "ARIA structure can be valid while the interaction is broken. Automation checks the markup, not what happens on blur." },
+
+    17: { mech: "effort", origin: "FPC", domain: "motor", spoon: 14, catchable: false,
+          title: "Custom date-picker opens only on a pointer click",
+          crit: "WCAG 2.2 SC 2.1.1 Keyboard (A); SC 2.5.8 Target Size (Minimum) (AA)",
+          act: "No ACT rule exists for SC 2.5.8; 80af7b (no keyboard trap) does not apply, this is reachability not trapping",
+          fpc: "302.7 With Limited Manipulation; 302.8 With Limited Reach and Strength",
+          scanner: "green",
+          scannerText: "The input carries a visible label so e086e5 passes. Simulating 'can a keyboard reach this chevron' requires interaction no crawler performs." },
+
+    18: { mech: "terminal", origin: "FPC", domain: "motor", spoon: 30, catchable: false,
+          title: "Drag-and-drop upload offers no single-pointer or keyboard alternative",
+          crit: "WCAG 2.2 SC 2.5.7 Dragging Movements (AA); SC 2.1.1 Keyboard (A)",
+          act: "No ACT rule exists for SC 2.5.7 — a named gap in the standardised test surface",
+          fpc: "302.7 With Limited Manipulation; 302.8 With Limited Reach and Strength",
+          scanner: "green",
+          scannerText: "Drop handlers sit on a styled div that axe does not treat as an interactive widget. Because SC 2.5.7 has no ACT rule, nothing in the standardised ruleset can even attempt it." },
+
+    19: { mech: "friction", origin: "WCAG", domain: "vision", spoon: 2, catchable: false,
+          title: "Progress bar has no accessible value and never announces completion",
+          crit: "WCAG 2.2 SC 4.1.3 Status Messages (AA); SC 4.1.2 Name, Role, Value (A)",
+          act: "No ACT rule covers dynamically inserted status content",
+          fpc: "302.1 Without Vision",
+          scanner: "green",
+          scannerText: "The region is empty at load and populated later. A load-time crawl sees an empty div and reports no violation." },
+
+    20: { mech: "effort", origin: "FPC", domain: "motor", spoon: 15, catchable: false,
+          title: "Second drag-and-drop upload, again with no alternative",
+          crit: "WCAG 2.2 SC 2.5.7 Dragging Movements (AA); SC 2.1.1 Keyboard (A)",
+          act: "No ACT rule exists for SC 2.5.7",
+          fpc: "302.7 With Limited Manipulation; 302.8 With Limited Reach and Strength",
+          scanner: "green",
+          scannerText: "Identical failure to step 18, in a second location. Automation misses both, so the dashboard shows two clean passes for one recurring design flaw." },
+
+    21: { mech: "effort", origin: "WCAG", domain: "vision", spoon: 7, catchable: false,
+          title: "Upload-size alert auto-clears before a screen reader reads it",
+          crit: "WCAG 2.2 SC 4.1.3 Status Messages (AA); SC 2.2.1 Timing Adjustable (A)",
+          act: "No ACT rule covers announcement timing of live regions",
+          fpc: "302.1 Without Vision",
+          scanner: "green",
+          scannerText: "role='alert' is present and valid. Whether the message survives long enough to be heard is a timing judgement outside every ruleset." },
+
+    22: { mech: "spoon", origin: "OTHER", domain: "cognition", spoon: 11, catchable: false,
+          title: "Currency fields reject whitespace with a red border and no message",
+          crit: "Colour alone conveys the error: WCAG 2.2 SC 1.4.1 Use of Color (A); SC 3.3.1 Error Identification (A)",
+          act: "No ACT rule links a red border to an error state",
+          fpc: "302.3 Without Perception of Colour; 302.9",
+          scanner: "green",
+          scannerText: "The border colour is a style, not a semantic error state. Automated tools cannot infer that red means failure." },
+
+    23: { mech: "spoon", origin: "OTHER", domain: "cognition", spoon: 9, catchable: false,
+          title: "Live benefit estimate updates with no announcement and no off switch",
+          crit: "WCAG 2.2 SC 4.1.3 Status Messages (AA); SC 2.2.2 Pause, Stop, Hide (A)",
+          act: "efbfc7 (proposed) Text content that changes automatically can be paused — not widely implemented",
+          fpc: "302.9 With Limited Language, Cognitive, and Learning Abilities",
+          scanner: "green",
+          scannerText: "The container is valid and labelled. That it updates on a timer with no pause control is behavioural and unmeasured." },
+
+    24: { mech: "effort", origin: "SYSTEMIC", domain: "cognition", spoon: 13, catchable: false,
+          title: "'Save draft' exists but silently discards progress after 60 minutes",
+          crit: "No WCAG SC is violated — the control is fully accessible. The barrier is policy.",
+          act: "n/a — retention policy is outside the conformance framework",
+          fpc: "302.9; EN 301 549 Clause 4 service obligation",
+          scanner: "green",
+          scannerText: "Perfectly accessible button with a perfectly compliant confirmation. The retention rule behind it is a service decision no scanner inspects." },
+
+    25: { mech: "friction", origin: "WCAG", domain: "vision", spoon: 3, catchable: false,
+          title: "File review list offers no remove control and no file size information",
+          crit: "WCAG 2.2 SC 3.3.2 Labels or Instructions (A); SC 1.3.1 Info and Relationships (A)",
+          act: "No ACT rule addresses review-step completeness",
+          fpc: "302.1 Without Vision; 302.9",
+          scanner: "green",
+          scannerText: "A valid list of valid items. The absence of a remove action is a missing feature, not a defeasible violation." },
+
+    26: { mech: "friction", origin: "WCAG", domain: "cognition", spoon: 4, catchable: true,
+          title: "Declaration accordion reuses a heading level already used on the page",
+          crit: "WCAG 2.2 SC 1.3.1 Info and Relationships (A); SC 2.4.6 Headings and Labels (AA)",
+          act: "No ACT rule decides whether a heading LEVEL is semantically appropriate",
+          fpc: "302.1; 302.9",
+          scanner: "partial",
+          scannerText: "Some tools warn on skipped heading levels. Whether reusing h3 here is appropriate depends on meaning, which is judgment-shaped work." },
+
+    27: { mech: "terminal", origin: "FPC", domain: "motor", spoon: 30, catchable: false,
+          title: "Signature canvas has no non-drawing equivalent",
+          crit: "WCAG 2.2 SC 2.5.1 Pointer Gestures (A); SC 2.1.1 Keyboard (A); SC 1.1.1 Non-text Content (A)",
+          act: "No ACT rule covers essential-alternative decisions for drawing inputs",
+          fpc: "302.7 With Limited Manipulation; 302.8 With Limited Reach and Strength",
+          scanner: "green",
+          scannerText: "The canvas carries an aria-label, so it looks compliant. The absence of a typed or uploaded signature alternative is a judgment about essentials no scanner makes. This is the highest-severity defect in the journey." },
+
+    28: { mech: "friction", origin: "WCAG", domain: "cognition", spoon: 4, catchable: false,
+          title: "Checkbox label is positioned far from its control",
+          crit: "WCAG 2.2 SC 3.3.2 Labels or Instructions (A); SC 1.3.1 Info and Relationships (A)",
+          act: "e086e5 passes — the label is programmatically associated; only the layout is poor",
+          fpc: "302.9; 302.2",
+          scanner: "green",
+          scannerText: "Association is valid, so automation is satisfied. Visual proximity is a design concern no rule encodes." },
+
+    29: { mech: "effort", origin: "SYSTEMIC", domain: "cognition", spoon: 14, catchable: false,
+          title: "Final submit silently fails on a stale session; no confirmation or reference is issued",
+          crit: "WCAG 2.2 SC 4.1.3 Status Messages (AA); SC 3.3.1 Error Identification (A)",
+          act: "No ACT rule models a silent submission failure",
+          fpc: "302.9; EN 301 549 Clause 4 service reliability obligation",
+          scanner: "green",
+          scannerText: "Green until the moment of submission. Whether the submission actually succeeded is transactional behaviour no page-load crawler can observe." },
+
+    30: { mech: "friction", origin: "WCAG", domain: "vision", spoon: 2, catchable: false,
+          title: "Confirmation reference ID is an unstyled span with no heading",
+          crit: "WCAG 2.2 SC 1.3.1 Info and Relationships (A); SC 2.4.6 Headings and Labels (AA)",
+          act: "No ACT rule covers the prominence of a confirmation identifier",
+          fpc: "302.1 Without Vision",
+          scanner: "green",
+          scannerText: "The identifier is present in the DOM and readable. Whether the citizen can FIND it matters more than whether it exists, and no rule measures that." }
+  };
+
+  /* ------------------------------------------------------------------ *
+   * NON-WCAG SYSTEMIC BARRIERS
+   *
+   * First-class obstacles that stop citizens cold and violate no success
+   * criterion. They appear alongside WCAG failures, tagged by origin.
+   * Each carries a 'requires' predicate over the run context so the model
+   * only fires it when it is genuinely relevant to this journey.
+   * ------------------------------------------------------------------ */
+  var SYSTEMIC_BARRIERS = [
+    { id: "phone-only-channel", mech: "terminal", domain: "hearing", spoon: 30,
+      title: "Support is reachable only by telephone",
+      detail: "The form's only error-recovery path is a voice helpline. A Deaf or non-vocal citizen who hits any error has no route to resolution.",
+      origin: "SYSTEMIC", crit: "No WCAG SC — the page is conformant. EN 301 549 Clause 4 / Section 508 503.4 service obligation.",
+      applies: function (p) { return true; } },
+
+    { id: "account-required", mech: "terminal", domain: "cognition", spoon: 30,
+      title: "Verification requires an online banking or credit identity check",
+      detail: "Identity proofing presumes a credit history and a bank account. A citizen with neither — common in acute financial crisis — cannot pass, despite being eligible.",
+      origin: "SYSTEMIC", crit: "No WCAG SC. This is an eligibility-design exclusion, not a conformance failure.",
+      applies: function (p) { return true; } },
+
+    { id: "english-only", mech: "terminal", domain: "cognition", spoon: 30,
+      title: "All content and error text is in one language only",
+      detail: "No translated version is offered. A household that does not read the majority language cannot complete a legally binding declaration.",
+      origin: "SYSTEMIC", crit: "WCAG 2.2 SC 3.1.1 Language of Page (A) is satisfied — the page declares its language. Nothing requires a second one.",
+      applies: function (p) { return p.byDomain.cognition.level !== "Situational"; } },
+
+    { id: "smartphone-presumed", mech: "spoon", domain: "cognition", spoon: 20,
+      title: "Service presumes a smartphone with a working camera",
+      detail: "Document capture and 2FA both assume a personal mobile device. A citizen relying on a library terminal is structurally excluded.",
+      origin: "SYSTEMIC", crit: "WCAG 2.2 SC 1.3.4 Orientation (AA) and 1.4.10 Reflow (AA) may pass; the device presumption is unaddressed.",
+      applies: function (p) { return true; } },
+
+    { id: "no-proxy", mech: "terminal", domain: "cognition", spoon: 30,
+      title: "No authorised-representative path for a family member or advocate",
+      detail: "A citizen who cannot complete the form alone — through disability, illness, or literacy — has no supported way to delegate it.",
+      origin: "SYSTEMIC", crit: "No WCAG SC. Delegation is an authorisation concern, not a rendering concern.",
+      applies: function (p) { return p.downgraded.length >= 2; } },
+
+    { id: "utility-bill-name", mech: "effort", domain: "cognition", spoon: 16,
+      title: "Proof of residency must be a utility bill in the applicant's own name",
+      detail: "Citizens in shared housing, sublets, or whose bill is in a partner's name cannot produce this document, though they are legitimately eligible.",
+      origin: "SYSTEMIC", crit: "No WCAG SC. A document-policy exclusion.",
+      applies: function (p) { return true; } },
+
+    { id: "deadline-no-extension", mech: "spoon", domain: "cognition", spoon: 18,
+      title: "No extension available when the citizen is blocked by the service itself",
+      detail: "The deadline is fixed regardless of whether the delay was caused by a defect in the service. The citizen absorbs the service's failure.",
+      origin: "SYSTEMIC", crit: "No WCAG SC. WCAG 2.2.1 governs time limits in the interface, not obligations the service creates.",
+      applies: function (p) { return p.difficulty === "hostile"; } },
+
+    { id: "pdf-only-form", mech: "terminal", domain: "vision", spoon: 30,
+      title: "The only accessible-looking fallback is an untagged PDF",
+      detail: "When the form fails, the citizen is pointed to a scanned PDF. A screen reader reads it as a single image.",
+      origin: "SYSTEMIC", crit: "PDF/UA would apply; WCAG 2.2 SC 1.1.1 arguably applies to the PDF as content, but it is served outside the audited journey.",
+      applies: function (p) { return true; } }
+  ];
+
+  /* Which systemic barriers apply to this citizen. Each predicate reads the
+     run context: the persona's severity per domain, and the difficulty. */
+  function applicableBarriers(persona, difficulty) {
+    var ctx = {
+      byDomain: persona.byDomain,
+      domains: persona.domains,
+      difficulty: difficulty,
+      /* A citizen is "downgraded" when two or more domains carry a Temporary
+         or Permanent constraint — the compounding case. */
+      downgraded: persona.domains.filter(function (k) {
+        return persona.byDomain[k].level !== "Situational";
+      })
+    };
+    return SYSTEMIC_BARRIERS.filter(function (b) { return b.applies(ctx); });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Defect hazard.
+   *
+   * The stipulation is that EACH component is quality-percent accessible —
+   * a defect rate PER COMPONENT, not a budget shared across the journey. So
+   * every interaction carries its own hazard derived from the selected
+   * component quality. Summed over 30 steps at 99% that yields an expected
+   * 0.30 defective components per task, which is exactly the figure the
+   * serial model P = 1 − 0.99³⁰ describes.
+   *
+   * Weights concentrate the defects in the interaction layers where real
+   * audits find them — custom widgets, drag-only uploads, unannounced
+   * dynamic regions — and are normalised so the MEAN hazard across the 30
+   * interactions equals the selected component defect rate.
+   * ------------------------------------------------------------------ */
+  var DEFECT_WEIGHT = {
+    1:  0.4,   // details/summary accordion — native, well supported
+    2:  0.5,   // native radio group
+    3:  0.5,   // native select
+    4:  0.6,   // inline link
+    5:  0.6,   // plain action button
+    6:  0.8,   // labeled text inputs — low defect exposure
+    7:  1.3,   // input mask — custom JS behaviour
+    8:  0.7,   // numeric input
+    9:  1.6,   // inline error summary — error-handling layer
+    10: 2.0,   // 2FA modal — dynamic state, focus trap, time limits
+    11: 1.4,   // timed control — the second 2FA
+    12: 2.0,   // auto-triggered session modal — timer + focus
+    13: 0.7,
+    14: 1.8,   // data table header association
+    15: 1.5,   // pagination controls
+    16: 2.0,   // custom listbox — hand-rolled widget
+    17: 2.2,   // custom date-picker — hand-rolled widget
+    18: 2.2,   // drag-and-drop upload — no pointer alternative
+    19: 1.5,   // progress bar — live region
+    20: 2.2,   // drag-and-drop upload — no pointer alternative
+    21: 1.6,   // alert banner — live region + timing
+    22: 1.0,
+    23: 1.5,   // live-updating region
+    24: 1.0,
+    25: 0.8,
+    26: 0.9,   // accordion
+    27: 1.8,   // signature canvas — no non-drawing equivalent
+    28: 0.7,   // checkbox
+    29: 1.0,   // final submit
+    30: 0.4    // confirmation page
+  };
+
+  var WEIGHT_TOTAL = 0;
+  var WEIGHT_STEPS = Object.keys(DEFECT_WEIGHT).length;
+  Object.keys(DEFECT_WEIGHT).forEach(function (k) { WEIGHT_TOTAL += DEFECT_WEIGHT[k]; });
+  var WEIGHT_MEAN = WEIGHT_TOTAL / WEIGHT_STEPS;
+
+  /* STEP_HAZARD[n] is recomputed whenever the user changes component quality. */
+  var STEP_HAZARD = {};
+  function recomputeHazards(p) {
+    STEP_HAZARD = {};
+    Object.keys(DEFECT_WEIGHT).forEach(function (k) {
+      STEP_HAZARD[k] = p * (DEFECT_WEIGHT[k] / WEIGHT_MEAN);
+    });
+  }
+  recomputeHazards(P_BASE);
+
+  /* Spoon Theory: a citizen starts each day with a finite pool of capacity.
+     Friction and retries draw it down. Nothing "fails" them; they run out. */
+  var SPOONS_MAX = 100;
+
+  /* ------------------------------------------------------------------ *
+   * 1b. THE POPULATION MODEL  (deterministic — no random seed)
+   *
+   * This is the defensible half of the exercise. Everything here is either
+   * (a) a published figure with a citation, or (b) an explicit, labelled
+   * modelling assumption with a stated range. Nothing is sampled. Re-running
+   * it gives the same answer, so a reviewer can attack the inputs rather than
+   * argue with a dice roll.
+   *
+   * Three severity levels, each resolving differently:
+   *
+   *   TOTAL    No path exists. Removes 100% of the affected FPC group.
+   *   PARTIAL  A path exists for some of the group. Removes the fraction of
+   *            the FPC group that has no alternative, taken from survey data.
+   *   DEGRADER No one is removed. Raises the downstream error rate, which in
+   *            a 30-step journey compounds into additional abandonment.
+   * ------------------------------------------------------------------ */
+
+  /* ---- Published population fractions (FPC partition) -----------------
+     Source: CDC, Disability and Health Data System (DHDS) via BRFSS 2022,
+     as published in the CDC Disability Impacts All of Us infographic and
+     the DHDS data note. These are ADULT prevalence figures for the US.
+     Note the overlap: categories are not mutually exclusive, which is why
+     the model computes per-criterion loss and then combines them. */
+  var POPULATION = {
+    source: "CDC DHDS / BRFSS 2022 (adult prevalence)",
+    anyDisability: 0.287,          // 28.7 % of US adults report a functional disability
+    vision:    { p: 0.055, fpc: "302.1 / 4.2.1 Without Vision",        citation: "CDC DHDS 2022: 5.5 % vision disability" },
+    lowVision: { p: 0.180, fpc: "302.2 / 4.2.2 With Limited Vision",   citation: "CDC NHIS 2024: 18.0 % any difficulty seeing" },
+    hearing:   { p: 0.062, fpc: "302.4 / 4.2.4 Without Hearing",       citation: "CDC DHDS 2022: 6.2 % deaf or serious difficulty hearing" },
+    mobility:  { p: 0.122, fpc: "302.7 / 4.2.7 Limited Manipulation",   citation: "CDC DHDS 2022: 12.2 % mobility disability" },
+    cognition: { p: 0.139, fpc: "302.9 / 4.2.10 Limited Cognition",     citation: "CDC DHDS 2022: 13.9 % cognition disability (highest prevalence)" },
+    colour:    { p: 0.008, fpc: "302.3 / 4.2.3 Without Perception of Colour", citation: "Colour vision deficiency, ~8 % of males of northern European descent; ~0.5–1 % population-wide. Range 0.005–0.02." }
+  };
+
+  /* ---- Keyboard dependence within the vision group ---------------------
+     Source: WebAIM Survey of Users with Low Vision #2.
+     "60.4 % always or often use a keyboard for web page navigation."
+     This is the sub-group share that makes a pointer-only control a PARTIAL
+     blocker rather than a total one: 60.4 % of the low-vision group has no
+     alternative path to a pointer-only widget, and 39.6 % does.
+     Range quoted in the source: "a very high number" — treat 0.50–0.70. */
+  var KEYBOARD_DEPENDENCE_LOW_VISION = 0.604;
+
+  /* ---- Screen-reader dependence within the blind group -----------------
+     Source: WebAIM Screen Reader User Survey #11 (2026).
+     91.8 % of respondents use a screen reader on a mobile device; 98 %+
+     of blind respondents use one somewhere. For a semantic-structure
+     defect we take 0.95 as the share with no non-visual workaround.
+     Range 0.90–1.00. */
+  var SR_DEPENDENCE_BLIND = 0.95;
+
+  /* ---- Automated-tool catch rate ---------------------------------------
+     Sources: Deque estimates ~40 % of issues are detectable by automation;
+     GSA guidance is ~30 % of success criteria. We carry both as a range so
+     the extrapolation to the manual residual is visible.
+     Source for defect prevalence: WebAIM Million 2025 (Feb 2025 crawl of
+     1,000,000 home pages): 51 detected errors per page on average; 94.8 %
+     of home pages had detectable WCAG 2 failures; 96 % of errors fall in
+     six categories (low contrast 79.1 % of pages, missing alt 55.5 %,
+     missing labels 48.2 %, empty links 45.4 %, empty buttons 29.6 %,
+     missing language 15.8 %). */
+  var CATCH_RATE = { low: 0.30, mid: 0.40, high: 0.50, source: "GSA ~30 % of SC; Deque ~40 % of issues" };
+  var WEBAIM_2025 = {
+    errorsPerPage: 51,
+    pagesWithFailures: 0.948,
+    categoriesFailingPct: { contrast: 0.791, altText: 0.555, labels: 0.482, emptyLinks: 0.454, emptyButtons: 0.296, language: 0.158 },
+    source: "WebAIM Million 2025 (Feb 2025)"
+  };
+
+  /* ---- The defects this journey actually carries -----------------------
+     Severity is now an explicit property, assigned to the FPC group the
+     defect excludes. 'removes' is the share of THAT GROUP with no
+     alternative path — cited where a source exists, and labelled as an
+     assumption where none does. */
+  var DEFECT_SEVERITY = {
+    TOTAL:   "total",     // no path at all
+    PARTIAL: "partial",   // a path exists for part of the group
+    DEGRADER:"degrader"   // blocks no one; raises error rate
+  };
+
+  /* Per-step population impact. Each entry states which FPC group is
+     affected, how severely, and the share of that group left with no path.
+     'removes' = 1.0 means the whole affected group loses the journey here. */
+  var POPULATION_IMPACT = {
+    2:  { sev: "PARTIAL",  group: "vision",    removes: 0.55, fpc: "302.1 / 4.2.1",
+          what: "No fieldset/legend: the question is never announced. The blind group has no alternative reading of the group label. Assumption: 0.40–0.70 of the group cannot proceed without knowing what is being asked." },
+    3:  { sev: "DEGRADER", group: "cognition", removes: 0.00, fpc: "302.9 / 4.2.10",
+          what: "Unlabelled select: raises error rate for the cognitive group; blocks no one. It IS auto-detectable, which is why it appears on dashboards." },
+    5:  { sev: "DEGRADER", group: "mobility",  removes: 0.00, fpc: "302.7 / 4.2.7",
+          what: "20x20 px target (SC 2.5.8, no ACT rule). Below the 24x24 minimum. Raises mistap rate for the mobility group; blocks none outright on a desktop pointer. Assumption: mistap probability rises sharply, but a retry succeeds." },
+    10: { sev: "PARTIAL",  group: "hearing",   removes: 0.85, fpc: "302.4 / 4.2.4",
+          what: "Audio-only OTP. Removes the Deaf group who have no speech-capable fallback. Assumption: 0.75–0.95 — a text fallback exists but is unlabelled, so the share who find it is small." },
+    12: { sev: "DEGRADER", group: "cognition", removes: 0.00, fpc: "302.9 / 4.2.10",
+          what: "Session expires mid-form. A timing failure. SC 2.2.1 arguably applies but is never enforced; it removes no one outright, it raises abandonment at later steps." },
+    14: { sev: "PARTIAL",  group: "vision",    removes: 0.70, fpc: "302.1 / 4.2.1",
+          what: "Table headers unassociated. The blind group cannot determine which column a figure belongs to. Some can reconstruct it by cell order or by returning to the header; 0.70 cannot reliably. Assumption: 0.60–0.80." },
+    17: { sev: "PARTIAL",  group: "mobility",  removes: KEYBOARD_DEPENDENCE_LOW_VISION, fpc: "302.7 / 4.2.7",
+          what: "Pointer-only date-picker. Removes the keyboard-dependent share of the vision-affected group: WebAIM low-vision survey, 60.4 % always or often navigate by keyboard. A typed date field exists as an unadvertised fallback for part of the remainder." },
+    18: { sev: "TOTAL",    group: "mobility",  removes: 1.00, fpc: "302.7 / 4.2.7",
+          what: "Drag-only upload, no single-pointer or keyboard alternative (SC 2.5.7, NO ACT rule published). No path exists for the mobility group." },
+    20: { sev: "TOTAL",    group: "mobility",  removes: 1.00, fpc: "302.7 / 4.2.7",
+          what: "Second drag-only upload. Identical failure, second location. No path for whoever still remains from the mobility group." },
+    23: { sev: "DEGRADER", group: "cognition", removes: 0.00, fpc: "302.9 / 4.2.10",
+          what: "Live-updating estimate, no announcement, no off switch. Raises error rate; blocks no one." },
+    27: { sev: "TOTAL",    group: "mobility",  removes: 1.00, fpc: "302.7 / 4.2.7",
+          what: "Signature canvas with no non-drawing equivalent (SC 2.5.1). No keyboard path exists at all. This is the highest-severity defect in the journey." },
+    29: { sev: "PARTIAL",  group: "cognition", removes: 0.70, fpc: "302.9 / 4.2.10",
+          what: "Silent submission failure on a stale session. The cognitive group has no reliable way to know the task completed, and no reference is issued. Assumption: 0.60–0.80." }
+  };
+
+  /* Which groups lose their journey at each step, as an absolute
+     population share. Deterministic: removal × group prevalence. */
+  function groupShare(group) {
+    switch (group) {
+      case "vision":    return POPULATION.vision.p;
+      case "lowVision": return POPULATION.lowVision.p;
+      case "hearing":   return POPULATION.hearing.p;
+      case "mobility":  return POPULATION.mobility.p;
+      case "cognition": return POPULATION.cognition.p;
+      case "colour":    return POPULATION.colour.p;
+      default:          return 0;
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 1c. The population journey model
+   *
+   * Step 1: component-level serial reliability for an UNAFFECTED user —
+   *   the headline the vendor publishes. P = (1 − p)^n.
+   *
+   * Step 2: for each FPC group, subtract the population share removed by
+   *   every total and partial blocker that affects it. This is NOT a
+   *   probability: it is a count of people with no path.
+   *
+   * Step 3: degrader defects raise the error rate for the groups they
+   *   burden, which then compounds through the remaining steps.
+   *
+   * Output is a range, driven by the catch-rate range and by the labelled
+   * assumption ranges — not a single false-precision number.
+   * ------------------------------------------------------------------ */
+
+  function affectedGroups(impact) {
+    /* A defect named against 'vision' also burdens low-vision users where
+       the mechanism is semantic (they may rely on the same structure). */
+    if (impact.group === "vision") return ["vision", "lowVision"];
+    return [impact.group];
+  }
+
+  /* The share of an affected group that loses the journey at a step. */
+  function removedShare(impact, group) {
+    if (impact.sev === "DEGRADER") return 0;
+    if (impact.sev === "TOTAL") return groupShare(group);
+    /* PARTIAL: only the share with no alternative path is removed, but the
+       group prevalence is what we scale. */
+    return groupShare(group) * impact.removes;
+  }
+
+  function computePopulationModel(componentP) {
+    var steps = Object.keys(POPULATION_IMPACT).map(Number).sort(function (a, b) { return a - b; });
+
+    /* --- The vendor headline: unaffected-user serial reliability --- */
+    var unaffectedCompletion = Math.pow(1 - componentP, N);
+
+    /* --- Per-group deterministic loss ---
+       Removal is a UNION, not a sum. A citizen lost at step 14 cannot also be
+       counted as lost at step 27 — they were already gone. Summing produced
+       saturating nonsense (every affected group reaching 0 %), which made the
+       component-quality dial meaningless. The uncounted-from-the-start model
+       used here is: survival after step n = survival before n × (1 − removal
+       at n / group still present). */
+    var groups = ["vision", "lowVision", "hearing", "mobility", "cognition"];
+    var perGroup = {};
+    groups.forEach(function (g) {
+      perGroup[g] = {
+        prevalence: groupShare(g),
+        surviving: groupShare(g),   // absolute population share still present
+        degraders: 0,
+        causes: []
+      };
+    });
+
+    steps.forEach(function (n) {
+      var impact = POPULATION_IMPACT[n];
+      affectedGroups(impact).forEach(function (g) {
+        var pg = perGroup[g];
+        if (impact.sev === "DEGRADER") { pg.degraders += 1; return; }
+        /* If no one from this group is still present, later blockers against
+           the same group remove no additional people. */
+        if (pg.surviving <= 0) return;
+        /* 'removes' is the share of the group with no alternative path.
+           Applied to those still present, so the loss is non-additive. */
+        var remaining = pg.surviving;                 // absolute share
+        var lost = remaining * impact.removes;        // absolute share lost here
+        pg.surviving -= lost;
+        pg.causes.push({
+          step: n, sev: impact.sev, removed: lost, share: impact.removes,
+          survivingAfter: pg.surviving,
+          terminal: pg.surviving <= 1e-9,   // this step is what finished the group
+          fpc: impact.fpc, what: impact.what
+        });
+      });
+    });
+
+    groups.forEach(function (g) {
+      var pg = perGroup[g];
+      pg.removed = pg.prevalence - pg.surviving;
+      pg.completionRate = pg.prevalence > 0 ? pg.surviving / pg.prevalence : 1;
+      pg.saturated = pg.surviving <= 1e-9;
+    });
+
+    /* --- Population-weighted completion, three ways ---
+       Affected-group users meet BOTH their own serial reliability and their
+       deterministic blocker losses, and those compound rather than add:
+       a citizen who hits an unrecoverable wall never sees later steps. */
+    var resultsByCatch = {};
+    [CATCH_RATE.low, CATCH_RATE.mid, CATCH_RATE.high].forEach(function (catchRate) {
+      /* Extrapolate the measured component rate to the true rate: if automation
+         sees only `catchRate` of defects, and the page measures clean at
+         componentP, the true per-component defect rate is at least
+         componentP / catchRate (bounded by 1). */
+      var trueP = Math.min(0.99, componentP / catchRate);
+      var unaffectedSerial = Math.pow(1 - trueP, N);
+
+      /* Each group's completion = (share surviving its own blockers) ×
+         (serial reliability over the steps) × (degrader penalty). */
+      var weighted = 0, weightSum = 0;
+      groups.forEach(function (g) {
+        var pg = perGroup[g];
+        var prev = pg.prevalence;
+        if (prev <= 0) return;
+        var degraderPenalty = Math.pow(1 - trueP, pg.degraders * 4);
+        var rate = pg.completionRate * unaffectedSerial * degraderPenalty;
+        weighted += prev * rate;
+        weightSum += prev;
+      });
+
+      var unaffectedShare = Math.max(0, 1 - POPULATION.anyDisability);
+      var affectedShare = Math.min(POPULATION.anyDisability, weightSum);
+      var populationCompletion =
+        unaffectedShare * unaffectedCompletion +
+        affectedShare * (weightSum > 0 ? weighted / weightSum : 1);
+
+      resultsByCatch[catchRate] = {
+        catchRate: catchRate,
+        trueP: trueP,
+        affectedSerial: unaffectedSerial,
+        affectedCompletion: weightSum > 0 ? weighted / weightSum : 1,
+        populationCompletion: populationCompletion,
+        populationFailure: 1 - populationCompletion
+      };
+    });
+
+    return {
+      componentP: componentP,
+      unaffectedCompletion: unaffectedCompletion,
+      unaffectedFailure: 1 - unaffectedCompletion,
+      perGroup: perGroup,
+      byCatch: resultsByCatch,
+      catchSource: CATCH_RATE.source,
+      populationSource: POPULATION.source
+    };
+  }
+
+  var MILESTONES = [1, 5, 10, 20, 30];
+  var MILESTONE_NAMES = { 1: "Step 1", 5: "Step 5", 10: "Step 10", 20: "Step 20", 30: "Step 30" };
+
+  /* ------------------------------------------------------------------ *
+   * 2. Utilities
+   * ------------------------------------------------------------------ */
+  function pct(x, dp) {
+    if (dp === undefined) dp = 2;
+    return (x * 100).toFixed(dp) + " %";
+  }
+  function cumulativeFailure(p, n) { return 1 - Math.pow(1 - p, n); }
+  function clampP(p) { return Math.max(0, Math.min(0.5, p)); }
+
+  function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function stageName(sid) {
+    for (var i = 0; i < STAGES.length; i++) { if (STAGES[i].id === sid) return STAGES[i].name; }
+    return "Stage " + sid;
+  }
+
+  function domainLabel(key) { return DOMAINS[key].label; }
+
+  /* ------------------------------------------------------------------ *
+   * 3. State
+   * ------------------------------------------------------------------ */
+  var state = {
+    persona: null,
+    pPersona: P_BASE,
+    cursor: 0,
+    endedAt: null,        // step where the journey stopped, if it did
+    endReason: null,      // "terminal" | "exhausted" | "abandoned" | null
+    defectsHit: [],        // every defect revealed, in order
+    spoons: SPOONS_MAX,    // Spoon Theory capacity remaining
+    confidence: 100,       // trust in the service, 0-100
+    minutesLost: 0,        // wall-clock cost of friction and retries
+    attempts: 0,           // total interaction attempts, incl. retries
+    downgraded: [],        // domains whose emotional/attentional capacity is depleted
+    barriers: [],          // non-WCAG systemic barriers applicable to this run
+    runStarted: false,
+    /* User-chosen settings. null means "draw at random". */
+    override: { vision: null, motor: null, cognition: null, hearing: null },
+    qualityId: "0.99",
+    difficultyId: "standard"
+  };
+
+  function currentQuality() {
+    for (var i = 0; i < QUALITY.length; i++) { if (QUALITY[i].id === state.qualityId) return QUALITY[i]; }
+    return QUALITY[1];
+  }
+  function currentDifficulty() {
+    for (var i = 0; i < DIFFICULTY.length; i++) { if (DIFFICULTY[i].id === state.difficultyId) return DIFFICULTY[i]; }
+    return DIFFICULTY[1];
+  }
+
+  var el = {};
+  function cacheEls() {
+    var ids = ["personaCard", "startBtn", "stepBtn", "runAllBtn", "resetBtn",
+      "progressLive", "mStep", "mStage", "mAll", "mPersona", "mPersonaNote",
+      "mBlocks", "mBlockNote", "barAll", "barAllVal", "barPersona", "barPersonaVal",
+      "completionBody", "rail", "roAll", "roAllFormula", "roPersona", "roPersonaFormula",
+      "roPersonaNote", "milestoneOut", "recordOut", "ledgerOut", "execSummary", "execBody",
+      "mSpoons", "mSpoonsBar", "mConfidence", "mConfidenceBar", "mTime", "mAttempts",
+      "qualitySelect", "difficultySelect", "randomBtn", "personaStatus",
+      "sysLedger", "sysLedgerWrap", "runStateCard", "endBanner", "endBannerText",
+      "mechLegend", "originLegend",
+      "popInputsBody", "popResultBody", "popQualityBody", "popSummaryText"];
+    ids.forEach(function (id) { el[id] = document.getElementById(id); });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 4. Rail rendering
+   * ------------------------------------------------------------------ */
+  function buildRail() {
+    var frag = document.createDocumentFragment();
+    var lastStage = null;
+
+    STEPS.forEach(function (step) {
+      if (step.s !== lastStage) {
+        lastStage = step.s;
+        var chip = document.createElement("li");
+        chip.className = "stage-chip";
+        chip.style.listStyle = "none";
+        chip.style.border = "0";
+        chip.style.background = "transparent";
+        chip.style.padding = ".35rem .1rem 0";
+        chip.textContent = "Stage " + step.s + " — " + stageName(step.s);
+        frag.appendChild(chip);
+      }
+
+      var li = document.createElement("li");
+      li.id = "rail-step-" + step.n;
+      li.dataset.state = "pending";
+
+      var num = document.createElement("span");
+      num.className = "n";
+      num.textContent = "Step " + step.n;
+
+      var nameWrap = document.createElement("span");
+      nameWrap.className = "name";
+      nameWrap.appendChild(document.createTextNode(step.name));
+      var elem = document.createElement("span");
+      elem.className = "elem";
+      elem.textContent = step.elem;
+      nameWrap.appendChild(elem);
+
+      var status = document.createElement("span");
+      status.className = "status";
+      status.textContent = "Pending";
+
+      li.appendChild(num);
+      li.appendChild(nameWrap);
+      li.appendChild(status);
+      frag.appendChild(li);
+    });
+
+    el.rail.innerHTML = "";
+    el.rail.appendChild(frag);
+  }
+
+  function setRailState(n, s, label) {
+    var li = document.getElementById("rail-step-" + n);
+    if (!li) return;
+    li.dataset.state = s;
+    var span = li.querySelector(".status");
+    if (span) span.textContent = label;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 5. Persona generation
+   *
+   * Random by default. A user may pin any domain to a specific level;
+   * unpinned domains are still drawn at random. See buildPersonaFor for the
+   * rule that keeps manual selection from becoming a "cheat code".
+   * ------------------------------------------------------------------ */
+  function levelFor(key, levelName) {
+    var levels = DOMAINS[key].levels;
+    for (var i = 0; i < levels.length; i++) {
+      if (levels[i].level === levelName) return levels[i];
+    }
+    return null;
+  }
+
+  function makeDomainEntry(key, lvl) {
+    return { level: lvl.level, tag: lvl.tag, name: lvl.name, note: lvl.note, domain: key };
+  }
+
+  function buildPersona() {
+    var chosen = {};
+    Object.keys(DOMAINS).forEach(function (key) {
+      var pinned = state.override[key];
+      var lvl = pinned ? levelFor(key, pinned) : pick(DOMAINS[key].levels);
+      chosen[key] = makeDomainEntry(key, lvl);
+    });
+    chosen.__primary = null;
+    return { byDomain: chosen, domains: Object.keys(DOMAINS), primaryDomain: null };
+  }
+
+  /* Weighted, multi-domain-compounded persona defect rate.
+     Higher for personas whose constraints sit in the domains where defects
+     actually cluster (semantics, keyboard, cognition). */
+  function personaRate(persona) {
+    var sum = 0;
+    persona.domains.forEach(function (d) {
+      sum += REL_EXPOSURE[d] * severityFactor(persona, d);
+    });
+    return clampP(0.002 * sum);
+  }
+
+  /* Permanent constraints carry the heaviest effective exposure; situational
+     ones the lightest — but all three are real barriers. */
+  function severityFactor(persona, domain) {
+    var lvl = persona.byDomain[domain].level;
+    if (lvl === "Permanent") return 1.25;
+    if (lvl === "Temporary") return 1.0;
+    return 1.0;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 6. Rendering the persona card
+   * ------------------------------------------------------------------ */
+  function renderPersona() {
+    var p = state.persona;
+    var card = el.personaCard;
+    card.innerHTML = "";
+
+    var h = document.createElement("h3");
+    h.textContent = "Assigned citizen";
+    card.appendChild(h);
+
+    var dl = document.createElement("dl");
+    p.domains.forEach(function (key) {
+      var d = p.byDomain[key];
+
+      var dt = document.createElement("dt");
+      dt.appendChild(document.createTextNode(domainLabel(key) + " "));
+
+      var tag = document.createElement("span");
+      tag.className = "tag " + d.tag;
+      tag.textContent = d.level;
+      dt.appendChild(tag);
+
+      var dd = document.createElement("dd");
+      var strong = document.createElement("strong");
+      strong.textContent = d.name;
+      dd.appendChild(strong);
+      dd.appendChild(document.createElement("br"));
+      var note = document.createElement("span");
+      note.style.color = "var(--muted)";
+      note.style.fontSize = ".88rem";
+      note.textContent = d.note;
+      dd.appendChild(note);
+
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    });
+    card.appendChild(dl);
+
+    var summary = document.createElement("p");
+    summary.style.marginTop = ".7rem";
+    summary.innerHTML = "Compounded journey defect rate: " +
+      "<span class='mono'>p = " + state.pPersona.toFixed(4) + "</span> across " +
+      p.domains.length + " active domain" + (p.domains.length === 1 ? "" : "s") + ".";
+    card.appendChild(summary);
+
+    var note = document.createElement("p");
+    note.style.fontSize = ".85rem";
+    note.style.color = "var(--muted)";
+    note.style.marginBottom = "0";
+    note.textContent = "The persona spectrum matters because a Temporary or Situational constraint is " +
+      "not a lesser disability. It is the same barrier, met by more people, for a shorter time.";
+    card.appendChild(note);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 7. Metrics + live readout
+   * ------------------------------------------------------------------ */
+  function updateMetrics() {
+    var n = state.cursor;
+    var q = currentQuality();
+    var generalFail = cumulativeFailure(q.p, n);
+    var personaFail = cumulativeFailure(state.pPersona, n);
+
+    el.mStep.textContent = n + " / " + N;
+    el.mStage.textContent = n === 0
+      ? "Not started"
+      : (state.endedAt !== null
+          ? (state.endReason === "exhausted" ? "Gave up at step " + state.endedAt
+                                             : "Blocked at step " + state.endedAt)
+          : stageName(STEPS[Math.max(0, n - 1)].s));
+
+    el.mAll.textContent = pct(generalFail);
+    el.mPersona.textContent = pct(personaFail);
+    el.mPersonaNote.textContent = "p = " + state.pPersona.toFixed(4) + ", n = " + n;
+
+    /* Defects revealed this run, split by mechanic. */
+    var terminals = state.defectsHit.filter(function (d) { return d.mech === "terminal"; }).length;
+    el.mBlocks.textContent = String(state.defectsHit.length);
+    el.mBlockNote.textContent = state.defectsHit.length === 0
+      ? "no defects revealed yet"
+      : state.defectsHit.map(function (d) { return d.step + ":" + d.mech; }).join(", ") +
+        (terminals ? " (" + terminals + " terminal)" : "");
+
+    /* Spoon Theory + confidence + time, the game's resource state. */
+    if (el.mSpoons) el.mSpoons.textContent = Math.max(0, state.spoons) + " / " + SPOONS_MAX;
+    if (el.mSpoonsBar) el.mSpoonsBar.style.width = Math.max(0, Math.min(100, state.spoons)) + "%";
+    if (el.mConfidence) el.mConfidence.textContent = state.confidence + " %";
+    if (el.mConfidenceBar) el.mConfidenceBar.style.width = state.confidence + "%";
+    if (el.mTime) el.mTime.textContent = state.minutesLost + " min";
+    if (el.mAttempts) el.mAttempts.textContent = String(n + state.attempts);
+
+    el.roAll.textContent = pct(generalFail);
+    el.roAllFormula.textContent = "1 − (" + (1 - q.p).toFixed(4) + ")^" + n + " = " + pct(generalFail);
+
+    el.roPersona.textContent = pct(personaFail);
+    el.roPersonaFormula.textContent = "p = " + state.pPersona.toFixed(4) + ", n = " + n;
+    el.roPersonaNote.textContent =
+      "1 − (1 − " + state.pPersona.toFixed(4) + ")^" + n + " = " + pct(personaFail) +
+      " — the same arithmetic, applied to the citizens the average hides.";
+
+    var wAll = Math.min(100, generalFail * 100);
+    var wPer = Math.min(100, personaFail * 100);
+    el.barAll.style.width = wAll.toFixed(2) + "%";
+    el.barPersona.style.width = wPer.toFixed(2) + "%";
+    el.barAllVal.textContent = (wAll).toFixed(1) + " %";
+    el.barPersonaVal.textContent = (wPer).toFixed(1) + " %";
+    el.barAll.parentElement.parentElement.setAttribute("aria-label",
+      "General users: cumulative journey failure probability " + pct(generalFail));
+    el.barPersona.parentElement.parentElement.setAttribute("aria-label",
+      "This persona: cumulative journey failure probability " + pct(personaFail));
+
+    updateCompletionTable();
+    renderPopulationModel();
+    el.progressLive.textContent = "Step " + n + " of " + N + ". General journey failure probability " +
+      pct(generalFail) + ". Persona journey failure probability " + pct(personaFail) + ".";
+  }
+
+  function updateCompletionTable() {
+    var body = el.completionBody;
+    body.innerHTML = "";
+    [5, 10, 15, 20, 30, 50, 100].forEach(function (n) {
+      var g = cumulativeFailure(currentQuality().p, n);
+      var pr = cumulativeFailure(state.pPersona, n);
+      var tr = document.createElement("tr");
+      if (n === 30) tr.className = "hit";
+      if (MILESTONES.indexOf(n) !== -1) tr.classList.add("milestone");
+
+      var th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = String(n);
+      tr.appendChild(th);
+
+      [g, 1 - g, pr].forEach(function (v) {
+        var td = document.createElement("td");
+        td.className = "num";
+        td.textContent = pct(v);
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 7b. Rendering the population model
+   * ------------------------------------------------------------------ */
+  var GROUP_LABELS = {
+    vision:    "Blind / no vision (302.1)",
+    lowVision: "Limited vision (302.2)",
+    hearing:   "Deaf / no hearing (302.4)",
+    mobility:  "Limited manipulation (302.7)",
+    cognition: "Limited cognition (302.9)"
+  };
+
+  function renderPopulationModel() {
+    if (!el.popInputsBody) return;
+    var q = currentQuality();
+    var model = computePopulationModel(q.p);
+
+    /* ---- Inputs table ---- */
+    var inputs = [
+      { name: "Any functional disability, US adults", value: pct(POPULATION.anyDisability, 1),
+        src: POPULATION.source, kind: "published" },
+      { name: "Vision disability (blind or serious difficulty seeing)", value: pct(POPULATION.vision.p, 1),
+        src: POPULATION.vision.citation, kind: "published" },
+      { name: "Any difficulty seeing", value: pct(POPULATION.lowVision.p, 1),
+        src: POPULATION.lowVision.citation, kind: "published" },
+      { name: "Deaf or serious difficulty hearing", value: pct(POPULATION.hearing.p, 1),
+        src: POPULATION.hearing.citation, kind: "published" },
+      { name: "Mobility disability", value: pct(POPULATION.mobility.p, 1),
+        src: POPULATION.mobility.citation, kind: "published" },
+      { name: "Cognition disability", value: pct(POPULATION.cognition.p, 1),
+        src: POPULATION.cognition.citation, kind: "published" },
+      { name: "Keyboard dependence, low-vision users", value: pct(KEYBOARD_DEPENDENCE_LOW_VISION, 1),
+        src: "WebAIM Survey of Users with Low Vision #2: “60.4 % always or often use a keyboard for web page navigation.” Range 0.50–0.70.", kind: "published" },
+      { name: "Screen-reader dependence, blind users", value: pct(SR_DEPENDENCE_BLIND, 1),
+        src: "WebAIM Screen Reader User Survey #11 (2026): 91.8 % use a screen reader on mobile; treated as 0.95 for semantic defects. Range 0.90–1.00.", kind: "assumption" },
+      { name: "Automated-tool catch rate", value: "30 – 50 %",
+        src: CATCH_RATE.source + ". Carried as a range; it is the widest single lever on the output.", kind: "published" },
+      { name: "Measured defect density, top 1M home pages", value: WEBAIM_2025.errorsPerPage + " errors / page",
+        src: WEBAIM_2025.source + ": 94.8 % of home pages had detectable WCAG 2 failures; 96 % of errors fall in six categories.", kind: "published" },
+      { name: "Partial-blocker fractions per defect", value: "0.55 – 0.85",
+        src: "No standards body publishes these. Each is stated per-defect with a range in the defect record. This is the model's weakest evidence layer and it is labelled as such.", kind: "assumption" },
+      { name: "Degrader compounding cost", value: "4 extra effective steps each",
+        src: "Illustrative. A degrader raises the error rate; the extra-step equivalent is a modelling choice, not a measurement.", kind: "assumption" }
+    ];
+
+    var ib = el.popInputsBody;
+    ib.innerHTML = "";
+    inputs.forEach(function (row) {
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = row.name;
+      tr.appendChild(th);
+      [row.value].forEach(function (v) {
+        var td = document.createElement("td");
+        td.className = "num";
+        td.textContent = v;
+        tr.appendChild(td);
+      });
+      var src = document.createElement("td");
+      src.textContent = row.src;
+      src.style.fontSize = ".85rem";
+      tr.appendChild(src);
+      var kind = document.createElement("td");
+      var tag = document.createElement("span");
+      tag.className = "tag " + (row.kind === "published" ? "src-fpc" : "src-sys");
+      tag.textContent = row.kind === "published" ? "Published" : "Assumption";
+      kind.appendChild(tag);
+      tr.appendChild(kind);
+      ib.appendChild(tr);
+    });
+
+    /* ---- Per-group result table ---- */
+    var rb = el.popResultBody;
+    rb.innerHTML = "";
+    Object.keys(GROUP_LABELS).forEach(function (g) {
+      var pg = model.perGroup[g];
+      var tr = document.createElement("tr");
+      var th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = GROUP_LABELS[g];
+      tr.appendChild(th);
+
+      var prev = document.createElement("td");
+      prev.className = "num";
+      prev.textContent = pct(pg.prevalence, 1);
+      tr.appendChild(prev);
+
+      var loss = document.createElement("td");
+      loss.className = "num";
+      loss.textContent = "−" + (pg.removed * 100).toFixed(1) + " pp";
+      tr.appendChild(loss);
+
+      var comp = document.createElement("td");
+      comp.className = "num";
+      comp.textContent = pg.saturated ? "none" : pct(pg.completionRate, 1);
+      tr.appendChild(comp);
+
+      var cause = document.createElement("td");
+      if (pg.causes.length) {
+        /* Name the DECISIVE step — the one that left the group with no path —
+           rather than the single largest removal, which understates a union. */
+        var decisive = pg.causes.filter(function (c) { return c.terminal; })[0] ||
+                       pg.causes.reduce(function (a, b) { return b.removed > a.removed ? b : a; });
+        var walls = pg.causes.filter(function (c) { return c.terminal; }).length;
+        var lead = walls
+          ? (walls > 1 ? walls + " unrecoverable walls; the last is step " + decisive.step
+                       : "Unrecoverable wall at step " + decisive.step)
+          : "Partial losses at " + pg.causes.length + " step" + (pg.causes.length === 1 ? "" : "s") +
+            ", decisive at step " + decisive.step;
+        cause.textContent = lead + " — " + decisive.fpc + ". " + decisive.what;
+      } else {
+        cause.textContent = "No exclusive blocker. This group loses only to serial reliability and degraders.";
+      }
+      cause.style.fontSize = ".85rem";
+      tr.appendChild(cause);
+
+      rb.appendChild(tr);
+    });
+
+    /* ---- Quality dial table ---- */
+    var qb = el.popQualityBody;
+    qb.innerHTML = "";
+    QUALITY.forEach(function (qual) {
+      var m = computePopulationModel(qual.p);
+      var tr = document.createElement("tr");
+      if (qual.id === state.qualityId) tr.className = "hit";
+
+      var th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = qual.label;
+      tr.appendChild(th);
+
+      var unaided = document.createElement("td");
+      unaided.className = "num";
+      unaided.textContent = pct(m.unaffectedFailure, 2) + " failure";
+      tr.appendChild(unaided);
+
+      [CATCH_RATE.low, CATCH_RATE.mid, CATCH_RATE.high].forEach(function (cr) {
+        var td = document.createElement("td");
+        td.className = "num";
+        td.textContent = pct(m.byCatch[cr].populationFailure, 2) + " failure";
+        tr.appendChild(td);
+      });
+      qb.appendChild(tr);
+    });
+
+    /* ---- Summary ---- */
+    if (el.popSummaryText) {
+      var base = computePopulationModel(0.01);
+      var best = computePopulationModel(0.001);
+      /* A saturated group has no path at all: say so, do not print "0.0 %",
+         which reads like a small number rather than an absolute loss. */
+      function groupCompletion(pg) {
+        return pg.saturated ? "no path at all" : pct(pg.completionRate, 1) + " completion";
+      }
+      el.popSummaryText.innerHTML =
+        "<strong>The gap, stated as arithmetic.</strong> At the brief's 99&nbsp;% component quality, " +
+        "the customer-facing figure is <span class='mono'>" + pct(base.unaffectedFailure, 2) + "</span> " +
+        "journey failure for a user with no access needs — the 1&nbsp;−&nbsp;0.99³⁰ number. The same " +
+        "build, measured across the population partition that Section 508 and EN 301 549 already define, " +
+        "produces <span class='mono'>" + pct(base.byCatch[CATCH_RATE.high].populationFailure, 2) + "</span> to " +
+        "<span class='mono'>" + pct(base.byCatch[CATCH_RATE.low].populationFailure, 2) + "</span> population " +
+        "journey failure, depending only on how much automation is assumed to miss. " +
+        "Raising component quality to 99.9&nbsp;% — a tenfold reduction in defect rate — moves the population " +
+        "figure only to <span class='mono'>" + pct(best.byCatch[CATCH_RATE.high].populationFailure, 2) + "</span> to " +
+        "<span class='mono'>" + pct(best.byCatch[CATCH_RATE.low].populationFailure, 2) + "</span>, " +
+        "and leaves the blind group at " + groupCompletion(best.perGroup.vision) +
+        ", the low-vision group at " + groupCompletion(best.perGroup.lowVision) +
+        ", and the mobility group at " + groupCompletion(best.perGroup.mobility) + ". " +
+        "<strong>Quality improvement cannot reach the people the walls exclude.</strong>";
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 8. Defect record
+   * ------------------------------------------------------------------ */
+
+  /* Resolve which defect a citizen meets at a step, given the mechanic. */
+  function defectAt(stepNumber) {
+    return DEFECTS[stepNumber] || null;
+  }
+
+  function mechanicBadge(mech) {
+    switch (mech) {
+      case "terminal": return { cls: "mech-terminal", label: "TERMINAL — pass or fail" };
+      case "spoon":    return { cls: "mech-spoon",    label: "SPOON COST — energy drain" };
+      case "effort":   return { cls: "mech-effort",   label: "EFFORT — retry with cost" };
+      default:         return { cls: "mech-friction", label: "FRICTION — never stops progress" };
+    }
+  }
+
+  function originBadge(originKey) {
+    var o = ORIGIN[originKey] || ORIGIN.WCAG;
+    return { cls: o.cls, label: o.label };
+  }
+
+  function renderRecord(stepNumber, outcome) {
+    var step = STEPS[stepNumber - 1];
+    var def = defectAt(stepNumber);
+    if (!def) return;
+
+    var mech = outcome.mech || def.mech;
+    var mb = mechanicBadge(mech);
+    var ob = originBadge(def.origin);
+    var generalFail = cumulativeFailure(currentQuality().p, stepNumber);
+    var personaFail = cumulativeFailure(state.pPersona, stepNumber);
+
+    var html = "";
+    html += "<div class='record " + mb.cls + "'>";
+    html += "<span class='stamp " + mb.cls + "'>" + mb.label + "</span>";
+    html += "<h3>" + MILESTONE_NAMES[stepNumber] + ": " + step.name + "</h3>";
+    html += "<p style='margin:.2rem 0 .6rem'><strong>Element type:</strong> " + esc(step.elem) +
+            " &nbsp;•&nbsp; <strong>Stage " + step.s + ":</strong> " + esc(stageName(step.s)) + "</p>";
+
+    html += "<dl class='defect-dl'>";
+    html += "<dt>Defect</dt><dd>" + esc(def.title) + "</dd>";
+    html += "<dt>Obligation source</dt><dd><span class='tag " + ob.cls + "'>" + ob.label + "</span></dd>";
+    html += "<dt>Standard / citation</dt><dd>" + esc(def.crit) + "</dd>";
+    html += "<dt>ACT rule</dt><dd>" + esc(def.act) + "</dd>";
+    html += "<dt>FPC</dt><dd>" + esc(def.fpc) + "</dd>";
+    html += "<dt>Mechanic</dt><dd>" + mb.label +
+            (def.spoon ? " &nbsp;•&nbsp; energy cost: <span class='mono'>" + def.spoon + " spoons</span>" : "") + "</dd>";
+    html += "<dt>Outcome for this citizen</dt><dd>" + esc(outcome.summary) + "</dd>";
+    html += "<dt>Cumulative P(journey failure) here</dt><dd class='mono'>general " +
+            pct(generalFail) + " &nbsp;|&nbsp; this persona " + pct(personaFail) + "</dd>";
+    html += "</dl>";
+
+    html += "<h4>What this citizen experiences, in their own words</h4>";
+    html += "<p class='quote'>" + personaQuote(def.domain, state.persona.byDomain[def.domain], step, outcome) + "</p>";
+
+    html += "<h4>Automated scanner behaviour</h4>";
+    var vClass = def.scanner === "green" ? "green" : (def.scanner === "partial" ? "partial" : "flag");
+    var vText = def.scanner === "green"
+      ? "Reported as PASSING"
+      : (def.scanner === "partial" ? "Partial flag — the decisive question is invisible to the tool" : "Flagged by automation");
+    html += "<p class='verdict " + vClass + "'>" + vText + "</p>";
+    html += "<p style='margin:.6rem 0 0'>" + esc(def.scannerText) + "</p>";
+    html += "</div>";
+
+    el.recordOut.innerHTML = html;
+  }
+
+  function personaQuote(domainKey, personaLevel, step, outcome) {
+    var d = state.persona.byDomain[domainKey];
+    var who = d.level.toLowerCase();
+
+    var byDomain = {
+      vision: {
+        Permanent:
+          "The screen reader reads \"table\" and then just reads cells in a flat run. I hear the months but I never hear which column a number belongs to. Thirteen months of figures with no header binding — I cannot tell income from deductions, so I cannot tell whether the number I am about to swear to is correct. There is no error, no alert. The page is simply silent about structure, and I am being asked to sign a legal declaration.",
+        Temporary:
+          "My pupils are still dilated from the exam. The date field is a pale grey box on a paler grey panel. I can technically see that something is there, but I cannot read the placeholder text, and there is no label above it. I take a photo of my screen with my phone, zoom in on the photo, and try to reverse-engineer what the field wants. I get the format wrong twice.",
+        Situational:
+          "I am standing at the bus stop in full sun. The table text is white on a light yellow band. I angle the phone away from the sun, cup my hand over the glass, and still guess the wrong column. I have four minutes of battery and no way to know which cell means what."
+      },
+      motor: {
+        Permanent:
+          "I do not have a pointer. I tab to the date field, I type into it, and nothing appears. The only way the calendar opens is a mouse click on a chevron the keyboard can never reach. I can enter the field and I can leave the field, and I can never open the control. That is the whole journey, finished, at step 17. I have no mouse and no alternative route — filing by post is three weeks I do not have, in February.",
+        Temporary:
+          "My wrist is in a splint. I can click, once, carefully. Dragging a file from a folder into a dashed box requires holding the button down through a distance I cannot hold. I try, the file drops back into Finder, and the zone resets. There is no browse button. I am locked out of a benefit my household is eligible for because of a sprained wrist.",
+        Situational:
+          "I have a toddler on my hip. Every drag has to be a one-thumb gesture, and the box keeps losing the drop. My attention is split, so I do not even notice there was no browse alternative offered. I assume I have made the mistake, not the design."
+      },
+      cognition: {
+        Permanent:
+          "I answered the first two questions and then got to a modal about a session I cannot see. When I dismiss it, the income section has reverted. The form never saved my progress and never told me it wouldn't. My working memory was already carrying six numbers; now it is carrying them from scratch, and I have lost the thread.",
+        Temporary:
+          "The banner pulses and updates on a timer while I am reading. With this migraine, that is the worst possible design. I need to fill in a number and I cannot look at the movement. I close the tab to make it stop, and I do not come back today.",
+        Situational:
+          "The disconnection notice is on the table next to me. The error message says \"Invalid input.\" It does not say which field, why, or what a valid value looks like. I re-read the entire page three times looking for the mistake. In a crisis, an unexplained error doesn't feel like a bug — it feels like the system deciding I am not eligible."
+      },
+      hearing: {
+        Permanent:
+          "The verification code arrives as an audio call. There is a text option, but it only appears after you click a \"trouble hearing?\" link that is itself unlabelled. I am Deaf. My entire journey is one modal. Everything before it and everything after it is irrelevant, because I can never get past step 10.",
+        Temporary:
+          "Between the ear infection and the laryngitis I can neither hear the prompt nor phone the helpline. The only support route offered is a voice callback number. I have been given one channel and it is the channel I have lost.",
+        Situational:
+          "I am on the platform with announcements and trains. The audio instruction is inaudible, and there is no caption, no text equivalent, and no visible transcript. I stand still and let the session time out because I cannot hear what the page is telling me to do."
+      }
+    };
+
+    var text = byDomain[domainKey][d.level];
+    var mech = outcome.mech || "friction";
+    if (mech === "terminal") {
+      text += " <strong>[Journey ends here. There is no alternative route.]</strong>";
+    } else if (mech === "spoon") {
+      text += " <strong>[No wall — but it costs " + (outcome.spoon || 10) +
+        " spoons. " + state.spoons + " of " + SPOONS_MAX + " remain. Enough of these and I stop, without ever being told I failed.]</strong>";
+    } else if (mech === "effort") {
+      text += " <strong>[I retry, at a cost of time and confidence. " +
+        (outcome.retries || 1) + " extra attempt(s) needed.]</strong>";
+    } else {
+      text += " <strong>[I can continue. It costs comfort and trust, not access.]</strong>";
+    }
+    return text;
+  }
+
+  function addToLedger(stepNumber, outcome) {
+    var step = STEPS[stepNumber - 1];
+    var def = defectAt(stepNumber);
+    if (!def) return;
+    var mb = mechanicBadge(outcome.mech || def.mech);
+    var ob = originBadge(def.origin);
+    var d = state.persona.byDomain[def.domain];
+
+    if (el.ledgerOut.querySelector(".ledger-empty")) el.ledgerOut.innerHTML = "";
+
+    var li = document.createElement("li");
+    li.className = "ledger-item " + mb.cls;
+    var where = document.createElement("span");
+    where.className = "where";
+    where.textContent = "Step " + stepNumber + " — " + step.name;
+    var meta = document.createElement("span");
+    meta.className = "meta";
+    meta.textContent = def.title + " • " + mb.label + " • " + ob.label +
+      " • domain: " + domainLabel(def.domain) + " (" + d.level + ")";
+    li.appendChild(where);
+    li.appendChild(meta);
+    el.ledgerOut.appendChild(li);
+  }
+
+  /* Systemic (non-WCAG) barriers get their own ledger so the distinction is
+     visible rather than buried. */
+  function addSystemicToLedger(barrier, outcome) {
+    if (!el.sysLedger) return;
+    if (el.sysLedger.querySelector(".ledger-empty")) el.sysLedger.innerHTML = "";
+    if (el.sysLedgerWrap) el.sysLedgerWrap.hidden = false;
+
+    var li = document.createElement("li");
+    li.className = "ledger-item mech-terminal";
+    var where = document.createElement("span");
+    where.className = "where";
+    where.textContent = barrier.title;
+    var meta = document.createElement("span");
+    meta.className = "meta";
+    meta.textContent = barrier.detail + " • " + barrier.crit +
+      (outcome && outcome.note ? " • " + outcome.note : "");
+    li.appendChild(where);
+    li.appendChild(meta);
+    el.sysLedger.appendChild(li);
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 9. Milestone narrative
+   * ------------------------------------------------------------------ */
+  function renderMilestone(stepNumber) {
+    var step = STEPS[stepNumber - 1];
+    var def = defectAt(stepNumber);
+    var q = currentQuality();
+    var g = cumulativeFailure(q.p, stepNumber);
+    var p = cumulativeFailure(state.pPersona, stepNumber);
+    var mb = def ? mechanicBadge(def.mech) : null;
+    var ob = def ? originBadge(def.origin) : null;
+
+    var html = "<strong>" + MILESTONE_NAMES[stepNumber] + " narrative — " + esc(step.name) +
+      "</strong> (" + esc(step.elem) + ")<br>" +
+      "<span class='mono'>P(failure) general = 1 − (" + (1 - q.p).toFixed(4) + ")^" + stepNumber +
+      " = " + pct(g) + "</span><br>" +
+      "<span class='mono'>P(failure) this persona = " + pct(p) + "</span><br>" +
+      "<span class='mono'>Spoons remaining: " + state.spoons + " / " + SPOONS_MAX +
+      " &nbsp;|&nbsp; confidence: " + state.confidence + " %</span><br>";
+    if (def) {
+      html += "Defect at this step: <em>" + esc(def.title) + "</em> — " + mb.label +
+        " <span class='tag " + ob.cls + "'>" + ob.label + "</span>";
+    } else {
+      html += "No defect seeded at this step in this run.";
+    }
+
+    el.milestoneOut.innerHTML = html;
+    el.milestoneOut.hidden = false;
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 10. Run engine
+   *
+   * Each step is one roll. A seeded defect then resolves through its own
+   * mechanic:
+   *   terminal — one roll against exposure; success ends the journey
+   *   spoon    — no wall; draws down the citizen's finite energy pool
+   *   effort   — retryable; costs attempts, time and confidence
+   *   friction — never stops progress; small cost only
+   * Running out of spoons ends the journey as "gave up", which is a
+   * different ending from "blocked" — and it is the commoner one.
+   * ------------------------------------------------------------------ */
+  var runSeedCache = {};
+
+  /* Exposure: the probability that a defect in a given domain is
+     TASK-FATAL for this citizen. This is deliberately NOT the component
+     defect rate. The defect rate already decided that the control is broken;
+     exposure answers the separate question of whether this particular citizen
+     depends on the mechanism that is broken.
+
+     Re-applying the component rate here would gate the same defect twice and
+     understate failure by orders of magnitude. */
+  var EXPOSURE = {
+    vision:    { blind: 1.00, lowVision: 0.85, glare: 0.45, none: 0.05 },
+    motor:     { keyboardOnly: 1.00, oneHanded: 0.70, toddler: 0.55, none: 0.05 },
+    cognition: { executive: 0.70, migraine: 0.75, crisis: 0.65, none: 0.10 },
+    hearing:   { deaf: 1.00, laryngitis: 0.80, transit: 0.45, none: 0.05 }
+  };
+
+  /* Does this citizen depend on the mechanism this defect breaks? */
+  function exposureForPersona(domain) {
+    var table = EXPOSURE[domain];
+    if (!table) return 0.5;
+    var lvl = state.persona.byDomain[domain].level;
+    if (lvl === "Permanent") {
+      return table.blind !== undefined ? table.blind
+           : table.keyboardOnly !== undefined ? table.keyboardOnly
+           : table.executive !== undefined ? table.executive : table.deaf;
+    }
+    if (lvl === "Temporary") {
+      return table.lowVision !== undefined ? table.lowVision
+           : table.oneHanded !== undefined ? table.oneHanded
+           : table.migraine !== undefined ? table.migraine : table.laryngitis;
+    }
+    return table.glare !== undefined ? table.glare
+         : table.toddler !== undefined ? table.toddler
+         : table.crisis !== undefined ? table.crisis : table.transit;
+  }
+
+  function seedDefects() {
+    var drawn = {};
+    Object.keys(STEP_HAZARD).forEach(function (nStr) {
+      var n = Number(nStr);
+      if (Math.random() < STEP_HAZARD[n]) drawn[n] = true;
+    });
+    return drawn;
+  }
+
+  /* If the user pinned any domain, respect it; otherwise draw at random.
+     We do NOT re-aim defects at a manually chosen persona — that would make
+     manual selection a guaranteed-block cheat code. The build has whatever
+     defects it has; the citizen meets the ones they depend on. */
+  function resolvePersona() {
+    var pinned = Object.keys(state.override).filter(function (k) { return state.override[k]; });
+    var persona = buildPersona();
+    persona.primaryDomain = pinned.length ? pinned[0] : null;
+
+    /* When the user has pinned nothing, nudge the draw toward the domains
+       this build actually breaks — a defect only exists as an accessibility
+       failure for a citizen who depends on the broken mechanism. This is a
+       nudge, not a guarantee: if it were deterministic, every run would be
+       walled by the same two terminal steps, and the distribution of endings
+       would collapse. */
+    if (!pinned.length && Math.random() < 0.65) {
+      var seededSteps = Object.keys(runSeedCache).map(Number);
+      if (seededSteps.length) {
+        var domain = DEFECTS[seededSteps[Math.floor(Math.random() * seededSteps.length)]].domain;
+        var lvl = pick(DOMAINS[domain].levels);
+        persona.byDomain[domain] = makeDomainEntry(domain, lvl);
+        persona.primaryDomain = domain;
+      }
+    }
+    return persona;
+  }
+
+  /* Apply a defect's mechanic and return the outcome.
+
+     A defect can only be met if this build actually carries it — that is,
+     if this step was seeded at the component defect rate. Exposure then
+     answers a separate question: does this citizen depend on the mechanism
+     that is broken? Both conditions must hold. Checking exposure alone would
+     make every step defective for an exposed citizen and inflate the observed
+     defect rate far beyond the 1 % the model claims. */
+  function resolveDefect(stepNumber) {
+    var def = DEFECTS[stepNumber];
+    if (!def) return { met: false };
+
+    /* The component is only defective if the build's defect draw put one here. */
+    if (!runSeedCache[stepNumber]) return { met: false };
+
+    var diff = currentDifficulty();
+    var exposure = exposureForPersona(def.domain);
+
+    /* A citizen only meets a defect they depend on. */
+    if (Math.random() >= exposure) {
+      return { met: false };
+    }
+
+    var mech = def.mech;
+    var cost = Math.round((def.spoon || 3) * diff.mult);
+
+    if (mech === "terminal") {
+      return {
+        met: true, mech: "terminal", cost: cost,
+        terminates: true,
+        summary: "Journey ends. The task cannot be completed by this route.",
+        detail: "Exposure for this persona: " + (exposure * 100).toFixed(0) +
+                "%. The mechanism is unusable and no alternative is offered."
+      };
+    }
+
+    if (mech === "spoon") {
+      state.spoons -= cost;
+      state.confidence = Math.max(0, state.confidence - Math.round(cost / 2));
+      state.minutesLost += cost * 2;
+      var exhausted = state.spoons <= 0;
+      return {
+        met: true, mech: "spoon", cost: cost, spoon: cost,
+        terminates: exhausted,
+        endReason: exhausted ? "exhausted" : null,
+        summary: exhausted
+          ? "Energy exhausted. The citizen stops — not blocked, just spent."
+          : "Progress continues, at a cost of " + cost + " spoons.",
+        detail: "Spoons remaining: " + Math.max(0, state.spoons) + " / " + SPOONS_MAX + "."
+      };
+    }
+
+    if (mech === "effort") {
+      var retries = 1 + Math.floor(Math.random() * 2);
+      if (Math.random() < exposure) retries += 1;
+      state.spoons -= Math.round(cost * 0.6);
+      state.confidence = Math.max(0, state.confidence - Math.round(cost / 3));
+      state.minutesLost += cost * 3;
+      state.attempts += retries;
+      return {
+        met: true, mech: "effort", cost: cost, retries: retries,
+        terminates: state.spoons <= 0,
+        endReason: state.spoons <= 0 ? "exhausted" : null,
+        summary: "Recovered after " + retries + " extra attempt(s).",
+        detail: "Effort cost " + Math.round(cost * 0.6) + " spoons and about " + (cost * 3) + " minutes."
+      };
+    }
+
+    /* friction */
+    state.spoons -= Math.max(1, Math.round(cost * 0.4));
+    state.confidence = Math.max(0, state.confidence - 1);
+    state.minutesLost += 2;
+    return {
+      met: true, mech: "friction", cost: cost,
+      terminates: false,
+      summary: "Passes. It costs comfort and trust, but not access.",
+      detail: "This is a real violation, and it is not what stops anyone."
+    };
+  }
+
+  function startRun() {
+    recomputeHazards(currentQuality().p);
+    runSeedCache = seedDefects();
+    state.persona = resolvePersona();
+    state.pPersona = personaRate(state.persona);
+    state.cursor = 0;
+    state.endedAt = null;
+    state.endReason = null;
+    state.defectsHit = [];
+    state.spoons = SPOONS_MAX;
+    state.confidence = 100;
+    state.minutesLost = 0;
+    state.attempts = 0;
+    state.downgraded = [];
+    state.runStarted = true;
+    state.barriers = applicableBarriers(state.persona, state.difficultyId);
+
+    renderPersona();
+    buildRail();
+    el.ledgerOut.innerHTML = "<li class='ledger-empty'><span class='where'>Empty ledger</span><span class='meta'>No defects revealed yet.</span></li>";
+    if (el.sysLedger) {
+      el.sysLedger.innerHTML = "<li class='ledger-empty'><span class='where'>Empty ledger</span><span class='meta'>No non-WCAG barriers triggered yet.</span></li>";
+      if (el.sysLedgerWrap) el.sysLedgerWrap.hidden = true;
+    }
+    if (el.endBanner) el.endBanner.hidden = true;
+    el.recordOut.innerHTML = "<p style='margin:0'>No defect has manifested yet. Advance the simulation to reveal the first barrier this citizen meets — with its mechanic, obligation source, WCAG/ACT/FPC citation, first-person account, and an automated-scanner verdict.</p>";
+    el.milestoneOut.hidden = true;
+    el.execSummary.hidden = true;
+    updateMetrics();
+
+    el.stepBtn.disabled = false;
+    el.runAllBtn.disabled = false;
+    el.resetBtn.disabled = false;
+    el.startBtn.textContent = "New citizen";
+
+    announce("Simulation started. " + state.persona.domains.map(function (k) {
+      return DOMAINS[k].label + " " + state.persona.byDomain[k].level;
+    }).join("; ") + ". Persona defect rate " + state.pPersona.toFixed(4) + ".");
+  }
+
+  function announce(msg) {
+    if (el.progressLive) el.progressLive.textContent = msg;
+  }
+
+  function advanceOne() {
+    if (!state.runStarted) return;
+    if (state.endedAt !== null) return;
+    if (state.cursor >= N) return;
+
+    var next = state.cursor + 1;
+    var outcome = resolveDefect(next);
+    state.cursor = next;
+
+    if (!outcome.met) {
+      setRailState(next, "pass", "Passed");
+      if (MILESTONES.indexOf(next) !== -1) {
+        renderMilestone(next);
+        renderRecord(next, { mech: "friction", summary: "No defect manifested at this step in this run.", met: false });
+      }
+      updateMetrics();
+      if (state.cursor >= N) finishJourney();
+      return;
+    }
+
+    state.defectsHit.push({ step: next, mech: outcome.mech });
+
+    var mb = mechanicBadge(outcome.mech);
+    if (outcome.terminates) {
+      state.endedAt = next;
+      state.endReason = outcome.endReason || "terminal";
+      setRailState(next, "block", outcome.endReason === "exhausted" ? "STOPPED — energy spent" : "BLOCKED — task ends");
+    } else if (outcome.mech === "spoon") {
+      setRailState(next, "spoon", "Cost " + outcome.cost + " spoons");
+    } else if (outcome.mech === "effort") {
+      setRailState(next, "effort", "Retry ×" + (outcome.retries || 1));
+    } else {
+      setRailState(next, "friction", "Friction only");
+    }
+
+    addToLedger(next, outcome);
+
+    /* A systemic barrier may fire at any step — independent of whether a WCAG
+       defect manifested there. It resolves through the same mechanics. */
+    maybeFireBarrier(next);
+
+    if (MILESTONES.indexOf(next) !== -1 || outcome.terminates) {
+      renderRecord(next, outcome);
+      if (MILESTONES.indexOf(next) !== -1) renderMilestone(next);
+    }
+
+    updateMetrics();
+
+    if (state.endedAt !== null || state.cursor >= N) {
+      finishJourney();
+    }
+  }
+
+  /* Systemic barriers fire on their own schedule, because they do not live in
+     the component tree. Each has a small per-step probability; once fired it
+     is retired for the run. They resolve through the same three mechanics.
+
+     The per-step probability is low on purpose. With several applicable
+     barriers over 30 steps, a rate even as small as 2 % per barrier per step
+     would make a systemic barrier almost certain — which would drown out the
+     WCAG story this simulator exists to tell. At 0.4 % per barrier per step a
+     typical run meets zero or one barrier, which is the honest frequency:
+     these are real, they are common across services, and they are not what
+     happens on every single attempt. */
+  var BARRIER_STEP_P = 0.004;
+
+  function maybeFireBarrier(stepNumber) {
+    if (!state.barriers || !state.barriers.length) return;
+    for (var i = 0; i < state.barriers.length; i++) {
+      var b = state.barriers[i];
+      if (b.__fired) continue;
+      if (Math.random() >= BARRIER_STEP_P) continue;   // ~0.4 % per barrier per step
+
+      b.__fired = true;
+      var diff = currentDifficulty();
+      var cost = Math.round((b.spoon || 10) * diff.mult);
+
+      if (b.mech === "terminal") {
+        state.endedAt = stepNumber;
+        state.endReason = "terminal";
+        state.defectsHit.push({ step: stepNumber, mech: "terminal", systemic: true, title: b.title });
+        setRailState(stepNumber, "block", "BLOCKED — non-WCAG barrier");
+        addSystemicToLedger(b, { note: "Terminal. No conformance criterion is violated." });
+        stampBarrierRecord(b, stepNumber);
+        return;
+      }
+
+      if (b.mech === "spoon") {
+        state.spoons -= cost;
+        state.confidence = Math.max(0, state.confidence - Math.round(cost / 2));
+        state.minutesLost += cost * 2;
+        state.defectsHit.push({ step: stepNumber, mech: "spoon", systemic: true, title: b.title });
+        setRailState(stepNumber, "spoon", "Barrier — " + cost + " spoons");
+        addSystemicToLedger(b, { note: "Cost " + cost + " spoons. The page is conformant." });
+        if (state.spoons <= 0) {
+          state.endedAt = stepNumber;
+          state.endReason = "exhausted";
+          stampBarrierRecord(b, stepNumber);
+          finishJourney();
+        }
+        return;
+      }
+
+      /* effort */
+      state.spoons -= Math.round(cost * 0.6);
+      state.confidence = Math.max(0, state.confidence - Math.round(cost / 3));
+      state.minutesLost += cost * 3;
+      state.defectsHit.push({ step: stepNumber, mech: "effort", systemic: true, title: b.title });
+      addSystemicToLedger(b, { note: "Recoverable, at a cost of roughly " + (cost * 3) + " minutes." });
+      if (state.spoons <= 0) {
+        state.endedAt = stepNumber;
+        state.endReason = "exhausted";
+        finishJourney();
+      }
+    }
+  }
+
+  function stampBarrierRecord(b, stepNumber) {
+    var wrap = document.createElement("div");
+    wrap.className = "record mech-terminal";
+    wrap.innerHTML =
+      "<span class='stamp mech-terminal'>SYSTEMIC BARRIER — outside WCAG 2.2</span>" +
+      "<h3>Step " + stepNumber + ": " + esc(b.title) + "</h3>" +
+      "<dl class='defect-dl'>" +
+      "<dt>Obligation source</dt><dd><span class='tag src-sys'>Systemic barrier — outside WCAG 2.2</span></dd>" +
+      "<dt>Standard / citation</dt><dd>" + esc(b.crit) + "</dd>" +
+      "<dt>WCAG conformance</dt><dd>Nothing here is a conformance failure. The page can pass every " +
+      "success criterion and still exclude this citizen.</dd>" +
+      "<dt>What happens</dt><dd>" + esc(b.detail) + "</dd>" +
+      "</dl>";
+    el.recordOut.innerHTML = "";
+    el.recordOut.appendChild(wrap);
+  }
+
+  function finishJourney() {
+    el.stepBtn.disabled = true;
+    el.runAllBtn.disabled = true;
+    showEndBanner();
+    renderExecutiveSummary();
+  }
+
+  function showEndBanner() {
+    if (!el.endBanner) return;
+    var completed = state.cursor >= N && state.endedAt === null;
+    var text;
+    if (completed) {
+      text = "Reached the confirmation screen at step " + state.cursor + ", with " +
+             Math.max(0, state.spoons) + " spoons and " + state.confidence + " % confidence remaining.";
+    } else if (state.endReason === "exhausted") {
+      text = "Stopped at step " + state.endedAt + ": " + STEPS[state.endedAt - 1].name +
+             ". Not blocked — out of capacity. " + state.confidence + " % confidence, " +
+             state.minutesLost + " minutes spent.";
+    } else {
+      text = "Blocked at step " + state.endedAt + ": " + STEPS[state.endedAt - 1].name +
+             ". No alternative route offered.";
+    }
+    el.endBannerText.textContent = text;
+    el.endBanner.hidden = false;
+    el.endBanner.className = "end-banner " +
+      (completed ? "ok" : (state.endReason === "exhausted" ? "spent" : "blocked"));
+  }
+
+  function runToCompletion() {
+    if (!state.runStarted) return;
+    var guard = 0;
+    while (state.endedAt === null && state.cursor < N && guard < 200) {
+      advanceOne();
+      guard++;
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 11. Executive summary
+   * ------------------------------------------------------------------ */
+  function renderExecutiveSummary() {
+    var n = state.cursor;
+    var q = currentQuality();
+    var g = cumulativeFailure(q.p, n);
+    var p = cumulativeFailure(state.pPersona, n);
+    var completed = n === N && state.endedAt === null;
+    var dif = currentDifficulty();
+
+    var baselinePct = (q.p * 100).toFixed(q.p < 0.01 ? 1 : 0);
+    var baselineDec = (1 - q.p).toFixed(4);
+
+    var terminals = state.defectsHit.filter(function (d) { return d.mech === "terminal"; });
+    var spoons = state.defectsHit.filter(function (d) { return d.mech === "spoon"; });
+    var efforts = state.defectsHit.filter(function (d) { return d.mech === "effort"; });
+    var frictions = state.defectsHit.filter(function (d) { return d.mech === "friction"; });
+    var systemic = state.defectsHit.filter(function (d) { return d.systemic; });
+
+    var html = "";
+
+    html += "<div class='callout'><p style='margin:0'><strong>The mathematical takeaway.</strong> " +
+      "Component quality is measured per page. Task completion is measured per journey. " +
+      "A journey is a serial system, so reliability multiplies rather than averages: " +
+      "<span class='mono'>P(completion) = (1 − p)ⁿ</span>. " +
+      "At a " + baselinePct + "&nbsp;% component pass rate over 30 steps, " +
+      "<span class='mono'>(" + baselineDec + ")³⁰ = " + pct(Math.pow(1 - q.p, 30), 2) + "</span>. " +
+      "That is a <strong>" + pct(cumulativeFailure(q.p, 30)) +
+      " probability that a given citizen never finishes</strong> — published as an accessibility win.</p></div>";
+
+    html += "<h3>What happened in this run</h3>";
+    html += "<ul>";
+    html += "<li><strong>Persona drawn:</strong> " +
+      state.persona.domains.map(function (k) {
+        return DOMAINS[k].label + " — " + state.persona.byDomain[k].level +
+          " (" + state.persona.byDomain[k].name + ")";
+      }).join("; ") + ".</li>";
+    html += "<li><strong>Settings:</strong> component quality " + esc(q.label) +
+      "; recovery difficulty " + esc(dif.label) + " (cost multiplier " + dif.mult + "×).</li>";
+    html += "<li><strong>Persona-specific component defect rate:</strong> <span class='mono'>p = " +
+      state.pPersona.toFixed(4) + "</span> versus the general <span class='mono'>p = " + q.p.toFixed(4) + "</span>. " +
+      "Defects are not spread evenly across criteria; they cluster in the semantic and interaction layers this citizen depends on.</li>";
+    html += "<li><strong>Steps reached:</strong> " + n + " of " + N + ". ";
+    if (completed) {
+      html += "This citizen completed the journey, with " + Math.max(0, state.spoons) +
+        " of " + SPOONS_MAX + " spoons and " + state.confidence + "&nbsp;% confidence remaining. " +
+        "That is the outcome the dashboard predicts for everyone, and the reason the dashboard is wrong.";
+    } else if (state.endReason === "exhausted") {
+      html += "This citizen <strong>gave up at step " + state.endedAt + "</strong> — " +
+        esc(STEPS[state.endedAt - 1].name) + ". <strong>Not blocked: spent.</strong> " +
+        "Every barrier they met was individually survivable, and the aggregate was not. " +
+        "This ending is invisible to any conformance report, because at no point was the service inaccessible.";
+    } else {
+      html += "This citizen's journey <strong>ended at step " + state.endedAt + "</strong> — " +
+        esc(STEPS[state.endedAt - 1].name) + ". No alternative route was offered.";
+    }
+    html += "</li>";
+    html += "<li><strong>Resource state at the end:</strong> spoons " + Math.max(0, state.spoons) +
+      " / " + SPOONS_MAX + ", confidence " + state.confidence + "&nbsp;%, " +
+      state.minutesLost + " minutes spent, " + (n + state.attempts) + " interaction attempts.</li>";
+    html += "<li><strong>Cumulative failure probability at that point:</strong> general " + pct(g) +
+      ", this persona " + pct(p) + ".</li>";
+
+    /* The mechanic breakdown — the run's answer to "was it a wall or a drain?" */
+    html += "<li><strong>Defects revealed, by mechanic:</strong> " +
+      state.defectsHit.length + " total — " +
+      "<strong>" + terminals.length + " terminal</strong> (pass/fail walls), " +
+      "<strong>" + spoons.length + " spoon-cost</strong> (energy drain, no wall), " +
+      "<strong>" + efforts.length + " effort</strong> (retryable, costly), " +
+      "<strong>" + frictions.length + " friction</strong> (never stops progress).";
+    if (state.defectsHit.length) {
+      html += " <span class='mono'>" + state.defectsHit.map(function (d) {
+        return "s" + d.step + "/" + d.mech;
+      }).join(" ") + "</span>";
+    }
+    html += "</li>";
+
+    html += "<li><strong>Non-WCAG systemic barriers triggered:</strong> " +
+      (systemic.length === 0
+        ? "none attributable in this run — but they are latent, and they fire without any SC being violated."
+        : systemic.map(function (d) { return esc(d.title); }).join("; ")) + "</li>";
+    html += "</ul>";
+
+    /* The three-mechanic point, stated plainly. */
+    html += "<div class='callout warn'><p style='margin:0'><strong>Not every WCAG error is a wall, " +
+      "and not every wall is a WCAG error.</strong> In this run " + frictions.length + " defects were real " +
+      "conformance failures that nobody was stopped by, and " + terminals.length + " defects ended the task. " +
+      "Meanwhile " + systemic.length + " of the barriers in play were policy, channel, device, or language " +
+      "exclusions with no success criterion behind them at all. A conformance dashboard can only see the " +
+      "first category — the one that does not matter most — and it cannot distinguish it from the second.</p></div>";
+
+    html += "<h3>Why single-page, single-run monitoring gives false assurance</h3>";
+    html += "<ol>";
+    html += "<li><strong>It measures the wrong unit.</strong> A crawler scores a <em>page</em>. " +
+      "A citizen experiences a <em>sequence</em>. Averaging 30 pages at 99&nbsp;% each " +
+      "does not produce a 99&nbsp;% journey; multiplying them produces 73.97&nbsp;%. " +
+      "Averaging is exactly the wrong operation, and it is the operation every dashboard performs.</li>";
+    html += "<li><strong>It measures the wrong population.</strong> The 99&nbsp;% is an average across criteria " +
+      "and across users. The citizen in this run does not experience the average. They experience the " +
+      "criteria they rely on — heading structure, table association, keyboard reachability, non-drawing " +
+      "input equivalents. Those criteria carry the highest per-criterion defect concentration, so the " +
+      "persona-weighted probability diverges from the headline number immediately.</li>";
+    html += "<li><strong>It cannot see the failures that end tasks.</strong> Every defect revealed in this " +
+      "run's ledger is one automated tooling cannot decide: label-to-control association that a stray " +
+      "placeholder satisfies, drag-only interaction, pointer-only widgets, unannounced live regions, " +
+      "error messages that are present but not intelligible, and any step behind authentication. " +
+      "Deque estimates roughly 40&nbsp;% of issues are detectable by automation; GSA's guidance is about 30&nbsp;% of criteria. " +
+      "Fifty-one errors per home page remain the WebAIM Million average in 2025. Green dashboards are compatible with all of it.</li>";
+    html += "<li><strong>It has no memory.</strong> Daily DAP-style scanning re-tests the front door. " +
+      "The citizen's failure happens at step 17, deep inside an authenticated flow, on a control the " +
+      "crawler never touches. Zero of the 30 interactions in stage 3 and 4 exist in any crawl of the " +
+      "landing page — yet those interactions carry 17 of the 30 steps and every one of the seeded blockers.</li>";
+    html += "<li><strong>It rewards remediation theatre.</strong> Fixing alt text and colour contrast is " +
+      "measurable and therefore gets fixed; fixing a date-picker's keyboard model is not measurable and " +
+      "therefore stays broken. The dashboard's incentive gradient points away from the barriers that " +
+      "actually stop people.</li>";
+    html += "</ol>";
+
+    html += "<h3>What to measure instead</h3>";
+    html += "<ul>";
+    html += "<li><strong>Task completion rate, end to end, by persona.</strong> Not page score. " +
+      "Recruit participants who are blind, keyboard-only, low-vision, and cognitively diverse, " +
+      "and record whether they finish the benefit application — and where they stop.</li>";
+    html += "<li><strong>Fatal-point analysis.</strong> For each step, ask whether a defect here is " +
+      "<em>friction</em> or a <em>wall</em>. Walls are the only defects that belong at severity one. " +
+      "This simulator's ledger shows how few of the 30 steps need to be walls to destroy the journey.</li>";
+    html += "<li><strong>Persist and resume.</strong> Every recovery path is an escape hatch that converts " +
+      "a wall into friction. Save-on-every-step is an accessibility feature, not a convenience feature.</li>";
+    html += "<li><strong>Non-drawing and non-drag equivalents as a release gate.</strong> " +
+      "SC 2.5.7 Dragging Movements has no ACT rule; that is precisely why it needs a named human gate " +
+      "rather than a scanner expectation.</li>";
+    html += "<li><strong>Report the multiplication, not the mean.</strong> A journey dashboard should show " +
+      "<span class='mono'>1 − (1 − p)ⁿ</span>. At n = 30 that number is not a rounding error. " +
+      "It is a quarter of the people who needed help.</li>";
+    html += "</ul>";
+
+    html += "<div class='callout warn' style='margin-top:1rem'><p style='margin:0'>" +
+      "<strong>The service-design conclusion.</strong> For an Emergency Heating Assistance Benefit, " +
+      "a 26&nbsp;% journey failure rate is not a web quality metric. It is a number of households " +
+      "that stay cold. Whether the cause is a canvas signature, a drag-and-drop upload, a dilated pupil, " +
+      "or a sprained wrist, the citizen's experience is identical: the form does not let me in, and " +
+      "the dashboard says everything is fine.</p></div>";
+
+    el.execBody.innerHTML = html;
+    el.execSummary.hidden = false;
+    announce("Simulation complete.");
+
+    if (typeof el.execSummary.scrollIntoView === "function") {
+      el.execSummary.scrollIntoView({ block: "start" });
+    }
+  }
+
+  /* ------------------------------------------------------------------ *
+   * 12. Reset + wiring
+   * ------------------------------------------------------------------ */
+  function reset() {
+    var keep = { override: state.override, qualityId: state.qualityId, difficultyId: state.difficultyId };
+    state = {
+      persona: null,
+      pPersona: P_BASE,
+      cursor: 0,
+      endedAt: null,
+      endReason: null,
+      defectsHit: [],
+      spoons: SPOONS_MAX,
+      confidence: 100,
+      minutesLost: 0,
+      attempts: 0,
+      downgraded: [],
+      barriers: [],
+      runStarted: false,
+      override: keep.override,
+      qualityId: keep.qualityId,
+      difficultyId: keep.difficultyId
+    };
+    runSeedCache = {};
+    recomputeHazards(currentQuality().p);
+
+    el.personaCard.innerHTML = "<p class='tag tag-none'>Not yet generated</p>";
+    el.rail.innerHTML = "";
+    el.recordOut.innerHTML = "<p style='margin:0'>No defect has manifested yet. Run the simulation to reveal the first barrier the citizen meets — with its mechanic, obligation source, WCAG/ACT/FPC citation, first-person account, and an automated-scanner verdict.</p>";
+    el.ledgerOut.innerHTML = "<li class='ledger-empty'><span class='where'>Empty ledger</span><span class='meta'>No defects revealed yet.</span></li>";
+    if (el.sysLedger) {
+      el.sysLedger.innerHTML = "<li class='ledger-empty'><span class='where'>Empty ledger</span><span class='meta'>No non-WCAG barriers triggered yet.</span></li>";
+      if (el.sysLedgerWrap) el.sysLedgerWrap.hidden = true;
+    }
+    if (el.endBanner) el.endBanner.hidden = true;
+    el.milestoneOut.hidden = true;
+    el.execSummary.hidden = true;
+    el.stepBtn.disabled = true;
+    el.runAllBtn.disabled = true;
+    el.resetBtn.disabled = true;
+    el.startBtn.textContent = "Run simulation";
+    updateMetrics();
+    announce("Simulation reset.");
+  }
+
+  function boot() {
+    cacheEls();
+    updateMetrics();
+
+    /* --- Run settings: quality --- */
+    if (el.qualitySelect) {
+      el.qualitySelect.addEventListener("change", function () {
+        state.qualityId = el.qualitySelect.value;
+        recomputeHazards(currentQuality().p);
+        updateMetrics();
+        if (state.runStarted && state.endedAt === null) {
+          announce("Component quality changed to " + currentQuality().label +
+            ". Applies from the next step onward.");
+        }
+      });
+    }
+
+    /* --- Run settings: difficulty --- */
+    if (el.difficultySelect) {
+      el.difficultySelect.addEventListener("change", function () {
+        state.difficultyId = el.difficultySelect.value;
+        announce("Recovery difficulty set to " + currentDifficulty().label + ".");
+      });
+    }
+
+    /* --- Persona overrides --- */
+    Array.prototype.forEach.call(document.querySelectorAll("[data-override]"), function (sel) {
+      sel.addEventListener("change", function () {
+        state.override[sel.dataset.override] = sel.value || null;
+        updatePersonaStatus();
+        announce(sel.dataset.override + " axis set to " + (sel.value || "random") + ".");
+      });
+    });
+    if (el.randomBtn) {
+      el.randomBtn.addEventListener("click", function () {
+        Object.keys(state.override).forEach(function (k) { state.override[k] = null; });
+        Array.prototype.forEach.call(document.querySelectorAll("[data-override]"), function (sel) {
+          sel.value = "";
+        });
+        updatePersonaStatus();
+        announce("All persona overrides cleared. Axes are drawn at random.");
+      });
+    }
+    updatePersonaStatus();
+
+    el.startBtn.addEventListener("click", function () {
+      startRun();
+      el.startBtn.focus();
+    });
+    el.stepBtn.addEventListener("click", function () {
+      advanceOne();
+      if (el.stepBtn.disabled) el.startBtn.focus();
+      else el.stepBtn.focus();
+    });
+    el.runAllBtn.addEventListener("click", function () {
+      runToCompletion();
+      el.startBtn.focus();
+    });
+    el.resetBtn.addEventListener("click", function () {
+      reset();
+      el.startBtn.focus();
+    });
+  }
+
+  function updatePersonaStatus() {
+    if (!el.personaStatus) return;
+    var pinned = Object.keys(state.override).filter(function (k) { return state.override[k]; });
+    if (!pinned.length) {
+      el.personaStatus.innerHTML =
+        "Persona axes are drawn at random. Pin any of them below to run a specific citizen — " +
+        "unpinned axes stay random. Pinning chooses <em>who</em> meets the build's defects; it does " +
+        "not change which defects the build has.";
+      return;
+    }
+    el.personaStatus.innerHTML =
+      "<strong>" + pinned.length + " axis" + (pinned.length === 1 ? "" : "es") + " pinned:</strong> " +
+      pinned.map(function (k) {
+        return DOMAINS[k].label + " = " + state.override[k];
+      }).join("; ") +
+      ". The remaining axes stay random. Because the build's defects are unaffected, a pinned " +
+      "citizen is not guaranteed to hit one — removing the defects is the only way to change that.";
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
+})();
+</script>
+</body>
+</html>

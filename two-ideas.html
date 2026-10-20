@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permutations &amp; Digital Accessibility — two ideas that turn out to be one</title>
+<style>
+  :root {
+    --ink:#16181d; --muted:#5a6170; --line:#d8dce4; --bg:#f7f8fa; --card:#fff;
+    --brand:#1c4f9c; --brand-2:#0f6f5c; --warn:#8a5200; --warn-bg:#fff8e8;
+    --l:#1c4f9c; --r:#0f6f5c; --l-bg:#f2f6fd; --r-bg:#f0f8f5;
+  }
+  * { box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font:16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width:1080px; margin:0 auto; padding:0 1.2rem; }
+  .skip {
+    position:absolute; left:-9999px; background:var(--brand); color:#fff;
+    padding:.6rem 1rem; border-radius:0 0 6px 0; z-index:99;
+  }
+  .skip:focus { left:0; top:0; }
+
+  header.masthead { background:#0e1116; color:#fff; padding:2.2rem 0 1.8rem; }
+  .kicker {
+    text-transform:uppercase; letter-spacing:.14em; font-size:.72rem;
+    color:#9fb4d6; margin:0 0 .5rem; font-weight:700;
+  }
+  h1 { font-size:clamp(1.5rem, 3.4vw, 2.3rem); line-height:1.2; margin:0 0 .6rem; }
+  .sub { color:#c7d2e2; max-width:62ch; margin:0; }
+
+  main { padding:1.6rem 0 4rem; }
+
+  .panel {
+    background:var(--card); border:1px solid var(--line); border-radius:12px;
+    padding:1.4rem 1.5rem; margin:0 0 1.4rem;
+  }
+  h2 { font-size:1.25rem; margin:0 0 .5rem; }
+  h3 { font-size:1rem; margin:1.2rem 0 .4rem; }
+  p { margin:.55rem 0; }
+  .muted { color:var(--muted); }
+  .mono {
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background:#eef1f6; padding:.08em .35em; border-radius:4px; font-size:.92em;
+  }
+
+  /* ---- the two-column teaching grid ---- */
+  .thegrid {
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    background:var(--card); margin:1rem 0 0;
+  }
+  .thegrid > .col { display:contents; }
+  .head-l, .head-r { padding:.7rem 1.1rem; font-weight:700; font-size:.78rem;
+    text-transform:uppercase; letter-spacing:.1em; }
+  .head-l { background:var(--l-bg); color:var(--l); border-bottom:1px solid var(--line); }
+  .head-r { background:var(--r-bg); color:var(--r); border-bottom:1px solid var(--line);
+    border-left:1px solid var(--line); }
+  .cell-l, .cell-r { padding:1.05rem 1.1rem; border-top:1px solid var(--line); }
+  .cell-r { border-left:1px solid var(--line); background:#fcfdfe; }
+  .cell-l h3, .cell-r h3 { margin-top:0; }
+  .cell-l form { margin:.6rem 0 0; }
+
+  .beat { font-size:.72rem; text-transform:uppercase; letter-spacing:.1em;
+    color:var(--muted); font-weight:700; margin:0 0 .35rem; }
+
+  .formula {
+    font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background:#0e1116; color:#dbe7ff; padding:.7rem .9rem; border-radius:8px;
+    font-size:.86rem; overflow-x:auto; white-space:pre; margin:.6rem 0 0;
+  }
+  .formula .hl { color:#7fe3c0; }
+  ul.tight { margin:.5rem 0 .2rem; padding-left:1.15rem; }
+  ul.tight li { margin:.25rem 0; }
+
+  .pour { list-style:none; padding:0; margin:.5rem 0 0; }
+  .pour li { display:flex; gap:.6rem; align-items:baseline; padding:.3rem 0; }
+  .pour b { display:inline-block; min-width:8.4rem; color:var(--r); }
+
+  .callout {
+    border-left:5px solid var(--brand-2); background:#f6f9fd;
+    padding:.85rem 1rem; border-radius:0 8px 8px 0; margin:1rem 0;
+  }
+  .callout.warn { border-left-color:var(--warn); background:var(--warn-bg); }
+  .callout p:first-child { margin-top:0; }
+  .callout p:last-child { margin-bottom:0; }
+
+  .btn {
+    font:inherit; font-weight:650; background:var(--brand); color:#fff;
+    border:0; border-radius:9px; padding:.7rem 1.15rem; cursor:pointer;
+  }
+  .btn:hover { background:#16407e; }
+  .btn.ghost { background:#fff; color:var(--brand); border:1px solid var(--line); }
+  .btn.ghost:hover { background:#f2f6fd; }
+  .btn-row { display:flex; gap:.6rem; flex-wrap:wrap; margin:.9rem 0 0; }
+
+  .reveal { margin:1.1rem 0 0; }
+  .reveal > summary {
+    cursor:pointer; font-weight:650; padding:.6rem .85rem; border-radius:9px;
+    background:#f2f6fd; border:1px solid var(--line); list-style:none;
+  }
+  .reveal > summary::-webkit-details-marker { display:none; }
+  .reveal > summary::before { content:"▸ "; color:var(--brand); }
+  .reveal[open] > summary::before { content:"▾ "; }
+  .reveal > summary:focus-visible { outline:3px solid #7aa6e6; outline-offset:2px; }
+
+  /* progressive fill: cells start hidden, revealed beat by beat */
+  .beatrow { display:contents; }
+  .beatrow.is-hidden .cell-l,
+  .beatrow.is-hidden .cell-r { display:none; }
+
+  table.data { border-collapse:collapse; width:100%; font-size:.9rem; margin:.7rem 0; }
+  table.data caption { text-align:left; color:var(--muted); font-size:.85rem; padding-bottom:.4rem; }
+  table.data th, table.data td { border:1px solid var(--line); padding:.45rem .6rem; text-align:left; }
+  table.data th[scope="row"] { background:#f7f8fa; }
+  .num { text-align:right; font-variant-numeric:tabular-nums; }
+
+  .pager { display:flex; justify-content:space-between; gap:1rem; align-items:center;
+    margin:1.4rem 0 0; flex-wrap:wrap; }
+  .pager .muted { font-size:.9rem; }
+
+  .bar-row { display:grid; grid-template-columns:8.5rem 1fr 4.5rem; gap:.6rem;
+    align-items:center; margin:.4rem 0; font-size:.9rem; }
+  .bar-track { background:#e7ebf2; border-radius:20px; height:14px; overflow:hidden; }
+  .bar-fill { display:block; height:100%; background:var(--l); border-radius:20px; }
+  .bar-fill.r { background:var(--r); }
+  .bar-val { text-align:right; font-variant-numeric:tabular-nums; }
+
+  .sr-only {
+    position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
+  }
+
+  @media (max-width:760px) {
+    .thegrid { grid-template-columns:1fr; }
+    .head-r { border-left:0; }
+    .cell-r { border-left:0; background:#fff; }
+    .bar-row { grid-template-columns:6.5rem 1fr 4rem; }
+  }
+  @media print {
+    body { background:#fff; }
+    .btn, .pager, .reveal > summary { display:none !important; }
+    .beatrow.is-hidden .cell-l, .beatrow.is-hidden .cell-r { display:block !important; }
+    .panel { break-inside:avoid; box-shadow:none; }
+  }
+  @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="kicker">Service Design Evidence Artefact — Page One of Two</p>
+    <h1>Permutations <span aria-hidden="true">|</span> Digital Accessibility</h1>
+    <p class="sub">
+      Two ideas, taught side by side, that turn out to be the same idea. Neither column is a
+      metaphor for the other — they are the same arithmetic in different clothes. If you already
+      know both, skip to the simulation.
+    </p>
+  </div>
+</header>
+
+<main id="main" class="wrap" tabindex="-1">
+
+  <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-start">
+    <h2 id="h-start">What this page is for</h2>
+    <p>
+      Later on you will be asked to believe a specific number: that a service reporting
+      <strong>99&nbsp;% accessibility</strong> can still fail roughly a quarter of the people who
+      try to use it. That claim is arithmetic, not opinion — but the arithmetic only lands if two
+      ideas already make sense. So this page teaches both at once, a step at a time.
+    </p>
+    <p class="muted">
+      <strong>Left column</strong> — permutations: how independent things combine, and why they
+      combine by <em>multiplying</em> rather than averaging.
+      <strong>Right column</strong> — digital accessibility: who is affected, what the standard
+      actually requires, and why "one page passed" is not "the task works."
+    </p>
+    <div class="callout">
+      <p><strong>The joining idea.</strong> A permutation is what you get when independent things
+      combine, and independence means the probabilities <em>multiply</em>. A public-service journey
+      is a permutation of its steps: 30 interactions in sequence, each with its own chance of
+      failing the person using it. That is the entire argument. Everything below is that sentence,
+      unpacked slowly.</p>
+    </div>
+    <div class="btn-row">
+      <button type="button" class="btn" id="revealBtn">Reveal the next beat</button>
+      <button type="button" class="btn ghost" id="revealAllBtn">Reveal everything</button>
+    </div>
+    <p class="muted" style="font-size:.9rem;margin-top:.5rem" id="revealStatus" role="status">
+      Beat 0 of 6 revealed. Nothing is hidden from you — the same content follows in order.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-grid">
+    <h2 id="h-grid">The two ideas, beat by beat</h2>
+    <p class="muted">
+      Each row is one idea, seen from both sides. Read across a row, not down a column — the
+      right-hand cell is the left-hand cell wearing different clothes.
+    </p>
+
+    <div class="thegrid" id="thegrid">
+      <div class="head-l" id="grid-head-l">Permutations — the mathematics</div>
+      <div class="head-r" id="grid-head-r">Digital accessibility — the domain</div>
+
+      <!-- BEAT 1 -->
+      <div class="beatrow is-hidden" data-beat="1">
+        <div class="cell-l">
+          <p class="beat">Beat 1 — what a permutation is</p>
+          <h3>Counting arrangements of distinct things</h3>
+          <p>A permutation is an <strong>arrangement of things where order matters</strong>. Counting
+          them answers a plain question: <em>how many ways can this turn out?</em></p>
+          <p>Two coins, each heads or tails, give four possible arrangements:</p>
+          <p class="formula">HH  HT  TH  TT        arrangements = 2 × 2 = 4</p>
+          <p>Three coins give <span class="mono">2³ = 8</span>. Ten coins give
+          <span class="mono">2¹⁰ = 1,024</span>. The count <strong>multiplies</strong>, it never adds
+          — and that single fact is the whole page.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 1 — what accessibility is</p>
+          <h3>A requirement that applies to every person, at once</h3>
+          <p>Digital accessibility means a service <strong>works for everyone who needs it</strong>,
+          including people with disabilities — and the obligation is not averaged over a crowd, it
+          applies to each user individually.</p>
+          <p>Roughly <strong>1 in 4 US adults</strong> reports a disability (CDC BRFSS 2022:
+          28.7&nbsp;%). The US Census measures a narrower definition and finds
+          <strong>13.6&nbsp;% of all ages</strong> (ACS 2024: 45.8 million people).</p>
+          <div class="callout warn" style="margin:.7rem 0 0">
+            <p><strong>That disagreement is the first real lesson.</strong> Two credible official
+            sources differ by more than a factor of two — because they ask different questions.
+            Every number in this artefact therefore states its source and its definition. If you
+            want to attack the conclusion later, attack it there.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BEAT 2 -->
+      <div class="beatrow is-hidden" data-beat="2">
+        <div class="cell-l">
+          <p class="beat">Beat 2 — independence</p>
+          <h3>When one outcome doesn't change the next</h3>
+          <p>Two events are <strong>independent</strong> when knowing one tells you nothing about
+          the other. A coin landing heads does not make the next coin more likely to be tails.</p>
+          <p>For independent events, the chance that <em>both</em> happen is the product:</p>
+          <p class="formula">P(A and B) = P(A) × P(B)
+
+two coins, both heads:  ½ × ½ = ¼ = 25 %</p>
+          <p>Notice what this does to a chain: if each step succeeds with probability
+          <span class="mono">p</span>, then <span class="mono">n</span> independent steps succeed
+          together with probability <span class="mono">pⁿ</span>. Small per-step losses become
+          large journey losses.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 2 — the four principles</p>
+          <h3>POUR: four obligations that all apply at once</h3>
+          <p>WCAG 2.2 organises its requirements under four principles. A service must satisfy
+          <strong>all four</strong> — this is the accessibility version of an "and":</p>
+          <ul class="pour">
+            <li><b>Perceivable</b><span>Can I receive the information? (text alternatives, contrast, captions)</span></li>
+            <li><b>Operable</b><span>Can I use the controls? (keyboard, timing, target size, no drag-only)</span></li>
+            <li><b>Understandable</b><span>Can I follow and predict it? (labels, errors, consistent navigation)</span></li>
+            <li><b>Robust</b><span>Does it work with my technology? (names, roles, values, compatibility)</span></li>
+          </ul>
+          <p>A page that is perceivable but not operable fails. There is no partial credit, because
+          the user needs all four — <em>the same "and" as the coin above</em>.</p>
+        </div>
+      </div>
+
+      <!-- BEAT 3 -->
+      <div class="beatrow is-hidden" data-beat="3">
+        <div class="cell-l">
+          <p class="beat">Beat 3 — the multiplication bites</p>
+          <h3>Why "99 % each" is not "99 % overall"</h3>
+          <p>Suppose each of 30 steps succeeds with probability <span class="mono">0.99</span>.
+          Independence means we multiply:</p>
+          <p class="formula">P(all 30 succeed) = 0.99³⁰ ≈ <span class="hl">0.7397</span>
+
+so the chance of at least one failure ≈ 26.03 %</p>
+          <p>The vendor's monitoring reports each step at 99&nbsp;%. The citizen experiences the
+          <em>product</em>, not the average. Nobody is served by the average of 30 steps — a person
+          meets the steps in order and is stopped by whichever one fails them.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 3 — a journey is a serial system</p>
+          <h3>Every step has to work, for every person</h3>
+          <p>Applying for a benefit is a <strong>sequence</strong>: screen eligibility, prove
+          identity, enter finances, upload documents, sign, confirm. Thirty interactions across four
+          stages. You cannot skip one and still be approved.</p>
+          <p>That makes the task what reliability engineers call a <strong>serial system</strong>: the
+          whole thing works only if every part works. Component reliability multiplies; it never
+          averages. This is mathematically identical to a chain of hardware that fails if any link
+          fails.</p>
+          <p class="muted">A dashboard checks each part. The citizen lives the whole chain.</p>
+        </div>
+      </div>
+
+      <!-- BEAT 4 -->
+      <div class="beatrow is-hidden" data-beat="4">
+        <div class="cell-l">
+          <p class="beat">Beat 4 — permutations of kind, not just of order</p>
+          <h3>Who a person is, crossed with what the build does</h3>
+          <p>There is a second permutation in play. A citizen is a combination of capability axes,
+          and each axis has levels. Using the Microsoft Persona Spectrum:</p>
+          <ul class="tight">
+            <li><strong>Vision</strong> — permanent (blind), temporary (post-treatment), situational (screen glare)</li>
+            <li><strong>Motor/touch</strong> — permanent (keyboard-only), temporary (one-handed injury), situational (holding a toddler)</li>
+            <li><strong>Cognition</strong> — permanent, temporary (migraine), situational (crisis and time pressure)</li>
+            <li><strong>Hearing/speech</strong> — permanent (Deaf), temporary (laryngitis), situational (noisy transit)</li>
+          </ul>
+          <p>Cross those axes with the build's defects and you get the space later pages sample from:
+          <span class="mono">4 axes × 3 levels</span> in each, times every step that can fail.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 4 — disability is not a fixed minority</p>
+          <h3>Temporary and situational, and a curve that reaches almost everyone</h3>
+          <p>The Persona Spectrum exists because "disability" is not a static category. It shifts with
+          injury, illness, situation and age:</p>
+          <ul class="tight">
+            <li><strong>12&nbsp;%</strong> of US adults ages 18–64 report a disability.</li>
+            <li><strong>24&nbsp;%</strong> of those 65–74.</li>
+            <li><strong>46&nbsp;%</strong> of those 75 and older (Census ACS / Pew 2023).</li>
+          </ul>
+          <p>So the affected population is not a small fixed slice you can average away — it is a
+          <strong>growing share of everyone</strong>, and any given person passes through it. The
+          same barrier is met permanently by some, temporarily by others, and situationally by many
+          more. That is why the model treats all three levels as real.</p>
+        </div>
+      </div>
+
+      <!-- BEAT 5 -->
+      <div class="beatrow is-hidden" data-beat="5">
+        <div class="cell-l">
+          <p class="beat">Beat 5 — combining more than two</p>
+          <h3>Chains of chance, and how fast they collapse</h3>
+          <p>The rule generalises: for <span class="mono">n</span> independent steps each succeeding
+          with probability <span class="mono">p</span>, the whole chain succeeds with probability
+          <span class="mono">pⁿ</span>.</p>
+          <table class="data">
+            <caption>Journey success for 30 steps at three per-step success rates</caption>
+            <thead>
+              <tr><th scope="col">Per step</th><th scope="col" class="num">Formula</th><th scope="col" class="num">Whole journey</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">99.9 %</th><td class="num">0.999³⁰</td><td class="num">97.04 %</td></tr>
+              <tr><th scope="row">99 %</th><td class="num">0.99³⁰</td><td class="num">73.97 %</td></tr>
+              <tr><th scope="row">97 %</th><td class="num">0.97³⁰</td><td class="num">40.10 %</td></tr>
+            </tbody>
+          </table>
+          <p>Improving each step from 99&nbsp;% to 99.9&nbsp;% — a tenfold cut in defects — buys about
+          <strong>23 percentage points</strong> of journey completion. That is the power of working on
+          the exponent instead of the headline.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 5 — why a green dashboard tells you little</p>
+          <h3>Automation sees a slice of the standard</h3>
+          <p>Automated tools — Lighthouse, axe-core, WAVE — are genuinely useful, and they agree on
+          roughly how much they can decide: the GSA puts it near <strong>30&nbsp;% of success
+          criteria</strong>; Deque puts it near <strong>40&nbsp;% of issues</strong>. The rest need a
+          person who knows the standard to look.</p>
+          <p>WebAIM's 2025 crawl of the top million home pages found <strong>51 detectable errors per
+          page</strong> and <strong>94.8&nbsp;%</strong> of pages failing WCAG 2. Those are the errors
+          automation <em>can</em> see. The blockers that stop people — keyboard traps, drag-only
+          uploads, unannounced live updates — are largely in the part it cannot.</p>
+          <p>A perfect score means <em>"nothing this tool knows how to check is broken."</em> It does
+          not mean the task works.</p>
+        </div>
+      </div>
+
+      <!-- BEAT 6 -->
+      <div class="beatrow is-hidden" data-beat="6">
+        <div class="cell-l">
+          <p class="beat">Beat 6 — where this page has been going</p>
+          <h3>The same arithmetic, applied to people</h3>
+          <p>Now combine the two columns. Thirty steps, each failing a given citizen with some
+          probability, and a citizen who is a permutation of capability axes. The journey either
+          works for that person or it does not.</p>
+          <p class="formula">per-step pass 0.99  →  journey pass <span class="hl">73.97 %</span>
+per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
+          <p>And that is before adding the barriers that stop someone outright while leaving the
+          arithmetic untouched — the drag-only upload that has no keyboard path at all.</p>
+        </div>
+        <div class="cell-r">
+          <p class="beat">Beat 6 — what "blocked" actually means</p>
+          <h3>Not every failure is the same kind of failure</h3>
+          <ul class="tight">
+            <li><strong>Total blocker</strong> — no path exists. A drag-only upload with no keyboard
+            alternative. The journey ends, deterministically, for those who cannot drag.</li>
+            <li><strong>Partial blocker</strong> — a path exists for some of the group but not all.
+            A date-picker that works with a pointer and not a keyboard.</li>
+            <li><strong>Degrader</strong> — blocks nobody outright, but raises error and abandonment
+            rate. Low contrast is the most common on the web and the most survivable.</li>
+          </ul>
+          <p>Two of these are measured in the next page's population model; one of them — contrast —
+          is real, reportable, and the reason nobody fails. Conflating them is how "99&nbsp;%"
+          gets published.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:1.2rem">
+      <p><strong>Where the two ideas meet.</strong> A permutation multiplies because independent
+      things must <em>all</em> happen. A journey multiplies because every step must work for the
+      person <em>and</em> all four POUR principles must hold. One arithmetic, two vocabularies. Once
+      that clicks, the simulation is just bookkeeping.</p>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-next">
+    <h2 id="h-next">Where to go next</h2>
+    <p>
+      If both ideas already make sense, nothing here is required reading — move straight to the
+      simulation, which is the evidence. If one column landed and the other did not, the reveal
+      controls above replay any beat.
+    </p>
+    <div class="pager">
+      <div>
+        <button type="button" class="btn" id="proofBtn">Continue to the simulation &amp; population model</button>
+      </div>
+      <p class="muted" style="margin:0">
+        Page two: 30-step interactive journey, persona controls, and the deterministic
+        population calculation with cited inputs.
+      </p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-sources">
+    <h2 id="h-sources">Sources for this page</h2>
+    <ul class="tight" style="font-size:.92rem">
+      <li>CDC, <em>Disability Impacts All of Us</em> / DHDS (BRFSS 2022): 28.7&nbsp;% of US adults report a disability.</li>
+      <li>US Census Bureau, American Community Survey 2024 (via Disability Statistics): 13.6&nbsp;% of all ages, 45,846,700 people.</li>
+      <li>Census ACS 1-year estimates / Pew Research 2023: disability prevalence 12&nbsp;% (18–64), 24&nbsp;% (65–74), 46&nbsp;% (75+).</li>
+      <li>Microsoft Inclusive Design, Persona Spectrum: permanent, temporary, situational.</li>
+      <li>W3C, WCAG 2.2 — the four POUR principles.</li>
+      <li>GSA (≈30&nbsp;% of success criteria automatable) and Deque (≈40&nbsp;% of issues).</li>
+      <li>WebAIM Million, 2025: 51 detectable errors per home page; 94.8&nbsp;% of pages with WCAG 2 failures.</li>
+    </ul>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var BEATS = 6;
+  var shown = 0;
+
+  function status(text) {
+    var el = document.getElementById("revealStatus");
+    if (el) el.textContent = text;
+  }
+  function applyBeat(n, open) {
+    var row = document.querySelector('.beatrow[data-beat="' + n + '"]');
+    if (!row) return;
+    row.classList.toggle("is-hidden", !open);
+  }
+  function setShown(n) {
+    shown = Math.max(0, Math.min(BEATS, n));
+    for (var i = 1; i <= BEATS; i++) applyBeat(i, i <= shown);
+    status(shown === 0
+      ? "Beat 0 of " + BEATS + " revealed. Nothing is hidden from you — the same content follows in order."
+      : "Beat " + shown + " of " + BEATS + " revealed.");
+    var btn = document.getElementById("revealBtn");
+    if (btn) {
+      btn.disabled = shown >= BEATS;
+      btn.textContent = shown >= BEATS ? "All beats revealed" : "Reveal the next beat";
+    }
+  }
+
+  document.getElementById("revealBtn").addEventListener("click", function () {
+    setShown(shown + 1);
+  });
+  document.getElementById("revealAllBtn").addEventListener("click", function () {
+    setShown(BEATS);
+  });
+
+  /* Progressive enhancement: with JS the grid reveals; without it, everything
+     is visible because we remove the hiding class up front if this fails. */
+  setShown(0);
+  window.__setBeats = setShown;   // used by the verification harness only
+})();
+</script>
+</body>
+</html>
