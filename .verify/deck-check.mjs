@@ -158,6 +158,26 @@ try {
   })()`);
   ok(slideText > 200, `the visible slide carries real content (${slideText} chars)`);
 
+  /* A slide taller than the screen must be scrollable BY KEYBOARD, not just by
+     mouse. tabindex="-1" made the scroll region unreachable, which axe reported
+     as scrollable-region-focusable — a real barrier, not a lint failure. */
+  const scrollable = await evalJs(`(function(){
+    var b = document.getElementById('deckBody');
+    return { tabIndex: b.tabIndex, role: b.getAttribute('role'),
+             label: b.getAttribute('aria-label'),
+             overflow: getComputedStyle(b).overflowY };
+  })()`);
+  ok(scrollable.tabIndex === 0,
+     `the scrolling slide surface is reachable by Tab (tabIndex=${scrollable.tabIndex})`);
+  ok(scrollable.role === "region" && !!scrollable.label,
+     `the scrolling region has a role and a name (${scrollable.role} / ${scrollable.label})`);
+
+  /* Press Tab from the body and require the deck surface itself to be a stop. */
+  await evalJs(`document.getElementById('deckBody').focus(); void 0;`);
+  await sleep(120);
+  const canFocusBody = await evalJs(`document.activeElement.id`);
+  ok(canFocusBody === "deckBody", `the slide surface takes focus (${canFocusBody})`);
+
   /* --- advance by clicking the slide surface --------------------------- */
   await evalJs(`document.getElementById('deckBody').click(); void 0;`);
   await sleep(300);

@@ -135,7 +135,7 @@ scanner knows how to check is broken. It would not establish that the argument i
 
 | Artefact | Automated | Keyboard | Zoom / reflow | Contrast | Screen reader | Status |
 |---|---|---|---|---|---|---|
-| `index.html` | **axe-core 4.14, 0 violations** (critical/serious; scanned as loaded and with all beats revealed) | Partially — `details`/`summary` and button activation driven in jsdom (`page-one.mjs`) and in real Chrome (`layout-check.mjs`, `run-example-check.mjs`) | Partially — reflow asserted at 360 px in real Chrome; 200 % zoom **not tested** | Not tested manually | **Not tested** | No claim |
+| `index.html` | **axe-core 4.14, 0 violations** (critical/serious; scanned as loaded, with all beats revealed, and **with the slide deck open**) | Partially — `details`/`summary` and button activation driven in jsdom (`page-one.mjs`) and in real Chrome (`layout-check.mjs`, `run-example-check.mjs`, `deck-check.mjs`); the deployed page is scanned by `live-check.mjs` | Partially — reflow asserted at 360 px in real Chrome; 200 % zoom **not tested** | Not tested manually | **Not tested** | No claim. A serious `scrollable-region-focusable` violation was found on the **deployed** page with the deck open — the scrolling slide surface was not keyboard-reachable. Fixed; the state is now scanned by `a11y-gate.mjs` and `live-check.mjs` |
 | `cumulative-accessibility-risk-simulator.html` | **axe-core 4.14, 0 violations** (critical/serious; scanned as loaded and with model tables populated) | Partially — programmatic activation of controls in jsdom (`verify.mjs`) | **Not tested** | Not tested manually | **Not tested** | No claim |
 
 The automated results above are produced by `.verify/a11y-gate.mjs`. **They are evidence, not a
@@ -276,6 +276,10 @@ held to that standard:
   Before the fix this failed: focus reached the reveal buttons behind the overlay.
 - Every exit is explicit — Next, Back, `Escape`, "Skip to the full page", and "Skip the intro".
   Arrow keys and `PageUp`/`PageDown` also move between beats while the deck is open.
+- The **scrolling slide surface** is a labelled, Tab-reachable region (`role="region"`,
+  `tabindex="0"`). It was `tabindex="-1"`, which made it reachable by mouse scroll but not by
+  keyboard — a serious `scrollable-region-focusable` violation, found on the **deployed** page.
+  `PageDown`/`PageUp` scroll a slide taller than the screen rather than skipping past it.
 - Focus is returned to the control that opened the deck when it closes, so keyboard users are not
   dropped at the top of a long document.
 - **Progressive enhancement:** with JavaScript unavailable the deck never opens, and all six beats
@@ -419,7 +423,7 @@ Chosen by risk. Given the subject matter, these are the priority areas:
 | Read the argument on page one | Low | Content assertions in `page-one.mjs` | None | None | — | — |
 | Reveal beats one at a time by keyboard | Medium | Programmatic activation | None | None | — | — |
 | Reveal all beats at once | Low | Programmatic activation | None | None | — | — |
-| Step through the full-screen six-beat intro | Medium | `deck-check.mjs` — real Chrome: open, advance by click and by arrow key, back, finish, both skip exits, no focus leak, background inert, reflow at 360 px | **Partial** — focus containment and background exposure measured in real Chrome; *not* checked with a screen reader | None | 2026-10-20 | `deck-check.mjs` |
+| Step through the full-screen six-beat intro | Medium | `deck-check.mjs` — real Chrome: open, advance by click and by arrow key, back, finish, both skip exits, no focus leak, background inert, scroll region Tab-reachable, reflow at 360 px. **`a11y-gate.mjs` and `live-check.mjs` scan the deck-open state** | **Partial** — focus containment, background exposure and scroll reachability measured in real Chrome; *not* checked with a screen reader | None | 2026-10-20 | `deck-check.mjs`, `live-check.mjs` |
 | Read the coin figure and disability pictograms | Low | `layout-check.mjs` — real Chrome: real size, accessible name, no label under 14 px | None | None | 2026-10-20 | `layout-check.mjs` |
 | Understand the five-layer distinction | Medium | `layout-check.mjs` — five layers render; text present in `page-one.mjs` | None | None | 2026-10-20 | `layout-check.mjs` |
 | Configure the run settings (quality, difficulty, persona) | Medium | `calib.mjs` | None | None | — | — |

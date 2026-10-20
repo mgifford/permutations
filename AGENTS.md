@@ -210,8 +210,18 @@ node deck-check.mjs                                     # npm run deck
   and Flesch-Kincaid grade. Fails on a cell over 95 words, a sentence over 45 words, or a cell
   under 25 words.
 - `a11y-gate.mjs` — **axe-core in a real browser.** Fails on any `critical` or `serious` violation
-  on either page, in every state (beats revealed, model tables populated). Reports the rest without
-  failing. Not a conformance claim — see the note it prints.
+  on either page, in every state (beats revealed, **slide deck open**, model tables populated).
+  Reports the rest without failing. Not a conformance claim — see the note it prints.
+- `live-check.mjs` — **the deployed site, not the filesystem.** Asserts the served page carries the
+  expected content, that it stays self-contained, and that no `critical` or `serious` axe violation
+  appears in any state. **Not part of `npm run all`**, because it needs the network; run it
+  deliberately after a push: `npm run live`.
+
+  It exists because a defect reached the live site while the local gate was green. With the deck
+  open, the live page carried a serious `scrollable-region-focusable` violation that no harness
+  scanned for. The a11y gate now scans the deck state too; `live-check.mjs` is the independent
+  confirmation that what is deployed matches what was tested. **An unscanned state is an
+  unguarded state** — that is the lesson, not the specific rule.
 
 **When you change behaviour, extend the harness.** Assertions are the only thing preventing a
 regression in the maths from shipping silently.

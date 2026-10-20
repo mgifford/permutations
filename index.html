@@ -382,7 +382,13 @@
     <span class="deck-count" id="deckCount">Beat 1 of 6</span>
   </div>
 
-  <div class="deck-body" id="deckBody" tabindex="-1">
+  <!-- tabindex="0" is deliberate: the slide surface scrolls, so a keyboard-only
+       reader must be able to Tab to it and scroll it with the arrow keys.
+       tabindex="-1" made it unreachable, which axe flagged as
+       scrollable-region-focusable — a real barrier on a tall slide, not just a
+       lint failure. The role and label stop it being an anonymous tab stop. -->
+  <div class="deck-body" id="deckBody" tabindex="0" role="region"
+       aria-label="Slide content">
     <section class="panel" aria-labelledby="h-deck">
       <h2 id="h-deck" class="sr-only">The six beats, one per screen</h2>
       <p class="beat" id="deckKicker" style="margin-bottom:1rem">
@@ -1530,14 +1536,38 @@
   }
 
   /* Keyboard: arrows move through the deck, Escape leaves it. Scoped to the
-     deck, so the arrow keys keep their normal meaning on the page. */
+     deck, so the arrow keys keep their normal meaning on the page.
+
+     PageDown/PageUp are the reader's way to SCROLL a slide that is taller than
+     the screen, so they only change slide when there is nothing left to scroll.
+     Stealing them outright would strand a keyboard user at the top of a long
+     slide — the exact barrier scrollable-region-focusable points at. */
+  function canScroll(dir) {
+    var body = document.getElementById("deckBody");
+    if (!body) return false;
+    var slack = body.scrollHeight - body.clientHeight;
+    if (slack <= 2) return false;
+    if (dir > 0) return body.scrollTop < slack - 2;
+    return body.scrollTop > 2;
+  }
+  function isFormField(el) {
+    return !!el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName);
+  }
   document.addEventListener("keydown", function (ev) {
     if (!deckOpen) return;
-    if (ev.key === "ArrowRight" || ev.key === "PageDown") {
-      if (ev.target && /^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName)) return;
+    if (ev.key === "ArrowRight") {
+      if (isFormField(ev.target)) return;
       ev.preventDefault(); deckNext();
-    } else if (ev.key === "ArrowLeft" || ev.key === "PageUp") {
-      if (ev.target && /^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName)) return;
+    } else if (ev.key === "ArrowLeft") {
+      if (isFormField(ev.target)) return;
+      ev.preventDefault(); deckBack();
+    } else if (ev.key === "PageDown") {
+      if (isFormField(ev.target)) return;
+      if (canScroll(1)) return;          /* let the browser scroll the slide */
+      ev.preventDefault(); deckNext();
+    } else if (ev.key === "PageUp") {
+      if (isFormField(ev.target)) return;
+      if (canScroll(-1)) return;
       ev.preventDefault(); deckBack();
     } else if (ev.key === "Escape") {
       ev.preventDefault(); closeDeck();

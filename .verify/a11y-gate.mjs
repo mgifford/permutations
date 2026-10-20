@@ -153,10 +153,23 @@ try {
     // page one: reveal every beat, then scan again
     const hasReveal = await evalJs(`!!document.getElementById('revealAllBtn')`);
     let revealed = null;
+    let deckState = null;
     if (hasReveal) {
       await evalJs(`document.getElementById('revealAllBtn').click(); void 0;`);
       await sleep(400);
       revealed = await scan("all beats revealed");
+    }
+
+    /* page one: the full-screen deck. This state was previously NOT scanned,
+       and the live page carried a serious scrollable-region-focusable
+       violation only visible with the deck open. An unscanned state is an
+       unguarded state, so it is scanned now. */
+    if (hasReveal && await evalJs(`typeof window.__openDeck === 'function'`)) {
+      await evalJs(`window.__openDeck(1); void 0;`);
+      await sleep(500);
+      deckState = await scan("slide deck open");
+      await evalJs(`window.__closeDeck(); void 0;`);
+      await sleep(300);
     }
 
     // page two: populate the model tables, which are empty until boot runs
@@ -167,7 +180,7 @@ try {
       populated = await scan("model tables populated");
     }
 
-    for (const state of [resting, revealed, populated].filter(Boolean)) {
+    for (const state of [resting, revealed, deckState, populated].filter(Boolean)) {
       for (const v of state.violations) {
         allFindings.push({
           page: page.name, state: state.label, id: v.id, impact: v.impact,

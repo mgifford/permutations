@@ -226,6 +226,7 @@ node layout-check.mjs                                   # real browser: page-one
 node run-example-check.mjs                              # real browser: the running example
 node deck-check.mjs                                     # real browser: the full-screen slide deck
 node a11y-gate.mjs                                      # real browser: axe-core gate
+node live-check.mjs                                     # the DEPLOYED site — needs the network
 ```
 
 `verify.mjs` drives the page's `boot()` explicitly, because jsdom's `runScripts: "outside-only"`
@@ -237,6 +238,15 @@ previous reveal bug was green in jsdom while being broken in every real browser.
 also covers something axe cannot: it presses Tab twenty times while the deck is open and requires
 that focus never reaches the page hidden behind the overlay. That failed when the deck was first
 built — axe reported zero violations with the defect live.
+
+`live-check.mjs` is kept out of `npm run all` deliberately, because it needs the network and should
+not make the suite fail for reasons unrelated to the change. Run it after a push (`npm run live`).
+It earns its place: a serious `scrollable-region-focusable` violation reached the deployed page
+because the deck-open state was not in any harness's scan set. The offending element was the
+scrolling slide surface, which had `tabindex="-1"` — reachable by mouse scroll, not by keyboard.
+The fix makes it a labelled, Tab-reachable region, and `PageDown` now scrolls a tall slide instead
+of skipping past it. Scanning the deployed page is what found it; testing only the filesystem
+would have missed it indefinitely.
 
 ---
 
