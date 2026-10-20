@@ -214,7 +214,10 @@
   .ledger li { border-left: 4px solid var(--brand-2); background: var(--panel-2); padding: .5rem .7rem; font-size: .9rem; border-radius: 0 6px 6px 0; }
   .ledger .where { font-weight: 700; display: block; }
   .ledger .meta { color: var(--muted); font-size: .82rem; }
-  .ledger li.ledger-empty { border-left-color: var(--line); opacity: .75; }
+  /* The empty-ledger placeholder previously carried opacity:.75, which pushed
+     its text to 3.14:1 — a real WCAG 1.4.3 failure, caught by .verify/a11y-gate.mjs.
+     Dimming is expressed through the border colour instead, which carries no text. */
+  .ledger li.ledger-empty { border-left-color: var(--line); }
   .ledger li.mech-terminal { border-left-color: var(--danger); background: var(--danger-bg); }
   .ledger li.mech-spoon { border-left-color: var(--warn); background: var(--warn-bg); }
   .ledger li.mech-effort { border-left-color: #5a3fa8; background: #f2eefc; }
@@ -699,7 +702,7 @@
     <h2 id="h-readout">5. Live probabilistic readout</h2>
     <div class="readout">
       <div class="box all">
-        <h4>The general journey</h4>
+        <h3>The general journey</h3>
         <span class="big-num" id="roAll">0.00 %</span>
         <p style="margin:0"><span class="mono" id="roAllFormula">1 − (0.99)^0 = 0.00 %</span></p>
         <p style="margin:.3rem 0 0; font-size:.85rem">
@@ -708,7 +711,7 @@
         </p>
       </div>
       <div class="box persona">
-        <h4>This citizen's journey</h4>
+        <h3>This citizen's journey</h3>
         <span class="big-num" id="roPersona">0.00 %</span>
         <p style="margin:0"><span class="mono" id="roPersonaFormula">p = 0.0100, n = 0</span></p>
         <p style="margin:.3rem 0 0; font-size:.85rem" id="roPersonaNote">
@@ -822,7 +825,8 @@
           Situational, applied across Vision, Motor/Touch, Cognition, and Hearing/Speech.</li>
         <li><strong>Automated coverage evidence</strong> — Deque Systems (~40&nbsp;% of issues detectable by
           automation); GSA Section 508 testing guidance (~30&nbsp;% of success criteria);
-          WebAIM Million 2025 (51 errors per home page average).</li>
+          WebAIM Million 2025 (51 errors per home page average) and 2026 (56.1 errors
+          per page; 95.9&nbsp;% of pages with detectable WCAG 2 failures).</li>
         <li><strong>Journey mapping practice</strong> — Government of Canada CSPS Journey Map job aid;
           UK GDS design notes on user journey mapping; Ontario Digital Service journey mapping guide.</li>
       </ul>
@@ -1487,18 +1491,37 @@
      Sources: Deque estimates ~40 % of issues are detectable by automation;
      GSA guidance is ~30 % of success criteria. We carry both as a range so
      the extrapolation to the manual residual is visible.
-     Source for defect prevalence: WebAIM Million 2025 (Feb 2025 crawl of
-     1,000,000 home pages): 51 detected errors per page on average; 94.8 %
-     of home pages had detectable WCAG 2 failures; 96 % of errors fall in
-     six categories (low contrast 79.1 % of pages, missing alt 55.5 %,
-     missing labels 48.2 %, empty links 45.4 %, empty buttons 29.6 %,
-     missing language 15.8 %). */
+     Source for defect prevalence: WebAIM Million, eighth annual report.
+     Both the 2025 and 2026 crawls are carried, because the trend is itself
+     part of the argument and the two disagree:
+       2025 (Feb 2025): 51 errors/page; 94.8 % of pages with detectable WCAG 2
+         failures; six categories held 96 % of errors (contrast 79.1 %, alt
+         55.5 %, labels 48.2 %, empty links 45.4 %, empty buttons 29.6 %,
+         language 15.8 %).
+       2026 (Feb 2026): 56.1 errors/page; 95.9 % of pages with detectable WCAG 2
+         failures; contrast 83.9 %, alt 53.1 %, labels 51 %, empty links
+         46.3 %, empty buttons 30.6 %, language 13.5 %.
+     The 2026 report reversed six years of small improvements, and attributed
+     the change to rising page complexity and ARIA use. */
   var CATCH_RATE = { low: 0.30, mid: 0.40, high: 0.50, source: "GSA ~30 % of SC; Deque ~40 % of issues" };
   var WEBAIM_2025 = {
     errorsPerPage: 51,
     pagesWithFailures: 0.948,
     categoriesFailingPct: { contrast: 0.791, altText: 0.555, labels: 0.482, emptyLinks: 0.454, emptyButtons: 0.296, language: 0.158 },
     source: "WebAIM Million 2025 (Feb 2025)"
+  };
+  /* Most recent crawl. Same shape, worse numbers. Kept separate rather than
+     overwriting 2025, so a reader can always see which year a figure came
+     from — and because the year-on-year worsening is part of the argument. */
+  var WEBAIM_2026 = {
+    errorsPerPage: 56.1,
+    pagesWithFailures: 0.959,
+    elementsPerPage: 1437,
+    errorDensity: 0.039,
+    ariaErrors: 59.1,
+    noAriaErrors: 42.0,
+    categoriesFailingPct: { contrast: 0.839, altText: 0.531, labels: 0.510, emptyLinks: 0.463, emptyButtons: 0.306, language: 0.135 },
+    source: "WebAIM Million 2026 (Feb 2026)"
   };
 
   /* ---- The defects this journey actually carries -----------------------
@@ -2056,8 +2079,8 @@
         src: "WebAIM Screen Reader User Survey #11 (2026): 91.8 % use a screen reader on mobile; treated as 0.95 for semantic defects. Range 0.90–1.00.", kind: "assumption" },
       { name: "Automated-tool catch rate", value: "30 – 50 %",
         src: CATCH_RATE.source + ". Carried as a range; it is the widest single lever on the output.", kind: "published" },
-      { name: "Measured defect density, top 1M home pages", value: WEBAIM_2025.errorsPerPage + " errors / page",
-        src: WEBAIM_2025.source + ": 94.8 % of home pages had detectable WCAG 2 failures; 96 % of errors fall in six categories.", kind: "published" },
+      { name: "Measured defect density, top 1M home pages", value: WEBAIM_2025.errorsPerPage + " errors / page (2025); " + WEBAIM_2026.errorsPerPage + " (2026)",
+        src: WEBAIM_2025.source + ": 94.8 % of home pages had detectable WCAG 2 failures; 96 % of errors fall in six categories. " + WEBAIM_2026.source + ": 95.9 % of pages, and " + WEBAIM_2026.elementsPerPage + " page elements per page on average (up 14.3 % in one year) — the 2026 report reversed six years of small improvements and attributes it to rising complexity and ARIA use.", kind: "published" },
       { name: "Partial-blocker fractions per defect", value: "0.55 – 0.85",
         src: "No standards body publishes these. Each is stated per-defect with a range in the defect record. This is the model's weakest evidence layer and it is labelled as such.", kind: "assumption" },
       { name: "Degrader compounding cost", value: "4 extra effective steps each",

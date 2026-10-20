@@ -9,9 +9,12 @@
     "popmodel": "node popmodel.mjs",
     "layout": "node layout-check.mjs",
     "run-example": "node run-example-check.mjs",
-    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run layout && npm run run-example"
+    "a11y": "node a11y-gate.mjs",
+    "readability": "node readability.mjs",
+    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run readability && npm run layout && npm run run-example && npm run a11y"
   },
   "dependencies": {
+    "axe-core": "^4.14.0",
     "jsdom": "^30.1.3",
     "ws": "^8.22.0"
   }

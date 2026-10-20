@@ -280,63 +280,51 @@
       <!-- BEAT 1 -->
       <div class="beatrow" hidden data-beat="1">
         <div class="cell-l">
-          <p class="beat">Beat 1 — what a permutation is</p>
-          <h3>Counting arrangements of distinct things</h3>
-          <p>A permutation is an <strong>arrangement of things where order matters</strong>. Counting
-          them answers a plain question: <em>how many ways can this turn out?</em></p>
-          <p>Two coins, each heads or tails, give four possible arrangements:</p>
-          <p class="formula">HH  HT  TH  TT        arrangements = 2 × 2 = 4</p>
-          <p>Three coins give <span class="mono">2³ = 8</span>. Ten coins give
-          <span class="mono">2¹⁰ = 1,024</span>. The count <strong>multiplies</strong>, it never adds
-          — and that single fact is the whole page.</p>
+          <p class="beat">Beat 1 — how things combine</p>
+          <h3>Each new choice multiplies the possibilities</h3>
+          <p>Flip two coins. Each can be heads or tails. How many outcomes are possible?</p>
+          <p class="formula">2 coins × 2 outcomes = 4 outcomes</p>
+          <p>Add a third coin and you double it again: 8. A fourth: 16. Each new thing
+          <strong>multiplies</strong> the options — it never adds them.</p>
+          <p>That is all a permutation is: <strong>the ways things can combine</strong>.</p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 1 — what accessibility is</p>
-          <h3>A requirement that applies to every person, at once</h3>
-          <p>Digital accessibility means a service <strong>works for everyone who needs it</strong>,
-          including people with disabilities — and the obligation is not averaged over a crowd, it
-          applies to each user individually.</p>
-          <p>Roughly <strong>1 in 4 US adults</strong> reports a disability (CDC BRFSS 2022:
-          28.7&nbsp;%). The US Census measures a narrower definition and finds
-          <strong>13.6&nbsp;% of all ages</strong> (ACS 2024: 45.8 million people).</p>
-          <div class="callout warn" style="margin:.7rem 0 0">
-            <p><strong>That disagreement is the first real lesson.</strong> Two credible official
-            sources differ by more than a factor of two — because they ask different questions.
-            Every number in this artefact therefore states its source and its definition. If you
-            want to attack the conclusion later, attack it there.</p>
-          </div>
+          <p class="beat">Beat 1 — who this is for</p>
+          <h3>Accessibility is about people, not checkboxes</h3>
+          <p>Digital accessibility means a service works for everyone who needs it. That includes
+          people with disabilities.</p>
+          <p>About <strong>1 in 4 US adults</strong> has a disability. The US Census counts
+          <strong>45.8 million people</strong> of all ages (ACS 2024).</p>
+          <p>They are your users whether or not your analytics show them. A screen reader user. A
+          keyboard-only user. Someone with a migraine today. Someone holding a baby.</p>
         </div>
       </div>
 
       <!-- BEAT 2 -->
       <div class="beatrow" hidden data-beat="2">
         <div class="cell-l">
-          <p class="beat">Beat 2 — independence</p>
-          <h3>When one outcome doesn't change the next</h3>
-          <p>Two events are <strong>independent</strong> when knowing one tells you nothing about
-          the other. A coin landing heads does not make the next coin more likely to be tails.</p>
-          <p>For independent events, the chance that <em>both</em> happen is the product:</p>
-          <p class="formula">P(A and B) = P(A) × P(B)
-
-two coins, both heads:  ½ × ½ = ¼ = 25 %</p>
-          <p>Notice what this does to a chain: if each step succeeds with probability
-          <span class="mono">p</span>, then <span class="mono">n</span> independent steps succeed
-          together with probability <span class="mono">pⁿ</span>. Small per-step losses become
-          large journey losses.</p>
+          <p class="beat">Beat 2 — when one thing doesn't affect the next</p>
+          <h3>Independent events multiply</h3>
+          <p>Flip a coin twice. The first flip landing heads tells you nothing about the second.
+          The flips are <strong>independent</strong>.</p>
+          <p>When events are independent, the chance of <em>both</em> happening is the
+          <strong>product</strong> of their chances:</p>
+          <p class="formula">both heads = ½ × ½ = ¼ = 25 %</p>
+          <p>This is the rule the whole page rests on. Remember it.</p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 2 — the four principles</p>
-          <h3>POUR: four obligations that all apply at once</h3>
-          <p>WCAG 2.2 organises its requirements under four principles. A service must satisfy
-          <strong>all four</strong> — this is the accessibility version of an "and":</p>
+          <p class="beat">Beat 2 — four things that must all work</p>
+          <h3>Accessibility has four parts, and you need all four</h3>
+          <p>WCAG — the international accessibility standard — groups its rules into four
+          principles:</p>
           <ul class="pour">
-            <li><b>Perceivable</b><span>Can I receive the information? (text alternatives, contrast, captions)</span></li>
-            <li><b>Operable</b><span>Can I use the controls? (keyboard, timing, target size, no drag-only)</span></li>
-            <li><b>Understandable</b><span>Can I follow and predict it? (labels, errors, consistent navigation)</span></li>
-            <li><b>Robust</b><span>Does it work with my technology? (names, roles, values, compatibility)</span></li>
+            <li><b>Perceivable</b><span>Can I take the information in?</span></li>
+            <li><b>Operable</b><span>Can I work the controls?</span></li>
+            <li><b>Understandable</b><span>Can I follow it?</span></li>
+            <li><b>Robust</b><span>Does it work with my technology?</span></li>
           </ul>
-          <p>A page that is perceivable but not operable fails. There is no partial credit, because
-          the user needs all four — <em>the same "and" as the coin above</em>.</p>
+          <p>A site that is perceivable but not operable fails. You need <strong>all
+          four</strong> — exactly the same "and" as the two coin flips.</p>
         </div>
       </div>
 
@@ -344,129 +332,97 @@ two coins, both heads:  ½ × ½ = ¼ = 25 %</p>
       <div class="beatrow" hidden data-beat="3">
         <div class="cell-l">
           <p class="beat">Beat 3 — the multiplication bites</p>
-          <h3>Why "99 % each" is not "99 % overall"</h3>
-          <p>Suppose each of 30 steps succeeds with probability <span class="mono">0.99</span>.
-          Independence means we multiply:</p>
-          <p class="formula">P(all 30 succeed) = 0.99³⁰ ≈ <span class="hl">0.7397</span>
-
-so the chance of at least one failure ≈ 26.03 %</p>
-          <p>The vendor's monitoring reports each step at 99&nbsp;%. The citizen experiences the
-          <em>product</em>, not the average. Nobody is served by the average of 30 steps — a person
-          meets the steps in order and is stopped by whichever one fails them.</p>
+          <h3>99 % each, many times, is not 99 % overall</h3>
+          <p>A 30-step form where each step works 99&nbsp;% of the time:</p>
+          <p class="formula">0.99 × 0.99 × ... 30 times = 0.7397</p>
+          <p>So all 30 steps work only <strong>74&nbsp;%</strong> of the time. The other
+          <strong>26&nbsp;%</strong> of journeys hit at least one failure.</p>
+          <p>Each step looked nearly perfect. The <em>journey</em> does not.</p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 3 — a journey is a serial system</p>
-          <h3>Every step has to work, for every person</h3>
-          <p>Applying for a benefit is a <strong>sequence</strong>: screen eligibility, prove
-          identity, enter finances, upload documents, sign, confirm. Thirty interactions across four
-          stages. You cannot skip one and still be approved.</p>
-          <p>That makes the task what reliability engineers call a <strong>serial system</strong>: the
-          whole thing works only if every part works. Component reliability multiplies; it never
-          averages. This is mathematically identical to a chain of hardware that fails if any link
-          fails.</p>
-          <p class="muted">A dashboard checks each part. The citizen lives the whole chain.</p>
+          <p class="beat">Beat 3 — a benefit form is a chain</p>
+          <h3>You cannot skip a step and still finish</h3>
+          <p>Applying for a benefit is a sequence: check eligibility, prove who you are, enter your
+          finances, upload documents, sign, confirm.</p>
+          <p>Get stuck at any one of those and you cannot apply. There is no partial credit and no
+          way around it.</p>
+          <p>So the number of steps is not a detail. <strong>Every step is one more chance to
+          lose someone.</strong></p>
         </div>
       </div>
 
       <!-- BEAT 4 -->
       <div class="beatrow" hidden data-beat="4">
         <div class="cell-l">
-          <p class="beat">Beat 4 — permutations of kind, not just of order</p>
-          <h3>Who a person is, crossed with what the build does</h3>
-          <p>There is a second permutation in play. A citizen is a combination of capability axes,
-          and each axis has levels. Using the Microsoft Persona Spectrum:</p>
-          <ul class="tight">
-            <li><strong>Vision</strong> — permanent (blind), temporary (post-treatment), situational (screen glare)</li>
-            <li><strong>Motor/touch</strong> — permanent (keyboard-only), temporary (one-handed injury), situational (holding a toddler)</li>
-            <li><strong>Cognition</strong> — permanent, temporary (migraine), situational (crisis and time pressure)</li>
-            <li><strong>Hearing/speech</strong> — permanent (Deaf), temporary (laryngitis), situational (noisy transit)</li>
-          </ul>
-          <p>Cross those axes with the build's defects and you get the space later pages sample from:
-          <span class="mono">4 axes × 3 levels</span> in each, times every step that can fail.</p>
+          <p class="beat">Beat 4 — combining more than two</p>
+          <h3>The same rule, all the way up</h3>
+          <p>The rule does not change as things get bigger. For any number of independent steps,
+          you multiply their chances together.</p>
+          <p>The more steps, the faster it drops. Going from 99&nbsp;% per step to 99.9&nbsp;% —
+          a ten-fold improvement — lifts the whole 30-step journey from <strong>74&nbsp;%</strong>
+          to <strong>97&nbsp;%</strong>.</p>
+          <p>Fixing the <em>step</em> fixes the <em>journey</em>. That is the leverage.</p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 4 — disability is not a fixed minority</p>
-          <h3>Temporary and situational, and a curve that reaches almost everyone</h3>
-          <p>The Persona Spectrum exists because "disability" is not a static category. It shifts with
-          injury, illness, situation and age:</p>
+          <p class="beat">Beat 4 — disability is not one fixed thing</p>
+          <h3>It is permanent, temporary, or situational</h3>
+          <p>The same barrier is met in three ways:</p>
           <ul class="tight">
-            <li><strong>12&nbsp;%</strong> of US adults ages 18–64 report a disability.</li>
-            <li><strong>24&nbsp;%</strong> of those 65–74.</li>
-            <li><strong>46&nbsp;%</strong> of those 75 and older (Census ACS / Pew 2023).</li>
+            <li><strong>Permanent</strong> — someone who is blind.</li>
+            <li><strong>Temporary</strong> — someone recovering from eye surgery.</li>
+            <li><strong>Situational</strong> — anyone squinting at a screen in bright sun.</li>
           </ul>
-          <p>So the affected population is not a small fixed slice you can average away — it is a
-          <strong>growing share of everyone</strong>, and any given person passes through it. The
-          same barrier is met permanently by some, temporarily by others, and situationally by many
-          more. That is why the model treats all three levels as real.</p>
+          <p>The last one includes <em>you</em>. And because disability rises sharply with age —
+          <strong>46&nbsp;%</strong> of people over 75 — most of us will meet it personally.</p>
         </div>
       </div>
 
       <!-- BEAT 5 -->
       <div class="beatrow" hidden data-beat="5">
         <div class="cell-l">
-          <p class="beat">Beat 5 — combining more than two</p>
-          <h3>Chains of chance, and how fast they collapse</h3>
-          <p>The rule generalises: for <span class="mono">n</span> independent steps each succeeding
-          with probability <span class="mono">p</span>, the whole chain succeeds with probability
-          <span class="mono">pⁿ</span>.</p>
-          <table class="data">
-            <caption>Journey success for 30 steps at three per-step success rates</caption>
-            <thead>
-              <tr><th scope="col">Per step</th><th scope="col" class="num">Formula</th><th scope="col" class="num">Whole journey</th></tr>
-            </thead>
-            <tbody>
-              <tr><th scope="row">99.9 %</th><td class="num">0.999³⁰</td><td class="num">97.04 %</td></tr>
-              <tr><th scope="row">99 %</th><td class="num">0.99³⁰</td><td class="num">73.97 %</td></tr>
-              <tr><th scope="row">97 %</th><td class="num">0.97³⁰</td><td class="num">40.10 %</td></tr>
-            </tbody>
-          </table>
-          <p>Improving each step from 99&nbsp;% to 99.9&nbsp;% — a tenfold cut in defects — buys about
-          <strong>23 percentage points</strong> of journey completion. That is the power of working on
-          the exponent instead of the headline.</p>
+          <p class="beat">Beat 5 — not every failure is a wall</p>
+          <h3>Three kinds of harm</h3>
+          <ul class="tight">
+            <li><strong>Total blocker</strong> — no way past. A drag-only upload with no keyboard
+            alternative. The journey just ends.</li>
+            <li><strong>Partial blocker</strong> — a way past exists, but not for everyone.
+            A date-picker that needs a mouse.</li>
+            <li><strong>Degrader</strong> — slows people down, stops nobody. Low contrast is the
+            classic example.</li>
+          </ul>
+          <p>Only the first kind shows up as "the user failed". The other two cost you people
+          quietly, and no report counts them.</p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 5 — why a green dashboard tells you little</p>
-          <h3>Automation sees a slice of the standard</h3>
-          <p>Automated tools — Lighthouse, axe-core, WAVE — are genuinely useful, and they agree on
-          roughly how much they can decide: the GSA puts it near <strong>30&nbsp;% of success
-          criteria</strong>; Deque puts it near <strong>40&nbsp;% of issues</strong>. The rest need a
-          person who knows the standard to look.</p>
-          <p>WebAIM's 2025 crawl of the top million home pages found <strong>51 detectable errors per
-          page</strong> and <strong>94.8&nbsp;%</strong> of pages failing WCAG 2. Those are the errors
-          automation <em>can</em> see. The blockers that stop people — keyboard traps, drag-only
-          uploads, unannounced live updates — are largely in the part it cannot.</p>
-          <p>A perfect score means <em>"nothing this tool knows how to check is broken."</em> It does
-          not mean the task works.</p>
+          <p class="beat">Beat 5 — why a green tick fools people</p>
+          <h3>Automated tools only check part of the job</h3>
+          <p>Tools like Lighthouse, axe and WAVE are useful — but everyone agrees they only catch
+          <strong>30–40&nbsp;%</strong> of problems. The rest need a human who knows the
+          standard.</p>
+          <p>A perfect score means <em>"nothing this tool knows how to check is broken."</em></p>
+          <p>It does not mean the task works. The walls — keyboard traps, drag-only uploads —
+          are mostly in the part no tool can see.</p>
         </div>
       </div>
 
       <!-- BEAT 6 -->
       <div class="beatrow" hidden data-beat="6">
         <div class="cell-l">
-          <p class="beat">Beat 6 — where this page has been going</p>
-          <h3>The same arithmetic, applied to people</h3>
-          <p>Now combine the two columns. Thirty steps, each failing a given citizen with some
-          probability, and a citizen who is a permutation of capability axes. The journey either
-          works for that person or it does not.</p>
-          <p class="formula">per-step pass 0.99  →  journey pass <span class="hl">73.97 %</span>
-per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
-          <p>And that is before adding the barriers that stop someone outright while leaving the
-          arithmetic untouched — the drag-only upload that has no keyboard path at all.</p>
+          <p class="beat">Beat 6 — the two ideas are one idea</p>
+          <h3>Same arithmetic, different words</h3>
+          <p>Permutations multiply because independent things must <em>all</em> work.</p>
+          <p>A journey multiplies because every step must work, <em>and</em> all four accessibility
+          principles must hold.</p>
+          <p>Both are the same "and". Both multiply. <strong>Neither averages.</strong></p>
         </div>
         <div class="cell-r">
-          <p class="beat">Beat 6 — what "blocked" actually means</p>
-          <h3>Not every failure is the same kind of failure</h3>
-          <ul class="tight">
-            <li><strong>Total blocker</strong> — no path exists. A drag-only upload with no keyboard
-            alternative. The journey ends, deterministically, for those who cannot drag.</li>
-            <li><strong>Partial blocker</strong> — a path exists for some of the group but not all.
-            A date-picker that works with a pointer and not a keyboard.</li>
-            <li><strong>Degrader</strong> — blocks nobody outright, but raises error and abandonment
-            rate. Low contrast is the most common on the web and the most survivable.</li>
-          </ul>
-          <p>Two of these are measured in the next page's population model; one of them — contrast —
-          is real, reportable, and the reason nobody fails. Conflating them is how "99&nbsp;%"
-          gets published.</p>
+          <p class="beat">Beat 6 — so what?</p>
+          <h3>A 99 % score can fail a quarter of your users</h3>
+          <p>Put the two columns together and the conclusion is arithmetic, not opinion:</p>
+          <p class="formula">99 % per step → <span class="hl">74 %</span> of journeys complete</p>
+          <p>And that is before counting the walls that stop people outright while the score
+          never notices.</p>
+          <p>Ready for the proof? The next page runs all 30 steps.</p>
         </div>
       </div>
     </div>
@@ -474,8 +430,7 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
     <div class="callout" style="margin-top:1.2rem">
       <p><strong>Where the two ideas meet.</strong> A permutation multiplies because independent
       things must <em>all</em> happen. A journey multiplies because every step must work for the
-      person <em>and</em> all four POUR principles must hold. One arithmetic, two vocabularies. Once
-      that clicks, the simulation is just bookkeeping.</p>
+      person <em>and</em> all four POUR principles must hold. One arithmetic, two vocabularies.</p>
     </div>
   </section>
 
@@ -501,6 +456,85 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
       single run — it is in the 26&nbsp;% of <em>journeys</em>. Run it a few times and watch the
       odds turn against you.</p>
     </div>
+
+    <div class="callout warn" style="margin:.7rem 0 0">
+      <p style="margin:0 0 .5rem"><strong>What this example is, and is not.</strong></p>
+      <ul class="tight" style="margin:0">
+        <li><strong>The 1&nbsp;% is illustrative.</strong> It is the industry-standard headline
+        number — "99&nbsp;% accessible" — not a measurement of any real service. No service was
+        audited to produce it.</li>
+        <li><strong>The eight steps are illustrative too.</strong> They are the <em>shape</em> of a
+        benefit application, written to make the arithmetic visible. They are not a transcript of a
+        real journey.</li>
+        <li><strong>What is not illustrative</strong> is the arithmetic. Once you fix a per-step
+        failure rate, the compounding is not a matter of opinion — it is the third line of the
+        page, and it holds at any rate you choose.</li>
+        <li><strong>1&nbsp;% is generous, not harsh.</strong> Real pages carry far more than one
+        defect per step. See below.</li>
+      </ul>
+    </div>
+
+    <h3>Why 1&nbsp;% per step is the optimistic case</h3>
+    <p>
+      The example above gives every step a 1&nbsp;% chance of failure, and treats each step as a
+      single component. Real services are worse than that on both counts, and the evidence for this
+      is not a model — it is an annual crawl of one million live home pages.
+    </p>
+    <table class="data">
+      <caption>Detected accessibility errors on the top one million home pages
+      (WebAIM Million, February 2026 crawl)</caption>
+      <thead>
+        <tr>
+          <th scope="col">Measure</th>
+          <th scope="col">Value</th>
+          <th scope="col">What it tells us</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Detected errors per home page (average)</th>
+          <td>56.1</td>
+          <td>Not one defect per page. Fifty-six.</td>
+        </tr>
+        <tr>
+          <th scope="row">Home pages with detectable WCAG&nbsp;2 failures</th>
+          <td>95.9&nbsp;%</td>
+          <td>Failing is the norm, not the exception.</td>
+        </tr>
+        <tr>
+          <th scope="row">Average page elements per home page</th>
+          <td>1,437</td>
+          <td>Up 14.3&nbsp;% in a single year.</td>
+        </tr>
+        <tr>
+          <th scope="row">Elements carrying a detected error</th>
+          <td>3.9&nbsp;%</td>
+          <td>One error in every 26 elements a person meets.</td>
+        </tr>
+        <tr>
+          <th scope="row">Errors on pages that use ARIA vs pages that do not</th>
+          <td>59.1 vs 42.0</td>
+          <td>Complexity, not intent, drives the count.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="muted" style="font-size:.9rem">
+      These are counts of what automation <em>can see</em>. Roughly 30–40&nbsp;% of issues are
+      reachable by a scanner at all, so the true figures are higher — and the gaps are exactly where
+      the walls live.
+    </p>
+    <p>
+      The report's own conclusion is the point of this page, in one line: home pages are getting
+      larger and more technologically complex, <strong>and complexity correlates with more
+      errors.</strong> The same year-over-year increase held for ARIA usage. A longer, richer
+      journey is not the same journey with more steps — it is a journey with more error
+      <em>opportunities per step</em>.
+    </p>
+    <p>
+      So the running example above is the <em>best</em> case. Set the quality dial to 97&nbsp;% or
+      95&nbsp;% in the simulation and the same compounding runs against a much higher rate. The
+      argument does not need the worst case. It only needs the arithmetic and an honest input.
+    </p>
 
     <div class="runex" id="runEx">
       <div class="runex-head">
@@ -542,6 +576,12 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
       that these are likely, it is that a multi-step journey gives failure many chances to happen,
       and that the three failure <em>types</em> produce completely different endings.
     </p>
+    <p>
+      That last point is worth sitting with. "How many users failed?" is the number everyone
+      tracks, and it counts only the total blockers. The partial blockers and degraders — the ones
+      that cost minutes, spoons and willingness rather than the whole attempt — never appear in it.
+      <strong>The number everyone reports misses most of the harm.</strong>
+    </p>
   </section>
 
   <!-- ============================================================ -->
@@ -574,7 +614,7 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
       <li>Microsoft Inclusive Design, Persona Spectrum: permanent, temporary, situational.</li>
       <li>W3C, WCAG 2.2 — the four POUR principles.</li>
       <li>GSA (≈30&nbsp;% of success criteria automatable) and Deque (≈40&nbsp;% of issues).</li>
-      <li>WebAIM Million, 2025: 51 detectable errors per home page; 94.8&nbsp;% of pages with WCAG 2 failures.</li>
+      <li>WebAIM Million, 2026 (February 2026 crawl): 56.1 detectable errors per home page; 95.9&nbsp;% of home pages with detectable WCAG 2 failures; 1,437 page elements per page on average; pages with ARIA averaged 59.1 errors against 42.0 without.</li>
     </ul>
   </section>
 

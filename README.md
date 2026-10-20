@@ -93,19 +93,30 @@ on GitHub Pages being available.
 Six beats, revealed one at a time, with a "reveal everything" control. **Nothing is withheld** —
 the content follows in order whether or not you press anything.
 
+**One idea per column, per beat.** Each beat is deliberately small — 33 to 89 words — and written
+for a reader with no maths background. Depth lives in the running example and the simulation,
+both of which are optional; a reader who stops after the beats still has the whole argument.
+This is enforced by harnesses, not by intention (see `.verify/readability.mjs`).
+
 | Beat | Permutations — the mathematics | Digital accessibility — the domain |
 |---|---|---|
-| 1 | What a permutation is; the count multiplies | Who is affected; why CDC (28.7 %) and Census (13.6 %) disagree |
-| 2 | **Independence:** `P(A and B) = P(A) × P(B)` | **POUR** — four principles that must all hold — the same "and" |
-| 3 | `0.99³⁰ ≈ 0.7397` | A journey is a serial system |
-| 4 | Permutations of *kind*: 4 axes × 3 levels | Disability is not fixed: 12 % / 24 % / 46 % by age |
-| 5 | Chain of 30 at three quality levels | Automation decides ~30–40 % of the standard |
-| 6 | The same arithmetic, applied to people | Total blockers, partial blockers, degraders |
+| 1 | Each new choice multiplies the possibilities | Accessibility is about people; 1 in 4 US adults, 45.8 million |
+| 2 | **Independence:** `½ × ½ = ¼` | **POUR** — four principles that must all hold — the same "and" |
+| 3 | `0.99³⁰ = 0.7397`, so 26 % of journeys fail | A benefit form is a chain; you cannot skip a step |
+| 4 | The rule scales; 99.9 % lifts the journey to 97 % | Disability is permanent, temporary, or situational |
+| 5 | Not every failure is a wall: three kinds of harm | Tools check only 30–40 % of the job |
+| 6 | Both columns are the same arithmetic | A 99 % score can fail a quarter of your users |
 
 Beat 2 is the hinge. "Two independent things must both happen" and "POUR's four principles must
 all hold" are the same logical shape. Once a reader accepts that, everything after is
 bookkeeping — and the claim "99 % isn't good enough" stops being an opinion and becomes a
 consequence.
+
+After the beats, **the running example** lets a reader click through an eight-step journey at 1 %
+per step and watch the risk accumulate. It states plainly that the 1 % and the eight steps are
+illustrative, that no real service was audited, and that 1 % is the *optimistic* case: the
+WebAIM Million 2026 crawl found 56.1 detectable errors on the average home page, and the report
+attributes the year-on-year worsening to rising page complexity.
 
 ### Page two — `cumulative-accessibility-risk-simulator.html` (the evidence)
 

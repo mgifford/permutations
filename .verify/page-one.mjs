@@ -46,8 +46,9 @@ ok(hiddenCount()===0, "reveal-all leaves nothing hidden");
 // check the joining math is actually correct in the text
 const body = d.body.textContent;
 ok(body.includes("0.99³⁰"), "formula 0.99^30 present");
-ok(/73\.97/.test(body), "73.97 present");
-ok(/97\.04/.test(body), "97.04 present");
+ok(body.includes("0.7397"), "exact product 0.7397 present");
+ok(/74\s*%/.test(body), "rounded journey pass 74 % present");
+ok(/97\s*%/.test(body), "ten-fold improvement to 97 % present");
 ok(/28\.7/.test(body), "CDC 28.7 present");
 ok(/13\.6/.test(body), "Census 13.6 present");
 ok(/46/.test(body), "46% 75+ present");
@@ -69,6 +70,28 @@ ok(!rendered.includes("[object Object]"), "no object leak in rendered text");
 
 // POUR all four
 ["Perceivable","Operable","Understandable","Robust"].forEach(p=>ok(body.includes(p),"POUR: "+p));
+
+/* ---- beat density -------------------------------------------------------
+   Each beat must carry ONE idea per column. An earlier revision stacked three
+   or four ideas, a callout and a table into a single beat, which read as a wall
+   of text. This assertion is the guard against that regressing: a beat cell is
+   meant to be read in about half a minute. */
+[...d.querySelectorAll(".beatrow")].forEach(row => {
+  const beatNo = row.dataset.beat;
+  ["cell-l","cell-r"].forEach(side => {
+    const cell = row.querySelector("." + side);
+    if (!cell) return;
+    const words = cell.textContent.trim().split(/\s+/).length;
+    ok(words <= 95, `beat ${beatNo} ${side} is short enough to read at a glance (${words} words)`);
+    // one lead idea only: a single h3, and at most one callout
+    ok(cell.querySelectorAll("h3").length === 1,
+       `beat ${beatNo} ${side} has exactly one heading`);
+    ok(cell.querySelectorAll(".callout").length <= 1,
+       `beat ${beatNo} ${side} carries at most one aside`);
+    ok(cell.querySelectorAll("table").length === 0,
+       `beat ${beatNo} ${side} does not carry a data table`);
+  });
+});
 
 // headings: two grid headers
 ok(d.getElementById("grid-head-l").textContent.includes("Permutations"), "left header");
@@ -100,6 +123,26 @@ ok(cites.filter(c=>c.trim().length>10).length===8,
 ok(cites.some(c=>/2\.5\.7/.test(c)), "the ACT-gap criterion SC 2.5.7 is named");
 ok(cites.some(c=>/NO published ACT rule/.test(c)),
    "the absence of an ACT rule is stated, not papered over");
+
+/* The illustrative nature of the example must be stated ON the page, not only
+   in the docs. This is the honesty constraint the project rests on: a reader
+   must never mistake 1 % or the eight steps for a measurement. */
+const running = d.querySelector('[aria-labelledby="h-running"]') || d.getElementById("h-running").closest("section");
+const runText = running.textContent;
+ok(/illustrative/i.test(runText), "running example labels its inputs as illustrative");
+ok(/not a measurement of any real service|No service was audited/i.test(runText),
+   "running example states no real service was audited");
+ok(/optimistic case/i.test(runText),
+   "running example says 1 % is the optimistic case, not the worst case");
+ok(/misses most of the harm/i.test(runText),
+   "running example states that the tracked failure number misses most of the harm");
+ok(/56\.1/.test(runText), "2026 WebAIM error count present");
+ok(/95\.9/.test(runText), "2026 WebAIM failure rate present");
+ok(/complexity|more complex|complex/i.test(runText),
+   "running example makes the complexity argument");
+// and the stale 2025-only framing must not survive
+ok(!/2025 crawl of the top million home pages found <strong>51/.test(html),
+   "no stale 2025-only WebAIM claim in the running example");
 
 // the arithmetic must be the real serial-reliability number
 const rx = d.getElementById("runExFormula");

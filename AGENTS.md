@@ -185,9 +185,36 @@ node run-example-check.mjs                              # npm run run-example
   Chrome/Chromium (override with `CHROME_BIN`); skips cleanly if absent.
 - `run-example-check.mjs` — **real browser.** Asserts the running example lays out, logs a stated
   outcome for every step, and does not overflow at 360 px.
+- `readability.mjs` — measures each beat cell's word count, sentence length, Flesch Reading Ease
+  and Flesch-Kincaid grade. Fails on a cell over 95 words, a sentence over 45 words, or a cell
+  under 25 words.
+- `a11y-gate.mjs` — **axe-core in a real browser.** Fails on any `critical` or `serious` violation
+  on either page, in every state (beats revealed, model tables populated). Reports the rest without
+  failing. Not a conformance claim — see the note it prints.
 
 **When you change behaviour, extend the harness.** Assertions are the only thing preventing a
 regression in the maths from shipping silently.
+
+### One idea per beat, in plain language
+
+Page one exists for readers without a maths background. An earlier revision stacked three or four
+ideas, a callout and a data table into a single beat; the result was unreadable. **A beat cell
+teaches exactly one thing.**
+
+Mechanically enforced, so it cannot drift back:
+
+- `page-one.mjs` fails a beat cell over 95 words, or carrying more than one heading, more than one
+  aside, or a data table.
+- `readability.mjs` fails a sentence over 45 words or a cell under 25 words, and reports the
+  Flesch-Kincaid grade per cell.
+
+Current state: 6 beats, 12 cells. Every cell is **33–89 words**, longest sentence **28 words**,
+average Flesch-Kincaid grade **5.8**, average reading ease **71.4** (Flesch: 60+ is plain English).
+These are the numbers `readability.mjs` prints; if a change pushes them up, the change is wrong,
+not the threshold.
+
+Depth beyond one idea belongs in the running example or the simulation, both of which are
+*optional* — a reader who stops after the beats should still have the whole argument.
 
 ### Some bugs jsdom cannot catch — use a real browser
 

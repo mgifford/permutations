@@ -135,8 +135,20 @@ scanner knows how to check is broken. It would not establish that the argument i
 
 | Artefact | Automated | Keyboard | Zoom / reflow | Contrast | Screen reader | Status |
 |---|---|---|---|---|---|---|
-| `index.html` | Not yet scanned | Partially — `details`/`summary` and button activation driven in jsdom (`page-one.mjs`) | **Not tested** | Not tested | **Not tested** | No claim |
-| `cumulative-accessibility-risk-simulator.html` | Not yet scanned | Partially — programmatic activation of controls in jsdom (`verify.mjs`) | **Not tested** | Not tested | **Not tested** | No claim |
+| `index.html` | **axe-core 4.14, 0 violations** (critical/serious; scanned as loaded and with all beats revealed) | Partially — `details`/`summary` and button activation driven in jsdom (`page-one.mjs`) and in real Chrome (`layout-check.mjs`, `run-example-check.mjs`) | Partially — reflow asserted at 360 px in real Chrome; 200 % zoom **not tested** | Not tested manually | **Not tested** | No claim |
+| `cumulative-accessibility-risk-simulator.html` | **axe-core 4.14, 0 violations** (critical/serious; scanned as loaded and with model tables populated) | Partially — programmatic activation of controls in jsdom (`verify.mjs`) | **Not tested** | Not tested manually | **Not tested** | No claim |
+
+The automated results above are produced by `.verify/a11y-gate.mjs`. **They are evidence, not a
+conformance claim**, and the gate prints that caveat on every run. Two real violations were found
+by this gate when it was first added and have since been fixed:
+
+- a colour-contrast failure (3.14:1) on the simulator's empty-ledger placeholder, caused by an
+  `opacity: .75` that dimmed text below the 4.5:1 threshold — a genuine SC 1.4.3 failure;
+- a skipped heading level (`<h2>` to `<h4>`) in the simulator's live readout section.
+
+Both were invisible to every other check in the suite. That is the point: automated scanning finds
+a narrow, useful band of problems, and the project would be self-refuting if it did not run it on
+itself. Neither fix was discovered by reading the code.
 
 The jsdom harnesses prove the pages *function* and the maths is *correct*. They are not
 accessibility evaluations and must not be presented as one. jsdom does not implement layout,

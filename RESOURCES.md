@@ -167,13 +167,22 @@ sources. It is labelled as such where it is used.
 
 | Figure | Value | Source | Notes |
 |---|---|---|---|
-| Errors per home page | **51** detected errors | [WebAIM Million 2025](https://webaim.org/projects/million/2025/) | February 2025 crawl, top 1,000,000 home pages, WAVE API on rendered DOM. |
-| Home pages with detectable WCAG 2 failures | **94.8 %** | WebAIM Million 2025 | Only the errors automation *can* see. |
-| Errors concentrated in six categories | **96 %** | WebAIM Million 2025 | Low contrast 79.1 % of pages; missing alt 55.5 %; missing form labels 48.2 %; empty links 45.4 %; empty buttons 29.6 %; missing language 15.8 %. |
+| Errors per home page | **51** (2025) → **56.1** (2026) | [WebAIM Million 2026](https://webaim.org/projects/million/) | February crawl each year, top 1,000,000 home pages, WAVE API on rendered DOM. Both years carried deliberately: the 2026 report **reversed six years of small annual improvements**, so the direction of travel is itself evidence. |
+| Home pages with detectable WCAG 2 failures | **94.8 %** (2025) → **95.9 %** (2026) | WebAIM Million 2026 | Only the errors automation *can* see. The report states full conformance is "certainly lower than 4.1 %". |
+| Average page elements per home page | **1,437** (2026), up 14.3 % in one year | WebAIM Million 2026 | Nearly doubled in seven years. This is the complexity signal. |
+| Elements carrying a detected error | **3.9 %** (2026) | WebAIM Million 2026 | One error in every 26 elements. |
+| Errors on pages using ARIA vs not | **59.1 vs 42.0** (2026) | WebAIM Million 2026 | Correlation, not causation — the report says these pages "were also more complex". Do not present as ARIA *causing* errors. |
+| Errors concentrated in six categories | **96 %** (2025); contrast 83.9 %, alt 53.1 %, labels 51 %, empty links 46.3 %, empty buttons 30.6 %, language 13.5 % (2026) | WebAIM Million 2026 | The six categories have been stable for seven years. |
 
 **Why this is cited:** it establishes that the *detectable* failures are already near-universal,
 and that they cluster in the categories automation handles. It is evidence that a green dashboard
 is reporting on the easy half.
+
+**It also establishes the complexity claim directly.** The 2026 report attributes the worsening to
+"the significant increase in home page complexity and ARIA code—both of which correlate to increased
+detectable errors", and concludes that improving accessibility at scale will require "both better
+practices and simpler systems". This is the published source for the page-one statement that a
+longer, richer journey carries more error *opportunities per step*, not merely more steps.
 
 **What it does not establish:** the four categories at the top of that list (contrast, alt text,
 labels, empty links) are predominantly **degraders** in this project's taxonomy — real, but not
@@ -249,6 +258,8 @@ this project touches.
 |---|---|
 | [WAI: Evaluating Web Accessibility](https://www.w3.org/WAI/test-evaluate/) | The evaluation method underpinning [ACCESSIBILITY.md §9](ACCESSIBILITY.md#9-testing-strategy) |
 | [WAI: Selecting Evaluation Tools](https://www.w3.org/WAI/test-evaluate/tools/selecting/) | Why a tool score is not a conformance claim |
+| [axe-core](https://github.com/dequelabs/axe-core) 4.14 | The automated gate used by `.verify/a11y-gate.mjs`. Deque's engine, run in a real browser. Fails on `critical` and `serious`; reports the rest. |
+| [Sa11y](https://sa11y.netlify.app/) | Considered and **not** adopted for the automated gate. It is an authoring-quality tool aimed at content authors, distributed as a CMS plugin and bookmarklet, and its own documentation states it is "**not** a comprehensive code analysis tool, nor… an overlay". Its ~80 checks overlap axe but skew toward content mistakes (link text, heading structure, image quality) rather than CI-blocking conformance failures, and it is not designed to run headless. Its *check intent* informed the manual checklist that `a11y-gate.mjs` prints after each run. Worth revisiting if the project later wants a human-facing authoring check on its own prose. |
 | [WAI-ARIA Authoring Practices Guide](https://www.w3.org/WAI/ARIA/apg/) | Patterns for any interactive component |
 | [Manual Accessibility Testing Guide](https://github.com/mgifford/ACCESSIBILITY.md) | The human testing this project has not yet completed |
 | [Behavioural Accessibility Automation](https://github.com/mgifford/ACCESSIBILITY.md) | Reflow and focus-visible behavioural checks |
