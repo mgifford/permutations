@@ -279,9 +279,14 @@ node --expose-gc --max-old-space-size=3000 verify.mjs   # 250 simulated runs + p
 node calib.mjs                                          # quality / difficulty / pinning controls
 node page-one.mjs                                       # page-one reveal mechanics and content
 node popmodel.mjs                                       # population numbers at each quality level
+node readability.mjs                                    # beat word counts and reading grade
 node layout-check.mjs                                   # real browser: page-one layout geometry
 node run-example-check.mjs                              # real browser: the running example
 node deck-check.mjs                                     # real browser: the full-screen slide deck
+node risk-line-check.mjs                                # real browser: risk figure at all 8 steps
+node shared-element-check.mjs                           # both artefacts agree on the shared-element model
+node spoon-pool-check.mjs                               # the shown pool matches the enforced one
+node reflow-check.mjs                                   # real browser: page two at 13 widths
 node a11y-gate.mjs                                      # real browser: axe-core gate
 node live-check.mjs                                     # the DEPLOYED site — needs the network
 ```
@@ -312,6 +317,33 @@ row, inside a 272 px grid, at a 360 px viewport. The grid's `overflow:hidden` cl
 `document.scrollWidth` never moved and the page looked fine while 133 px of content was cut off.
 Width alone would not have caught it — the earlier assertion here only required the cells to be
 "wide", and they were. **Fit is what matters, not width.**
+
+### Page two had no geometric guard at all, and it showed
+
+Page one was measured; page two was not. So `cumulative-accessibility-risk-simulator.html` scrolled
+sideways at every width below ~820 px — **479 px of document against a 360 px viewport**, an extra
+119 px a phone user meets immediately. Found on 2026-10-20 while checking the spoon panel, and
+confirmed pre-existing by stashing the surrounding change and reproducing it on the committed
+version. `reflow-check.mjs` now guards it at 13 widths.
+
+Two things about that defect are worth keeping, because both would have misled a review:
+
+**The cause was not where it looked.** The widest overflow came from the population table, which was
+entirely innocent: `.table-scroll` had `clientWidth 280` against `scrollWidth 507` — it was doing
+exactly its job. Ranking offenders by overflow width points at whichever *working scroller* contains
+the widest content. The real cause was a `<select>` whose intrinsic width came from its longest
+`<option>`, "Hostile — deadline pressure, no channel (1.6× cost)", and that width propagated up
+through `.setup-row` and `.grid-2`.
+
+**The obvious fix was actively harmful.** `min-width:0` on the `.grid-2` children — the same rule
+that fixed page one — let the grid track shrink while the select inside kept its intrinsic width.
+Overflow at 820 px went from **53 px to 233 px**. The fix belongs on the select, and it is one line:
+`min-width:0; max-width:100%`. No option text is clipped by it (`scrollWidth === clientWidth` on all
+six), and `min-height:40px` is untouched, so SC 2.5.8 Target Size still holds.
+
+The guard asserts **both** the symptom and the cause, deliberately. Checking only
+`document.scrollWidth` would pass a "fix" that moved the overflow elsewhere or deleted the option
+that caused it.
 
 ---
 
