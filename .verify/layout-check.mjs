@@ -241,10 +241,40 @@ try {
   const narrow = await evalJs(probe);
   ok(narrow.strayCells === 0, "no stray cells at 360px viewport");
   const c0 = narrow.rows[0].cells;
-  ok(c0[0].box.w > 300 && c0[1].box.w > 300,
-     "at 360px both cells of a beat are full width (single column)");
-  ok(c0[1].box.h > 0 && c0[1].box.w > 300,
+  ok(c0[0].box.w > 200 && c0[1].box.w > 200,
+     "at 360px both cells of a beat are full width and stacked (single column)");
+  ok(c0[1].box.h > 0 && c0[1].box.w > 200,
      "the second cell stacks below the first at 360px");
+
+  /* No beat may extend past the grid box, at any width.
+     This was broken for a long time and nothing noticed: .formula uses
+     white-space:pre, so a long formula's min-content width set a floor of
+     ~404px on every beat row inside a 272px grid at 360px. The grid's
+     overflow:hidden clipped it, so document scrollWidth never moved and the
+     page looked fine while the content was cut off. Width alone did not catch
+     it — the earlier assertion here only required the cells to be "wide".
+     Fit, not width, is what matters. */
+  const widths = [1280, 768, 480, 360, 320];
+  for (const W of widths) {
+    await send("Emulation.setDeviceMetricsOverride", {
+      width: W, height: 800, deviceScaleFactor: 1, mobile: false,
+    });
+    await sleep(300);
+    const fit = await evalJs(`(function(){
+      var grid = document.getElementById('thegridPage');
+      var gb = grid.getBoundingClientRect();
+      var rows = [].slice.call(grid.querySelectorAll('.beatrow[data-beat]'));
+      var worst = 0;
+      rows.forEach(function(r){ worst = Math.max(worst, r.getBoundingClientRect().right); });
+      return { vw: window.innerWidth,
+               docScroll: document.documentElement.scrollWidth,
+               past: Math.round(worst - gb.right) };
+    })()`);
+    ok(fit.past <= 1,
+       `at ${W}px no beat extends past the grid box (overflows by ${fit.past}px)`);
+    ok(fit.docScroll <= fit.vw + 1,
+       `at ${W}px the page does not scroll horizontally (${fit.docScroll} vs ${fit.vw})`);
+  }
   await send("Emulation.clearDeviceMetricsOverride");
 
   ws.close();

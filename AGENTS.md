@@ -278,6 +278,20 @@ Whenever a change depends on **layout, geometry, stacking, overflow, or visibili
 assert it in `layout-check.mjs` or `run-example-check.mjs`, not in jsdom. These are skipped
 gracefully when no Chrome binary is present, so a machine without one still runs the rest.
 
+**Two more lessons from the same family, learned later:**
+
+- **"Present in the DOM" is not "rendered".** Assert measured size, not existence. A figure that
+  collapses to zero height passes every `querySelector` check ever written.
+- **"No horizontal scrollbar" is not "nothing overflows".** A parent with `overflow:hidden` clips
+  the overflow silently: `document.scrollWidth` never moves, so the page looks correct while
+  content is cut off. This hid a real reflow defect for a long time — a `.formula` with
+  `white-space:pre` set a ~404 px min-content floor on every beat row inside a 272 px grid at a
+  360 px viewport. Compare each child's `getBoundingClientRect().right` against its container's
+  `right`; do not ask whether the page scrolls.
+- **Grid and flex items default to `min-width:auto`**, so one unbreakable descendant — a long
+  token, a `<pre>`, a wide table, an SVG's intrinsic width — sets a floor on the whole track. If a
+  column refuses to shrink, this is the first thing to check.
+
 ### jsdom gotchas already discovered — do not rediscover them
 
 - With `runScripts: "outside-only"`, the inline script's `DOMContentLoaded` path never fires.

@@ -248,6 +248,14 @@ The fix makes it a labelled, Tab-reachable region, and `PageDown` now scrolls a 
 of skipping past it. Scanning the deployed page is what found it; testing only the filesystem
 would have missed it indefinitely.
 
+`layout-check.mjs` carries a second lesson. It asserts that no beat extends past the grid box at
+1280, 768, 480, 360 and 320 px. That sounds fussy until you know what it caught: `.formula` uses
+`white-space:pre`, so a long formula's min-content width set a floor of ~404 px on **every** beat
+row, inside a 272 px grid, at a 360 px viewport. The grid's `overflow:hidden` clipped it, so
+`document.scrollWidth` never moved and the page looked fine while 133 px of content was cut off.
+Width alone would not have caught it — the earlier assertion here only required the cells to be
+"wide", and they were. **Fit is what matters, not width.**
+
 ---
 
 ## The honest limits

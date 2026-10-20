@@ -113,6 +113,19 @@
      other as a stray grid item and the row never disappeared. */
   .beatrow { display:grid; grid-column:1 / -1; grid-template-columns:1fr 1fr; }
   .beatrow[hidden] { display:none; }
+
+  /* Grid items default to min-width:auto, so an unbreakable child sets a floor
+     on the whole column. The .formula blocks use white-space:pre, and a long
+     one ("0.99 × 0.99 × ... 30 times = 0.7397") has a min-content width of
+     ~319px — which pushed every beat row to ~404px inside a 272px grid at a
+     360px viewport. The overflow was clipped by the grid's overflow:hidden, so
+     document scrollWidth never moved and nothing looked broken.
+
+     min-width:0 lets the column shrink to the available space, and the
+     formula's own overflow-x:auto then scrolls it. Without this, the column
+     grows instead of the formula scrolling. */
+  .thegrid > *, .beatrow > * { min-width:0; }
+
   .beatrow > .cell-r { border-left:1px solid var(--line); }
   /* The placeholder keeps the two-column shape on screen before the first
      reveal, so the layout reads as "waiting" rather than "empty". */
