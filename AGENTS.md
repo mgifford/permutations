@@ -162,20 +162,45 @@ Run the harnesses. A change to either page that does not pass the full suite is 
 ```bash
 cd .verify
 npm install
-node --expose-gc --max-old-space-size=3000 verify.mjs
-node calib.mjs
-node page-one.mjs
-node popmodel.mjs
+npm run all          # runs every harness in order
+```
+
+Individually, if you need to isolate a failure:
+
+```bash
+node --expose-gc --max-old-space-size=3000 verify.mjs   # or: npm run verify
+node calib.mjs                                          # npm run calib
+node page-one.mjs                                       # npm run page-one
+node popmodel.mjs                                       # npm run popmodel
+node layout-check.mjs                                   # npm run layout
+node run-example-check.mjs                              # npm run run-example
 ```
 
 - `verify.mjs` — 250 simulated runs plus population-model assertions (tables populated, published
   inputs distinguished from assumptions, absolute loss printed as absolute rather than "0.0 %").
 - `calib.mjs` — confirms the quality, difficulty and pinning controls behave.
-- `page-one.mjs` — page-one reveal mechanics and content.
+- `page-one.mjs` — page-one reveal mechanics, content, and the running example's arithmetic.
 - `popmodel.mjs` — population numbers at each quality level.
+- `layout-check.mjs` — **real browser.** Asserts measured geometry for the page-one reveal. Requires
+  Chrome/Chromium (override with `CHROME_BIN`); skips cleanly if absent.
+- `run-example-check.mjs` — **real browser.** Asserts the running example lays out, logs a stated
+  outcome for every step, and does not overflow at 360 px.
 
 **When you change behaviour, extend the harness.** Assertions are the only thing preventing a
 regression in the maths from shipping silently.
+
+### Some bugs jsdom cannot catch — use a real browser
+
+jsdom has no layout engine. A previous version of `index.html` hid beats with a class that set
+`display: none` on the two children of a `display: contents` wrapper. jsdom reported the class
+applied and the children's computed `display` as `none`, so `page-one.mjs` passed — but a
+`display: contents` element generates no box, so the row never collapsed and the un-hidden cells
+stacked into the grid as stray items. The page was visibly broken in every real browser while the
+harness was green.
+
+Whenever a change depends on **layout, geometry, stacking, overflow, or visibility as rendered**,
+assert it in `layout-check.mjs` or `run-example-check.mjs`, not in jsdom. These are skipped
+gracefully when no Chrome binary is present, so a machine without one still runs the rest.
 
 ### jsdom gotchas already discovered — do not rediscover them
 

@@ -176,14 +176,26 @@ Per-group completion at baseline, showing what quality improvement cannot reach:
 ```bash
 cd .verify
 npm install
+npm run all          # every harness, in order
+```
+
+Individually:
+
+```bash
 node --expose-gc --max-old-space-size=3000 verify.mjs   # 250 simulated runs + population model
 node calib.mjs                                          # quality / difficulty / pinning controls
 node page-one.mjs                                       # page-one reveal mechanics and content
 node popmodel.mjs                                       # population numbers at each quality level
+node layout-check.mjs                                   # real browser: page-one layout geometry
+node run-example-check.mjs                              # real browser: the running example
 ```
 
 `verify.mjs` drives the page's `boot()` explicitly, because jsdom's `runScripts: "outside-only"`
 mode never fires `DOMContentLoaded`.
+
+The last two need a Chrome or Chromium binary and drive it through the DevTools protocol; they
+skip with a clear message if none is found. They exist because jsdom has no layout engine, and a
+previous reveal bug was green in jsdom while being broken in every real browser.
 
 ---
 

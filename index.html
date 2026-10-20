@@ -52,7 +52,6 @@
     border:1px solid var(--line); border-radius:12px; overflow:hidden;
     background:var(--card); margin:1rem 0 0;
   }
-  .thegrid > .col { display:contents; }
   .head-l, .head-r { padding:.7rem 1.1rem; font-weight:700; font-size:.78rem;
     text-transform:uppercase; letter-spacing:.1em; }
   .head-l { background:var(--l-bg); color:var(--l); border-bottom:1px solid var(--line); }
@@ -107,9 +106,14 @@
   .reveal > summary:focus-visible { outline:3px solid #7aa6e6; outline-offset:2px; }
 
   /* progressive fill: cells start hidden, revealed beat by beat */
-  .beatrow { display:contents; }
-  .beatrow.is-hidden .cell-l,
-  .beatrow.is-hidden .cell-r { display:none; }
+  /* A revealed beat spans both columns as a single grid row. Hiding the row
+     element itself (rather than trying to hide its two children through a
+     display:contents wrapper) is what actually collapses the row — with
+     display:contents the wrapper has no box, so hiding one cell left the
+     other as a stray grid item and the row never disappeared. */
+  .beatrow { display:grid; grid-column:1 / -1; grid-template-columns:1fr 1fr; }
+  .beatrow[hidden] { display:none; }
+  .beatrow > .cell-r { border-left:1px solid var(--line); }
 
   table.data { border-collapse:collapse; width:100%; font-size:.9rem; margin:.7rem 0; }
   table.data caption { text-align:left; color:var(--muted); font-size:.85rem; padding-bottom:.4rem; }
@@ -133,16 +137,81 @@
     overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;
   }
 
+  /* ---- running example ------------------------------------------------ */
+  .runex {
+    border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem;
+    background:#fcfdfe; margin:1rem 0 0;
+  }
+  .runex-head {
+    display:flex; justify-content:space-between; gap:1rem;
+    align-items:flex-start; flex-wrap:wrap; margin-bottom:.7rem;
+  }
+  .runex-odds { text-align:right; }
+  .runex-odds .label {
+    display:block; font-size:.72rem; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--muted); font-weight:700;
+  }
+  .runex-odds .value {
+    display:block; font-size:1.5rem; font-weight:700; line-height:1.1;
+    font-variant-numeric:tabular-nums; color:var(--brand);
+  }
+  .runex-steps { list-style:none; padding:0; margin:1rem 0 0; }
+  .runex-steps li {
+    display:grid; grid-template-columns:1.6rem 1fr auto; gap:.6rem;
+    align-items:baseline; padding:.5rem .1rem; border-bottom:1px solid var(--line);
+  }
+  .runex-steps li:last-child { border-bottom:0; }
+  .runex-steps .num {
+    font-variant-numeric:tabular-nums; color:var(--muted); font-size:.85rem;
+    font-weight:700;
+  }
+  .runex-steps .what { font-size:.92rem; }
+  .runex-steps .what b { display:block; }
+  .runex-steps .cite {
+    display:block; font-size:.78rem; color:var(--muted); margin-top:.15rem;
+  }
+  .runex-steps .outcome {
+    font-size:.78rem; font-weight:700; text-align:right; white-space:nowrap;
+  }
+  .runex-steps li[data-state="done"] { background:#f4f9f6; }
+  .runex-steps li[data-state="failed"] { background:#fdf3f2; }
+  .runex-steps li[data-state="current"] { background:#f2f6fd; }
+  .runex-steps .outcome.pass { color:#0f6f5c; }
+  .runex-steps .outcome.hurt { color:#8a5200; }
+  .runex-steps .outcome.stop { color:#a3271d; }
+  .runex-steps .outcome.spent { color:#5a3d8a; }
+
+  .runex-log { margin:.9rem 0 0; }
+  .runex-log .entry {
+    border-left:4px solid var(--line); background:#fff;
+    padding:.6rem .8rem; border-radius:0 8px 8px 0; margin:.4rem 0 0;
+    font-size:.9rem;
+  }
+  .runex-log .entry.pass { border-left-color:#0f6f5c; }
+  .runex-log .entry.friction { border-left-color:#8a5200; background:#fff8e8; }
+  .runex-log .entry.effort { border-left-color:#8a5200; background:#fff8e8; }
+  .runex-log .entry.spoon { border-left-color:#5a3d8a; background:#f7f2fb; }
+  .runex-log .entry.terminal { border-left-color:#a3271d; background:#fdf3f2; }
+  .runex-log .entry .who { font-weight:700; }
+  .runex-log .entry p { margin:.2rem 0 0; }
+
+  @media (max-width:600px) {
+    .runex-steps li { grid-template-columns:1.4rem 1fr; }
+    .runex-steps .outcome { grid-column:2; text-align:left; }
+  }
+
   @media (max-width:760px) {
     .thegrid { grid-template-columns:1fr; }
     .head-r { border-left:0; }
+    .beatrow { grid-template-columns:1fr; }
+    .beatrow > .cell-r { border-left:0; background:#fff; }
     .cell-r { border-left:0; background:#fff; }
     .bar-row { grid-template-columns:6.5rem 1fr 4rem; }
   }
   @media print {
     body { background:#fff; }
     .btn, .pager, .reveal > summary { display:none !important; }
-    .beatrow.is-hidden .cell-l, .beatrow.is-hidden .cell-r { display:block !important; }
+    .beatrow[hidden] { display:grid !important; }
     .panel { break-inside:avoid; box-shadow:none; }
   }
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
@@ -153,12 +222,12 @@
 
 <header class="masthead">
   <div class="wrap">
-    <p class="kicker">Service Design Evidence Artefact — Page One of Two</p>
+    <p class="kicker">Accessibility <span aria-hidden="true">·</span> explained from first principles</p>
     <h1>Permutations <span aria-hidden="true">|</span> Digital Accessibility</h1>
     <p class="sub">
       Two ideas, taught side by side, that turn out to be the same idea. Neither column is a
       metaphor for the other — they are the same arithmetic in different clothes. If you already
-      know both, skip to the simulation.
+      know both, skip ahead to the examples.
     </p>
   </div>
 </header>
@@ -209,7 +278,7 @@
       <div class="head-r" id="grid-head-r">Digital accessibility — the domain</div>
 
       <!-- BEAT 1 -->
-      <div class="beatrow is-hidden" data-beat="1">
+      <div class="beatrow" hidden data-beat="1">
         <div class="cell-l">
           <p class="beat">Beat 1 — what a permutation is</p>
           <h3>Counting arrangements of distinct things</h3>
@@ -240,7 +309,7 @@
       </div>
 
       <!-- BEAT 2 -->
-      <div class="beatrow is-hidden" data-beat="2">
+      <div class="beatrow" hidden data-beat="2">
         <div class="cell-l">
           <p class="beat">Beat 2 — independence</p>
           <h3>When one outcome doesn't change the next</h3>
@@ -272,7 +341,7 @@ two coins, both heads:  ½ × ½ = ¼ = 25 %</p>
       </div>
 
       <!-- BEAT 3 -->
-      <div class="beatrow is-hidden" data-beat="3">
+      <div class="beatrow" hidden data-beat="3">
         <div class="cell-l">
           <p class="beat">Beat 3 — the multiplication bites</p>
           <h3>Why "99 % each" is not "99 % overall"</h3>
@@ -300,7 +369,7 @@ so the chance of at least one failure ≈ 26.03 %</p>
       </div>
 
       <!-- BEAT 4 -->
-      <div class="beatrow is-hidden" data-beat="4">
+      <div class="beatrow" hidden data-beat="4">
         <div class="cell-l">
           <p class="beat">Beat 4 — permutations of kind, not just of order</p>
           <h3>Who a person is, crossed with what the build does</h3>
@@ -333,7 +402,7 @@ so the chance of at least one failure ≈ 26.03 %</p>
       </div>
 
       <!-- BEAT 5 -->
-      <div class="beatrow is-hidden" data-beat="5">
+      <div class="beatrow" hidden data-beat="5">
         <div class="cell-l">
           <p class="beat">Beat 5 — combining more than two</p>
           <h3>Chains of chance, and how fast they collapse</h3>
@@ -372,7 +441,7 @@ so the chance of at least one failure ≈ 26.03 %</p>
       </div>
 
       <!-- BEAT 6 -->
-      <div class="beatrow is-hidden" data-beat="6">
+      <div class="beatrow" hidden data-beat="6">
         <div class="cell-l">
           <p class="beat">Beat 6 — where this page has been going</p>
           <h3>The same arithmetic, applied to people</h3>
@@ -411,12 +480,77 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
   </section>
 
   <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-running">
+    <h2 id="h-running">Feel it: a running example at 1&nbsp;%</h2>
+    <p>
+      Reading "0.99³⁰" is abstract. Clicking through it is not. Below is a short journey — a
+      benefit application, the same shape as the full 30-step task — where <strong>every step has a
+      1&nbsp;% chance of going wrong</strong>. That is the vendor's number: 99&nbsp;% per component.
+    </p>
+    <p>
+      <strong>Press "Attempt step 1" and keep going.</strong> A 1&nbsp;% failure rate will mostly
+      pass. Occasionally it will not — and what happens next depends on what <em>kind</em> of defect
+      it was, which is the second half of the argument. Watch the running total, and notice that it
+      never comes back down.
+    </p>
+
+    <div class="callout" style="margin:.9rem 0 0">
+      <p style="margin:0"><strong>The honest note the whole project rests on.</strong> At 1&nbsp;%,
+      most single runs pass every step. That is exactly why the problem is invisible to the person
+      checking one page, and invisible to the vendor reporting one number. The injury is not in any
+      single run — it is in the 26&nbsp;% of <em>journeys</em>. Run it a few times and watch the
+      odds turn against you.</p>
+    </div>
+
+    <div class="runex" id="runEx">
+      <div class="runex-head">
+        <div>
+          <p class="beat" style="margin:0" id="runExCount">Not started — 0 of 8 steps attempted</p>
+          <p class="mono" style="margin:.2rem 0 0" id="runExFormula">
+            P(all clear so far) = 0.99⁰ = 100.00 %
+          </p>
+        </div>
+        <div class="runex-odds">
+          <span class="label">Journey failure risk</span>
+          <span class="value" id="runExRisk">0.00 %</span>
+        </div>
+      </div>
+
+      <div class="bar-row" style="grid-template-columns:1fr;">
+        <span class="bar-track" role="img" aria-labelledby="runExBarLabel">
+          <span class="bar-fill" id="runExBar" style="width:0%"></span>
+        </span>
+      </div>
+      <p class="sr-only" id="runExBarLabel">Journey failure risk accumulated so far</p>
+
+      <ol class="runex-steps" id="runExSteps"></ol>
+
+      <div class="runex-log" id="runExLog" role="log" aria-live="polite" aria-label="What just happened"></div>
+
+      <div class="btn-row">
+        <button type="button" class="btn" id="runExStep">Attempt step 1</button>
+        <button type="button" class="btn ghost" id="runExAll">Play the whole journey</button>
+        <button type="button" class="btn ghost" id="runExReset" disabled>Start again</button>
+      </div>
+      <p class="muted" style="font-size:.9rem;margin:.5rem 0 0" id="runExStatus" role="status"></p>
+    </div>
+
+    <h3>Where the running example's defects come from</h3>
+    <p>
+      Each step is a real defect class, cited. The <em>probability</em> that any given run hits a
+      particular one is 1&nbsp;%, because the build is "99&nbsp;% accessible" — the point is not
+      that these are likely, it is that a multi-step journey gives failure many chances to happen,
+      and that the three failure <em>types</em> produce completely different endings.
+    </p>
+  </section>
+
+  <!-- ============================================================ -->
   <section class="panel" aria-labelledby="h-next">
     <h2 id="h-next">Where to go next</h2>
     <p>
       If both ideas already make sense, nothing here is required reading — move straight to the
       simulation, which is the evidence. If one column landed and the other did not, the reveal
-      controls above replay any beat.
+      controls replay any beat.
     </p>
     <div class="pager">
       <div>
@@ -425,8 +559,8 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
         </a>
       </div>
       <p class="muted" style="margin:0">
-        Page two: 30-step interactive journey, persona controls, and the deterministic
-        population calculation with cited inputs.
+        A 30-step interactive journey with persona controls, and the deterministic population
+        calculation with cited inputs.
       </p>
     </div>
   </section>
@@ -449,6 +583,274 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
 <script>
 (function () {
   "use strict";
+
+  /* ==================================================================
+   * A. THE RUNNING EXAMPLE
+   *
+   * Eight steps, each with a 1 % chance of going wrong — the vendor's
+   * "99 % accessible". Three of those defects are walls for a specific
+   * person, two cost recoverable effort, one drains a finite pool, one is
+   * pure friction that stops nobody.
+   *
+   * The probability is real: each attempt draws independently at p = 0.01.
+   * The point of the exercise is that at 1 % most runs pass every step —
+   * which is precisely why nobody notices, because the person checking
+   * looks at one run and the vendor reports one number.
+   * ================================================================== */
+  var P = 0.01;
+
+  /* `mech` is the type of harm, and it matters more than whether a defect
+     fires. Two runs can both "hit a 1 % defect" and end completely
+     differently. Deliberately NOT all walls — most defects are not. */
+  var RUN_STEPS = [
+    { what: "Open the application form",
+      cite: "No defect modelled — a baseline step, to show a clean pass.",
+      mech: "none" },
+    { what: "Choose your benefit type from a radio group",
+      cite: "Group has no fieldset/legend, so the question is never announced. " +
+            "SC 1.3.1 Info and Relationships (A); SC 3.3.2 Labels or Instructions (A). " +
+            "ACT rule e086e5 passes, because each radio has a name — the group does not.",
+      mech: "spoon", spoon: 18, who: "a blind screen reader user" },
+    { what: "Enter your date of birth in the date-picker",
+      cite: "Pointer-only date-picker with no keyboard path. SC 2.1.1 Keyboard (A). " +
+            "60.4 % of low-vision respondents navigate by keyboard (WebAIM Low Vision Survey #2).",
+      mech: "effort", spoon: 14, who: "a keyboard-only user" },
+    { what: "Upload your utility bill as proof of address",
+      cite: "Drag-only upload, no single-pointer or keyboard alternative. " +
+            "SC 2.5.7 Dragging Movements (AA) — which has NO published ACT rule. " +
+            "No automated tool can decide this.",
+      mech: "terminal", who: "someone who cannot drag" },
+    { what: "Confirm your household income figure",
+      cite: "Table headers are not associated with their cells, so which column a figure " +
+            "belongs to is unresolvable. SC 1.3.1 Info and Relationships (A).",
+      mech: "effort", spoon: 12, who: "a screen reader user" },
+    { what: "Read the live estimate of your award",
+      cite: "The figure updates silently — no announcement, no way to switch it off. " +
+            "SC 4.1.3 Status Messages (AA); SC 2.2.2 Pause, Stop, Hide (A).",
+      mech: "friction", who: "a screen reader user" },
+    { what: "Sign the declaration",
+      cite: "Signature canvas with no non-drawing equivalent. SC 2.5.1 Pointer Gestures (A). " +
+            "The highest-severity defect here: no keyboard path exists at all.",
+      mech: "terminal", who: "someone who cannot produce a drawn signature" },
+    { what: "Submit and receive your reference number",
+      cite: "On a session timeout the submission fails silently and no reference is issued. " +
+            "SC 3.3.1 Error Identification (A); SC 2.2.1 Timing Adjustable (A).",
+      mech: "spoon", spoon: 20, who: "a user under crisis time pressure" }
+  ];
+
+  var SPOONS_MAX = 100;
+  var run = null;
+
+  function runExEls() {
+    return {
+      steps: document.getElementById("runExSteps"),
+      log: document.getElementById("runExLog"),
+      count: document.getElementById("runExCount"),
+      formula: document.getElementById("runExFormula"),
+      risk: document.getElementById("runExRisk"),
+      bar: document.getElementById("runExBar"),
+      stepBtn: document.getElementById("runExStep"),
+      allBtn: document.getElementById("runExAll"),
+      resetBtn: document.getElementById("runExReset"),
+      status: document.getElementById("runExStatus"),
+    };
+  }
+
+  function freshRun() {
+    return { i: 0, spoons: SPOONS_MAX, minutes: 0, attempts: 0,
+             ended: null, endReason: null, outcomes: [] };
+  }
+
+  function pct(n, d) { return (n * 100).toFixed(d === undefined ? 2 : d) + " %"; }
+
+  function renderRunEx() {
+    var e = runExEls();
+    if (!e.steps) return;
+
+    /* ---- the step list ---- */
+    e.steps.innerHTML = "";
+    RUN_STEPS.forEach(function (s, idx) {
+      var li = document.createElement("li");
+      var st = run.outcomes[idx];
+      li.dataset.state = st ? (st.hit ? "failed" : "done")
+                            : (idx === run.i && !run.ended ? "current" : "pending");
+
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(idx + 1);
+
+      var what = document.createElement("span");
+      what.className = "what";
+      var b = document.createElement("b");
+      b.textContent = s.what;
+      what.appendChild(b);
+      var cite = document.createElement("span");
+      cite.className = "cite";
+      cite.textContent = s.cite;
+      what.appendChild(cite);
+
+      var out = document.createElement("span");
+      out.className = "outcome";
+      if (!st) {
+        out.textContent = idx === run.i && !run.ended ? "current" : "—";
+      } else if (!st.hit) {
+        out.textContent = "✓ clear";
+        out.classList.add("pass");
+      } else {
+        out.textContent = st.label;
+        out.classList.add(st.cls);
+      }
+
+      li.appendChild(num); li.appendChild(what); li.appendChild(out);
+      e.steps.appendChild(li);
+    });
+
+    /* ---- running arithmetic ---- */
+    var n = run.outcomes.filter(function (o) { return o !== undefined; }).length;
+    var clear = Math.pow(1 - P, n);
+    e.count.textContent = (run.ended ? "Ended" : "In progress") +
+      " — " + n + " of " + RUN_STEPS.length + " steps attempted";
+    e.formula.textContent = "P(all clear so far) = 0.99^" + n + " = " + pct(clear);
+    var risk = 1 - clear;
+    e.risk.textContent = pct(risk);
+    e.bar.style.width = Math.min(100, risk * 100).toFixed(2) + "%";
+
+    /* ---- buttons ---- */
+    e.stepBtn.textContent = "Attempt step " + Math.min(run.i + 1, RUN_STEPS.length);
+    e.stepBtn.disabled = !!run.ended || run.i >= RUN_STEPS.length;
+    e.allBtn.disabled = !!run.ended || run.i >= RUN_STEPS.length;
+    e.resetBtn.disabled = run.i === 0 && !run.ended;
+
+    var showSpoons = run.spoons < SPOONS_MAX;
+    e.status.textContent = showSpoons
+      ? "Capacity remaining: " + run.spoons + " / " + SPOONS_MAX +
+        " spoons · time lost: " + run.minutes + " min · attempts: " + run.attempts
+      : "";
+  }
+
+  function logEntry(mech, html) {
+    var e = runExEls();
+    var d = document.createElement("div");
+    d.className = "entry " + (mech || "");
+    d.innerHTML = html;
+    e.log.appendChild(d);
+  }
+
+  function attemptOne() {
+    if (run.ended || run.i >= RUN_STEPS.length) return;
+    var idx = run.i;
+    var s = RUN_STEPS[idx];
+    run.attempts++;
+
+    /* A genuine independent draw at 1 %. */
+    var hit = Math.random() < P;
+    var outcome = { hit: hit };
+
+    if (!hit) {
+      outcome.label = "✓ clear"; outcome.cls = "pass";
+      logEntry("pass", "<span class='who'>Step " + (idx + 1) + " passed.</span>" +
+        "<p>No defect this time. A 1 % rate mostly passes — which is the point. " +
+        "The risk figure above still did not go down.</p>");
+    } else {
+      switch (s.mech) {
+        case "terminal":
+          outcome.label = "✕ BLOCKED"; outcome.cls = "stop";
+          run.ended = true; run.endReason = "walled";
+          logEntry("terminal",
+            "<span class='who'>Step " + (idx + 1) + " — the journey stops here.</span>" +
+            "<p>This is a <strong>total blocker</strong> for " + s.who + ". There is no alternative " +
+            "path, so it is not a lower score and not a retry — it is a full stop. " +
+            "A conformance report can record this as compliant, because the criterion it fails " +
+            "either has no automated test or none that reached this state.</p>");
+          break;
+        case "spoon":
+          outcome.label = "◐ capacity lost"; outcome.cls = "spent";
+          run.spoons -= s.spoon;
+          if (run.spoons <= 0) {
+            run.spoons = 0; run.ended = true; run.endReason = "spent";
+            outcome.label = "◐ gave up"; outcome.cls = "spent";
+            logEntry("spoon",
+              "<span class='who'>Step " + (idx + 1) + " — capacity exhausted. The person stops.</span>" +
+              "<p>Nothing " + s.who + " encountered was impassable. But each barrier drew on a " +
+              "finite pool of capacity, and the pool ran out. This ending — <em>gave up</em> — " +
+              "appears in no conformance report at all, because every individual criterion may " +
+              "have been satisfied.</p>");
+          } else {
+            logEntry("spoon",
+              "<span class='who'>Step " + (idx + 1) + " — " + s.spoon + " spoons spent.</span>" +
+              "<p>" + s.who + " gets through, at a real cost. Spoon Theory: capacity is finite, " +
+              "and a service that spends it on barriers has less left for the actual task.</p>");
+          }
+          break;
+        case "effort":
+          outcome.label = "↻ retried"; outcome.cls = "hurt";
+          run.minutes += 6; run.spoons -= s.spoon;
+          logEntry("effort",
+            "<span class='who'>Step " + (idx + 1) + " — recovered by " + s.who + ", at a price.</span>" +
+            "<p>An alternative path existed, so the journey continues — six extra minutes and " +
+            s.spoon + " spoons spent working around the service instead of using it. " +
+            "This is the failure mode that dashboards and completion rates both miss.</p>");
+          break;
+        default:
+          outcome.label = "△ friction"; outcome.cls = "hurt";
+          run.minutes += 2;
+          logEntry("friction",
+            "<span class='who'>Step " + (idx + 1) + " — a real violation that stops nobody.</span>" +
+            "<p>This is a genuine WCAG failure and worth fixing. It is also not why anyone fails. " +
+            "Conflating this with the blockers above is how a build gets described as 99 %.</p>");
+      }
+    }
+
+    run.outcomes[idx] = outcome;
+    run.i++;
+    renderRunEx();
+    if (run.ended) endRunEx();
+  }
+
+  function endRunEx() {
+    var e = runExEls();
+    var msg = run.endReason === "walled"
+      ? "The journey ended: the person was blocked and there is no way forward."
+      : "The journey ended: the person gave up. Nobody was blocked — the capacity simply ran out.";
+    logEntry(run.endReason === "walled" ? "terminal" : "spoon",
+      "<span class='who'>Run finished.</span><p>" + msg +
+      " Click <em>Start again</em> and try another run — at 1 % per step, the outcome changes " +
+      "every time, and that variability is itself the finding.</p>");
+  }
+
+  function resetRunEx() {
+    run = freshRun();
+    var e = runExEls();
+    if (e.log) e.log.innerHTML = "";
+    renderRunEx();
+    logEntry("", "<span class='who'>Starting a fresh journey.</span>" +
+      "<p>Every step from here has a 1 % chance of hitting one of the cited defects. " +
+      "Press <em>Attempt step 1</em> to go one at a time, or <em>Play the whole journey</em> " +
+      "to see a complete run.</p>");
+  }
+
+  function wireRunEx() {
+    var e = runExEls();
+    if (!e.steps) return;
+    e.stepBtn.addEventListener("click", function () {
+      attemptOne();
+      if (e.stepBtn.disabled) e.resetBtn.focus(); else e.stepBtn.focus();
+    });
+    e.allBtn.addEventListener("click", function () {
+      var guard = 0;
+      while (!run.ended && run.i < RUN_STEPS.length && guard++ < 50) attemptOne();
+      e.resetBtn.focus();
+    });
+    e.resetBtn.addEventListener("click", function () {
+      resetRunEx();
+      e.stepBtn.focus();
+    });
+    resetRunEx();
+  }
+
+  /* ==================================================================
+   * B. THE REVEAL
+   * ================================================================== */
   var BEATS = 6;
   var shown = 0;
 
@@ -459,7 +861,8 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
   function applyBeat(n, open) {
     var row = document.querySelector('.beatrow[data-beat="' + n + '"]');
     if (!row) return;
-    row.classList.toggle("is-hidden", !open);
+    if (open) row.removeAttribute("hidden");
+    else row.setAttribute("hidden", "");
   }
   function setShown(n) {
     shown = Math.max(0, Math.min(BEATS, n));
@@ -481,10 +884,10 @@ per-step pass 0.999 →  journey pass <span class="hl">97.04 %</span></p>
     setShown(BEATS);
   });
 
-  /* Progressive enhancement: with JS the grid reveals; without it, everything
-     is visible because we remove the hiding class up front if this fails. */
   setShown(0);
-  window.__setBeats = setShown;   // used by the verification harness only
+  wireRunEx();
+  window.__setBeats = setShown;      // harness hooks only
+  window.__runEx = { get run() { return run; }, attemptOne: attemptOne, reset: resetRunEx };
 })();
 </script>
 </body>
