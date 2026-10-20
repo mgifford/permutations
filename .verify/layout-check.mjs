@@ -95,9 +95,11 @@ try {
   // give the page a moment to lay out
   await sleep(600);
 
-  /* Measured geometry, not class names. */
+  /* Measured geometry, not class names. Only rows carrying data-beat are
+     beats; the pre-reveal placeholder shares the .beatrow class so it inherits
+     the two-column shape, and must never be counted as a beat. */
   const probe = `(() => {
-    const rows = [...document.querySelectorAll('.beatrow')];
+    const rows = [...document.querySelectorAll('.beatrow[data-beat]')];
     const bx = el => { const b = el.getBoundingClientRect(); return { w: Math.round(b.width), h: Math.round(b.height) }; };
     const grid = document.getElementById('thegrid');
     return {
@@ -142,6 +144,49 @@ try {
   const cellsOk = three.rows[0].cells.length === 2 &&
                   three.rows[0].cells.every(c => c.box.w > 100 && c.box.h > 50);
   ok(cellsOk, "both columns of a revealed beat are laid out and visible");
+
+  /* --- feedback: a click must SHOW something -------------------------------
+     A user reported the reveal "only worked once". It always worked — but the
+     control sits at the top of the page and the revealed row appears ~2,300px
+     below it, off screen, so clicking looked like it did nothing. jsdom cannot
+     see that, because it has no viewport. Asserted here instead. */
+  await evalJs(`window.scrollTo(0,0); window.__setBeats(0); void 0;`);
+  await sleep(250);
+
+  const phBefore = await evalJs(`(function(){
+    var ph = document.getElementById('gridPlaceholder');
+    return { exists: !!ph, shown: ph ? !ph.hasAttribute('hidden') : null,
+             h: ph ? ph.getBoundingClientRect().height : 0 };
+  })()`);
+  ok(phBefore.exists, "a placeholder keeps the two-column shape visible before any reveal");
+  ok(phBefore.shown === true && phBefore.h > 20,
+     `the placeholder is rendered before the first reveal (h=${phBefore.h})`);
+
+  const feedback = await evalJs(`(function(){
+    window.scrollTo(0,0);
+    var before = window.scrollY;
+    document.getElementById('revealBtn').click();
+    var row = document.querySelector('.beatrow[data-beat="1"]');
+    return { before: before, rowTop: row.getBoundingClientRect().top };
+  })()`);
+  await sleep(800); /* let the smooth scroll settle */
+
+  const after = await evalJs(`(function(){
+    var row = document.querySelector('.beatrow[data-beat="1"]');
+    var r = row.getBoundingClientRect();
+    var ph = document.getElementById('gridPlaceholder');
+    return { scrollY: Math.round(window.scrollY),
+             visible: r.top < window.innerHeight && r.bottom > 0,
+             top: Math.round(r.top),
+             phHidden: ph ? ph.hasAttribute('hidden') : null };
+  })()`);
+
+  ok(after.visible,
+     `clicking scrolls the newly revealed beat into view (was ${feedback.rowTop}px below the fold, now top=${after.top})`);
+  ok(after.scrollY > 0,
+     `the page actually moves when a beat is revealed (scrollY=${after.scrollY})`);
+  ok(after.phHidden === true,
+     "the placeholder is removed once a real beat is showing");
 
   /* Reveal everything. */
   await evalJs(`document.getElementById('revealAllBtn').click(); void 0;`);

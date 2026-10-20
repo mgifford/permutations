@@ -70,7 +70,7 @@ console.log("beat  side    words  sentences  avg len  longest  reading ease  gra
 console.log("-".repeat(78));
 
 const rows = [];
-[...d.querySelectorAll(".beatrow")].forEach(row => {
+[...d.querySelectorAll(".beatrow[data-beat]")].forEach(row => {
   ["cell-l", "cell-r"].forEach(side => {
     const cell = row.querySelector("." + side);
     if (!cell) return;

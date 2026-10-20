@@ -114,6 +114,16 @@
   .beatrow { display:grid; grid-column:1 / -1; grid-template-columns:1fr 1fr; }
   .beatrow[hidden] { display:none; }
   .beatrow > .cell-r { border-left:1px solid var(--line); }
+  /* The placeholder keeps the two-column shape on screen before the first
+     reveal, so the layout reads as "waiting" rather than "empty". */
+  .beatrow.placeholder { background:var(--card); }
+  .beatrow.placeholder p { margin:.9rem 0; font-size:.92rem; }
+  .beatrow.placeholder[hidden] { display:none; }
+  /* Brief highlight so a newly revealed row is visible even if the scroll
+     lands slightly off. Respects prefers-reduced-motion below. */
+  @keyframes beatIn { from { background:#eef4ff; } to { background:transparent; } }
+  .beatrow.just-revealed { animation:beatIn 1.1s ease-out 1; }
+  @media (prefers-reduced-motion:reduce) { .beatrow.just-revealed { animation:none; } }
 
   table.data { border-collapse:collapse; width:100%; font-size:.9rem; margin:.7rem 0; }
   table.data caption { text-align:left; color:var(--muted); font-size:.85rem; padding-bottom:.4rem; }
@@ -267,6 +277,18 @@
     <div class="thegrid" id="thegrid">
       <div class="head-l" id="grid-head-l">Permutations — the mathematics</div>
       <div class="head-r" id="grid-head-r">Digital accessibility — the domain</div>
+
+      <!-- Placeholder: makes the two-column shape visible before anything is
+           revealed. Without it the grid renders as two headers over empty
+           space, which reads as a broken layout rather than a waiting one. -->
+      <div class="beatrow placeholder" id="gridPlaceholder">
+        <div class="cell-l">
+          <p class="muted">The mathematics column. Six ideas, revealed one at a time.</p>
+        </div>
+        <div class="cell-r">
+          <p class="muted">The accessibility column. Each row pairs with the one beside it.</p>
+        </div>
+      </div>
 
       <!-- BEAT 1 -->
       <div class="beatrow" hidden data-beat="1">
@@ -894,24 +916,63 @@
     if (open) row.removeAttribute("hidden");
     else row.setAttribute("hidden", "");
   }
-  function setShown(n) {
+  function setShown(n, opts) {
+    var prev = shown;
     shown = Math.max(0, Math.min(BEATS, n));
     for (var i = 1; i <= BEATS; i++) applyBeat(i, i <= shown);
+
+    /* The placeholder only belongs on screen while nothing is revealed. */
+    var ph = document.getElementById("gridPlaceholder");
+    if (ph) { if (shown === 0) ph.removeAttribute("hidden"); else ph.setAttribute("hidden", ""); }
+
     status(shown === 0
       ? "Beat 0 of " + BEATS + " revealed. Nothing is hidden from you — the same content follows in order."
       : "Beat " + shown + " of " + BEATS + " revealed.");
     var btn = document.getElementById("revealBtn");
     if (btn) {
       btn.disabled = shown >= BEATS;
-      btn.textContent = shown >= BEATS ? "All beats revealed" : "Reveal the next beat";
+      btn.textContent = shown >= BEATS
+        ? "All beats revealed"
+        : (shown === 0 ? "Reveal the next beat" : "Reveal beat " + (shown + 1) + " of " + BEATS);
+    }
+
+    /* Without this, clicking appeared to do nothing: the control sits at the
+       top of the page and the revealed row lands ~2,300px below it, off screen.
+       The mechanism always worked; the reader just could not see it.
+
+       Guarded because scrollIntoView is not universally available (jsdom omits
+       it entirely) and scrolling is a nicety, not the reveal itself. An
+       exception here must never prevent the beat from being revealed. */
+    if (opts && opts.scrollTo && shown > prev) {
+      var row = document.querySelector('.beatrow[data-beat="' + shown + '"]');
+      if (row) {
+        row.classList.add("just-revealed");
+        window.setTimeout(function () { row.classList.remove("just-revealed"); }, 1300);
+        if (typeof row.scrollIntoView === "function") {
+          try {
+            row.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+          } catch (e) {
+            /* Older implementations reject an options object. Fall back to the
+               no-argument form, which every implementation accepts. */
+            try { row.scrollIntoView(); } catch (e2) {}
+          }
+        }
+      }
     }
   }
 
+  function prefersReducedMotion() {
+    try {
+      return window.matchMedia &&
+             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    } catch (e) { return false; }
+  }
+
   document.getElementById("revealBtn").addEventListener("click", function () {
-    setShown(shown + 1);
+    setShown(shown + 1, { scrollTo: true });
   });
   document.getElementById("revealAllBtn").addEventListener("click", function () {
-    setShown(BEATS);
+    setShown(BEATS, { scrollTo: shown === 0 });
   });
 
   setShown(0);

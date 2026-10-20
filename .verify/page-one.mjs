@@ -11,10 +11,10 @@ const ok=(c,m)=>{if(!c){fails++;msgs.add(m);}};
    wrapper, which read as hidden in jsdom (no layout engine) but did not
    collapse in a real browser. See layout-check.mjs for the real-browser
    guard, and AGENTS.md for why both harnesses exist. */
-const hiddenCount = () => d.querySelectorAll(".beatrow[hidden]").length;
-const visibleCount = () => d.querySelectorAll(".beatrow:not([hidden])").length;
+const hiddenCount = () => d.querySelectorAll(".beatrow[data-beat][hidden]").length;
+const visibleCount = () => d.querySelectorAll(".beatrow[data-beat]:not([hidden])").length;
 
-ok(d.querySelectorAll(".beatrow").length===6, "six beats present");
+ok(d.querySelectorAll(".beatrow[data-beat]").length===6, "six beats present");
 ok(hiddenCount()===6, "all beats hidden initially, got "+hiddenCount());
 const st = d.getElementById("revealStatus").textContent;
 ok(/Beat 0 of 6/.test(st), "status starts at 0 of 6: "+st);
@@ -38,7 +38,7 @@ ok(visibleCount()===6, "all six visible after six reveals, got "+visibleCount())
 ok(d.getElementById("revealBtn").disabled, "next button disabled when complete");
 
 // reveal-all path
-d.querySelectorAll(".beatrow").forEach(r=>r.setAttribute("hidden",""));
+d.querySelectorAll(".beatrow[data-beat]").forEach(r=>r.setAttribute("hidden",""));
 d.getElementById("revealAllBtn").click();
 ok(visibleCount()===6, "reveal-all shows every beat");
 ok(hiddenCount()===0, "reveal-all leaves nothing hidden");
@@ -76,7 +76,7 @@ ok(!rendered.includes("[object Object]"), "no object leak in rendered text");
    or four ideas, a callout and a table into a single beat, which read as a wall
    of text. This assertion is the guard against that regressing: a beat cell is
    meant to be read in about half a minute. */
-[...d.querySelectorAll(".beatrow")].forEach(row => {
+[...d.querySelectorAll(".beatrow[data-beat]")].forEach(row => {
   const beatNo = row.dataset.beat;
   ["cell-l","cell-r"].forEach(side => {
     const cell = row.querySelector("." + side);
@@ -173,7 +173,7 @@ ok(stepList.querySelectorAll("li[data-state='failed']").length===0,
 // the run object is exposed for harness use; a forced terminal must end it
 ok(!!d.defaultView.__runEx, "run example exposes its state for testing");
 
-console.log("beats:",d.querySelectorAll(".beatrow").length);
+console.log("beats:",d.querySelectorAll(".beatrow[data-beat]").length);
 console.log(fails===0?"ALL ASSERTIONS PASSED":fails+" FAILURES:");
 [...msgs].forEach(m=>console.log(" -",m));
 if (fails) process.exitCode = 1;
