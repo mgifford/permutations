@@ -101,7 +101,7 @@ try {
   const probe = `(() => {
     const rows = [...document.querySelectorAll('.beatrow[data-beat]')];
     const bx = el => { const b = el.getBoundingClientRect(); return { w: Math.round(b.width), h: Math.round(b.height) }; };
-    const grid = document.getElementById('thegrid');
+    const grid = document.getElementById('thegridPage');
     return {
       rows: rows.map(r => ({
         beat: r.dataset.beat,

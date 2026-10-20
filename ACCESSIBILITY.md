@@ -264,6 +264,25 @@ purely textual.
 - Both pages ship a skip link (`<a class="skip" href="#main">`) that becomes visible on focus.
 - `main` carries `tabindex="-1"` so the skip link target is focusable.
 
+#### The full-screen beat deck (page one)
+
+The six-beat intro can present as a full-screen slide deck. It behaves as a modal dialog and is
+held to that standard:
+
+- It is `role="dialog"` with `aria-modal="true"` and an accessible name.
+- While it is open, **everything behind it is `inert` and `aria-hidden`**, so the page cannot be
+  tabbed into or read behind the overlay. This is asserted in a real browser in `deck-check.mjs`
+  by pressing Tab twenty times and requiring that focus never lands on content outside the dialog.
+  Before the fix this failed: focus reached the reveal buttons behind the overlay.
+- Every exit is explicit — Next, Back, `Escape`, "Skip to the full page", and "Skip the intro".
+  Arrow keys and `PageUp`/`PageDown` also move between beats while the deck is open.
+- Focus is returned to the control that opened the deck when it closes, so keyboard users are not
+  dropped at the top of a long document.
+- **Progressive enhancement:** with JavaScript unavailable the deck never opens, and all six beats
+  render in the ordinary scrollable page, in order. Nothing is available only through the deck.
+- The beats exist **once** in the markup and are moved into the deck and back, so the deck and the
+  page cannot drift apart.
+
 ### Forms, errors and status
 
 - Every control has a persistent visible label.
@@ -376,6 +395,7 @@ Chosen by risk. Given the subject matter, these are the priority areas:
 | Read the argument on page one | Low | Content assertions in `page-one.mjs` | None | None | — | — |
 | Reveal beats one at a time by keyboard | Medium | Programmatic activation | None | None | — | — |
 | Reveal all beats at once | Low | Programmatic activation | None | None | — | — |
+| Step through the full-screen six-beat intro | Medium | `deck-check.mjs` — real Chrome: open, advance by click and by arrow key, back, finish, both skip exits, no focus leak, background inert, reflow at 360 px | **Partial** — focus containment and background exposure measured in real Chrome; *not* checked with a screen reader | None | 2026-10-20 | `deck-check.mjs` |
 | Configure the run settings (quality, difficulty, persona) | Medium | `calib.mjs` | None | None | — | — |
 | Complete a full 30-step simulated journey | **High** | `verify.mjs`, 250 runs | None | None | — | — |
 | Interpret the population model tables | **High** | Table-population assertions | None | None | — | — |

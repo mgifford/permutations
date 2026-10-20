@@ -225,12 +225,125 @@
     .panel { break-inside:avoid; box-shadow:none; }
   }
   @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
+  /* ==================================================================
+     SLIDE DECK
+     Each beat can present as a full-screen slide with both columns side
+     by side. The deck is progressive enhancement: with JavaScript off, or
+     when the reader exits, the same markup renders as the ordinary
+     scrollable two-column page. Nothing is withheld either way.
+     ================================================================== */
+  body.deck { overflow:hidden; height:100vh; }
+  body.deck .masthead,
+  body.deck .sitefoot { display:none; }
+
+  .deck-stage {
+    position:fixed; inset:0; z-index:50;
+    display:flex; flex-direction:column;
+    background:var(--card);
+  }
+  .deck-stage[hidden] { display:none; }
+
+  .deck-bar {
+    display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+    padding:.7rem 1.1rem; border-bottom:1px solid var(--line);
+    background:var(--bg);
+  }
+  .deck-brand { font-weight:700; font-size:.86rem; margin-right:auto; }
+  .deck-count {
+    font-variant-numeric:tabular-nums; color:var(--muted);
+    font-size:.86rem; font-weight:650;
+  }
+  .deck-dots { display:flex; gap:.35rem; align-items:center; }
+  .deck-dots span {
+    width:.55rem; height:.55rem; border-radius:50%;
+    background:var(--line); display:block;
+  }
+  .deck-dots span[data-on="1"] { background:var(--brand); }
+  .deck-dots span[aria-current="step"] { outline:2px solid var(--brand); outline-offset:2px; }
+
+  .deck-body { flex:1; overflow:auto; }
+  .deck-body .panel { max-width:1080px; margin:0 auto; padding:1.6rem 1.2rem 2rem; box-shadow:none; }
+  .deck-body .beatrow[hidden] { display:none; }
+
+  /* The two columns, full screen, one beat at a time. */
+  .deck-body .thegrid {
+    display:block; border:0; background:transparent; overflow:visible; margin:0;
+  }
+  .deck-body .head-l, .deck-body .head-r { display:none; }
+  .deck-body .beatrow {
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border:1px solid var(--line); border-radius:14px; overflow:hidden;
+    background:var(--card);
+  }
+  .deck-body .beatrow > .cell-l { padding:2.2rem 2rem; }
+  .deck-body .beatrow > .cell-r { padding:2.2rem 2rem; }
+  .deck-body .beatrow h3 { font-size:clamp(1.25rem, 2.4vw, 1.85rem); line-height:1.25; }
+  .deck-body .beatrow p { font-size:1.05rem; line-height:1.65; }
+  .deck-body .formula { font-size:1.05rem; }
+
+  .deck-foot {
+    border-top:1px solid var(--line); background:var(--bg);
+    padding:.8rem 1.1rem; display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+  }
+  .deck-hint {
+    margin:0; color:var(--muted); font-size:.9rem; flex:1; min-width:12rem;
+  }
+  .deck-hint strong { color:var(--ink); }
+
+  @media (max-width:760px) {
+    .deck-body .beatrow { grid-template-columns:1fr; }
+    .deck-body .beatrow > .cell-r { border-left:0; border-top:1px solid var(--line); padding-top:1.4rem; }
+    .deck-body .beatrow > .cell-l { padding-bottom:1.4rem; }
+    .deck-body .beatrow > .cell-l, .deck-body .beatrow > .cell-r { padding-left:1.2rem; padding-right:1.2rem; }
+  }
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<header class="masthead">
+<!-- ================================================================
+     SLIDE DECK
+     The intro as six full-screen slides. It is progressive enhancement:
+     if this script never runs (or the reader exits), the same six beats
+     render as the scrollable page below. Nothing exists only here.
+     ================================================================ -->
+<div class="deck-stage" id="deckStage" role="dialog" aria-modal="true"
+     aria-label="The six-beat introduction" hidden>
+  <div class="deck-bar">
+    <span class="deck-brand">Permutations <span aria-hidden="true">|</span> Digital Accessibility</span>
+    <span class="deck-dots" id="deckDots" aria-hidden="true"></span>
+    <span class="deck-count" id="deckCount">Beat 1 of 6</span>
+  </div>
+
+  <div class="deck-body" id="deckBody" tabindex="-1">
+    <section class="panel" aria-labelledby="h-deck">
+      <h2 id="h-deck" class="sr-only">The six beats, one per screen</h2>
+      <p class="beat" id="deckKicker" style="margin-bottom:1rem">
+        The two ideas, taught side by side. One beat per screen.
+      </p>
+
+      <!-- The grid is MOVED here from the page when the deck opens, and moved
+           back on exit. One copy of the beats exists; the page and the deck
+           cannot drift apart. -->
+      <div id="deckMount"></div>
+    </section>
+  </div>
+
+  <div class="deck-foot">
+    <p class="deck-hint" id="deckHint">
+      <strong>Click anywhere, or press →</strong> for the next beat.
+    </p>
+    <div class="btn-row" style="margin:0">
+      <button type="button" class="btn ghost" id="deckBack" disabled>Back</button>
+      <button type="button" class="btn" id="deckNext">Next beat →</button>
+      <button type="button" class="btn ghost" id="deckSkip">Skip to the full page</button>
+      <button type="button" class="btn ghost" id="deckExit">Skip the intro</button>
+    </div>
+  </div>
+</div>
+
+<header class="masthead" id="masthead">
   <div class="wrap">
     <p class="kicker">Accessibility <span aria-hidden="true">·</span> explained from first principles</p>
     <h1>Permutations <span aria-hidden="true">|</span> Digital Accessibility</h1>
@@ -239,6 +352,10 @@
       and when you see that, the rest of this site is just arithmetic. Know them already? Skip to
       the examples.
     </p>
+    <div class="btn-row" style="margin-top:.9rem">
+      <button type="button" class="btn" id="startDeck">Start the six-beat intro</button>
+      <a class="btn ghost" href="#h-running" id="skipIntro">Skip the intro</a>
+    </div>
   </div>
 </header>
 
@@ -274,7 +391,11 @@
       right-hand cell is the left-hand cell wearing different clothes.
     </p>
 
-    <div class="thegrid" id="thegrid">
+    <div class="btn-row">
+      <button type="button" class="btn" id="startDeckInline">Show these as full-screen slides</button>
+    </div>
+
+    <div class="thegrid" id="thegridPage">
       <div class="head-l" id="grid-head-l">Permutations — the mathematics</div>
       <div class="head-r" id="grid-head-r">Digital accessibility — the domain</div>
 
@@ -901,66 +1022,38 @@
   }
 
   /* ==================================================================
-   * B. THE REVEAL
+   * B. THE SLIDE DECK
+   *
+   * The six beats present as full-screen slides. Three properties matter:
+   *
+   *   1. The beats exist ONCE in the markup. The deck MOVES the grid into
+   *      itself and moves it back on exit, so the page and the deck can
+   *      never disagree about content.
+   *   2. It is progressive enhancement. With JavaScript unavailable the
+   *      deck never opens and the page renders every beat, in order.
+   *   3. Every exit is explicit: forward, back, skip to the end of the
+   *      intro, or skip the intro entirely. Nothing traps the reader.
    * ================================================================== */
   var BEATS = 6;
-  var shown = 0;
+  var shown = 0;          /* how many beats are visible */
+  var slide = 1;          /* which slide the deck is on */
+  var deckOpen = false;
+  var gridHome = null;    /* where the grid came from, so it can go back */
 
   function status(text) {
     var el = document.getElementById("revealStatus");
     if (el) el.textContent = text;
   }
+  function rowFor(n) {
+    var scope = deckOpen ? document.getElementById("deckMount") : document;
+    return scope.querySelector('.beatrow[data-beat="' + n + '"]');
+  }
   function applyBeat(n, open) {
-    var row = document.querySelector('.beatrow[data-beat="' + n + '"]');
+    var row = rowFor(n);
     if (!row) return;
     if (open) row.removeAttribute("hidden");
     else row.setAttribute("hidden", "");
   }
-  function setShown(n, opts) {
-    var prev = shown;
-    shown = Math.max(0, Math.min(BEATS, n));
-    for (var i = 1; i <= BEATS; i++) applyBeat(i, i <= shown);
-
-    /* The placeholder only belongs on screen while nothing is revealed. */
-    var ph = document.getElementById("gridPlaceholder");
-    if (ph) { if (shown === 0) ph.removeAttribute("hidden"); else ph.setAttribute("hidden", ""); }
-
-    status(shown === 0
-      ? "Beat 0 of " + BEATS + " revealed. Nothing is hidden from you — the same content follows in order."
-      : "Beat " + shown + " of " + BEATS + " revealed.");
-    var btn = document.getElementById("revealBtn");
-    if (btn) {
-      btn.disabled = shown >= BEATS;
-      btn.textContent = shown >= BEATS
-        ? "All beats revealed"
-        : (shown === 0 ? "Reveal the next beat" : "Reveal beat " + (shown + 1) + " of " + BEATS);
-    }
-
-    /* Without this, clicking appeared to do nothing: the control sits at the
-       top of the page and the revealed row lands ~2,300px below it, off screen.
-       The mechanism always worked; the reader just could not see it.
-
-       Guarded because scrollIntoView is not universally available (jsdom omits
-       it entirely) and scrolling is a nicety, not the reveal itself. An
-       exception here must never prevent the beat from being revealed. */
-    if (opts && opts.scrollTo && shown > prev) {
-      var row = document.querySelector('.beatrow[data-beat="' + shown + '"]');
-      if (row) {
-        row.classList.add("just-revealed");
-        window.setTimeout(function () { row.classList.remove("just-revealed"); }, 1300);
-        if (typeof row.scrollIntoView === "function") {
-          try {
-            row.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
-          } catch (e) {
-            /* Older implementations reject an options object. Fall back to the
-               no-argument form, which every implementation accepts. */
-            try { row.scrollIntoView(); } catch (e2) {}
-          }
-        }
-      }
-    }
-  }
-
   function prefersReducedMotion() {
     try {
       return window.matchMedia &&
@@ -968,16 +1061,262 @@
     } catch (e) { return false; }
   }
 
-  document.getElementById("revealBtn").addEventListener("click", function () {
-    setShown(shown + 1, { scrollTo: true });
+  /* --- the scrollable page view --------------------------------------- */
+  function setShown(n, opts) {
+    var prev = shown;
+    shown = Math.max(0, Math.min(BEATS, n));
+    for (var i = 1; i <= BEATS; i++) applyBeat(i, i <= shown);
+
+    var ph = document.getElementById("gridPlaceholder");
+    if (ph) { if (shown === 0) ph.removeAttribute("hidden"); else ph.setAttribute("hidden", ""); }
+
+    status(shown === 0
+      ? "Beat 0 of 6 revealed. Nothing is hidden from you — the same content follows in order."
+      : "Beat " + shown + " of 6 revealed.");
+    var btn = document.getElementById("revealBtn");
+    if (btn) {
+      btn.disabled = shown >= BEATS;
+      btn.textContent = shown >= BEATS
+        ? "All beats revealed"
+        : (shown === 0 ? "Reveal the next beat" : "Reveal beat " + (shown + 1) + " of 6");
+    }
+
+    /* A revealed beat can land far below the fold, which made the reveal look
+       like it had done nothing. Guarded: scrollIntoView is not universal
+       (jsdom omits it) and an exception must never block the reveal. */
+    if (opts && opts.scrollTo && shown > prev && !deckOpen) {
+      var row = rowFor(shown);
+      if (row) {
+        row.classList.add("just-revealed");
+        window.setTimeout(function () { row.classList.remove("just-revealed"); }, 1300);
+        if (typeof row.scrollIntoView === "function") {
+          try {
+            row.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+          } catch (e) { try { row.scrollIntoView(); } catch (e2) {} }
+        }
+      }
+    }
+  }
+
+  /* --- the deck ------------------------------------------------------- */
+  function renderDots() {
+    var dots = document.getElementById("deckDots");
+    if (!dots) return;
+    var html = "";
+    for (var i = 1; i <= BEATS; i++) html += '<span data-on="' + (i <= slide ? 1 : 0) + '"></span>';
+    dots.innerHTML = html;
+  }
+
+  function showSlide(n) {
+    slide = Math.max(1, Math.min(BEATS, n));
+    for (var i = 1; i <= BEATS; i++) applyBeat(i, i === slide);
+
+    var ph = document.getElementById("gridPlaceholder");
+    if (ph) ph.setAttribute("hidden", "");
+
+    var count = document.getElementById("deckCount");
+    if (count) count.textContent = "Beat " + slide + " of " + BEATS;
+
+    var back = document.getElementById("deckBack");
+    var next = document.getElementById("deckNext");
+    if (back) back.disabled = slide <= 1;
+    if (next) next.textContent = slide >= BEATS ? "Finish →" : "Next beat →";
+
+    var hint = document.getElementById("deckHint");
+    if (hint) {
+      hint.innerHTML = slide >= BEATS
+        ? "That is all six. <strong>Click Finish, or press →</strong> to return to the full page."
+        : "<strong>Click anywhere, or press →</strong> for the next beat.";
+    }
+    renderDots();
+    var body = document.getElementById("deckBody");
+    if (body && typeof body.scrollTo === "function") body.scrollTo(0, 0);
+  }
+
+  function openDeck(atBeat) {
+    var stage = document.getElementById("deckStage");
+    var mount = document.getElementById("deckMount");
+    var grid = document.getElementById("thegridPage");
+    if (!stage || !mount || !grid) return;
+
+    /* Already open: jump to the requested beat rather than silently ignoring
+       the call. Without this, opening at beat 6 while open left the deck
+       showing an earlier slide with the wrong button label. */
+    if (deckOpen) { showSlide(atBeat || slide); return; }
+
+    gridHome = { parent: grid.parentNode, next: grid.nextSibling };
+    mount.appendChild(grid);
+    grid.removeAttribute("hidden");
+
+    /* The deck treats the grid as a slide surface, so the page-level
+       placeholder would be a stray slide. */
+    var ph = document.getElementById("gridPlaceholder");
+    if (ph) ph.setAttribute("hidden", "");
+
+    deckOpen = true;
+    shown = BEATS;              /* when the deck closes, every beat is on the page */
+    stage.removeAttribute("hidden");
+    document.body.classList.add("deck");
+
+    /* The overlay covers the page, so everything behind it must leave the tab
+       order AND the accessibility tree. Without this, tabbing out of the deck
+       lands on controls the reader cannot see, and a screen reader walks the
+       whole hidden page. Both were observed in a real browser; axe does not
+       detect either. `inert` is used where supported, with aria-hidden and a
+       focus guard as fallback. */
+    setBackgroundInert(true);
+
+    showSlide(atBeat || 1);
+    var body = document.getElementById("deckBody");
+    if (body && typeof body.focus === "function") body.focus();
+  }
+
+  /* Everything outside the deck, as a list of the nodes to hide. */
+  function backgroundNodes() {
+    var stage = document.getElementById("deckStage");
+    var nodes = [];
+    var kids = document.body.children;
+    for (var i = 0; i < kids.length; i++) {
+      if (kids[i] !== stage) nodes.push(kids[i]);
+    }
+    return nodes;
+  }
+
+  function setBackgroundInert(on) {
+    var nodes = backgroundNodes();
+    for (var i = 0; i < nodes.length; i++) {
+      var node = nodes[i];
+      if (on) {
+        /* Remember any pre-existing aria-hidden so it can be restored. */
+        if (!node.hasAttribute("data-deck-aria")) {
+          node.setAttribute("data-deck-aria", node.getAttribute("aria-hidden") || "");
+        }
+        node.setAttribute("aria-hidden", "true");
+        if ("inert" in node) node.inert = true;
+      } else {
+        if (node.hasAttribute("data-deck-aria")) {
+          var prev = node.getAttribute("data-deck-aria");
+          if (prev) node.setAttribute("aria-hidden", prev);
+          else node.removeAttribute("aria-hidden");
+          node.removeAttribute("data-deck-aria");
+        }
+        if ("inert" in node) node.inert = false;
+      }
+    }
+  }
+
+  /* Fallback for engines without `inert`: if focus somehow lands outside the
+     deck, pull it back. This is a guard, not the mechanism. */
+  document.addEventListener("focusin", function (ev) {
+    if (!deckOpen) return;
+    var stage = document.getElementById("deckStage");
+    if (stage && !stage.contains(ev.target)) {
+      var body = document.getElementById("deckBody");
+      if (body && typeof body.focus === "function") body.focus();
+    }
   });
-  document.getElementById("revealAllBtn").addEventListener("click", function () {
-    setShown(BEATS, { scrollTo: shown === 0 });
+
+  function closeDeck() {
+    if (!deckOpen) return;
+    var stage = document.getElementById("deckStage");
+    var grid = document.getElementById("thegridPage");
+
+    /* Reveal every beat BEFORE moving the grid, while it is still in the deck
+       where the rows can be found. Doing it after the move is what left a
+       single beat visible on the page. */
+    for (var i = 1; i <= BEATS; i++) applyBeat(i, true);
+
+    if (grid && gridHome) {
+      if (gridHome.next && gridHome.next.parentNode === gridHome.parent) {
+        gridHome.parent.insertBefore(grid, gridHome.next);
+      } else {
+        gridHome.parent.appendChild(grid);
+      }
+    }
+    deckOpen = false;
+    if (stage) stage.setAttribute("hidden", "");
+    document.body.classList.remove("deck");
+    setBackgroundInert(false);
+    shown = BEATS;
+
+    /* The reader has seen every beat; the page should reflect that. */
+    setShown(BEATS);
+    var ph = document.getElementById("gridPlaceholder");
+    if (ph) ph.setAttribute("hidden", "");
+
+    /* Put focus back where the reader left from, so keyboard users are not
+       dropped at the top of a 4,000-pixel document. */
+    var back = document.getElementById("startDeck") || document.getElementById("h-grid");
+    if (back && typeof back.focus === "function") {
+      try { back.focus({ preventScroll: true }); } catch (e) {}
+    }
+  }
+
+  function deckNext() {
+    if (slide >= BEATS) closeDeck(); else showSlide(slide + 1);
+  }
+  function deckBack() { if (slide > 1) showSlide(slide - 1); }
+
+  /* --- wiring --------------------------------------------------------- */
+  function on(id, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener("click", fn);
+  }
+  on("startDeck", function () { openDeck(1); });
+  on("startDeckInline", function () { openDeck(1); });
+  on("deckNext", deckNext);
+  on("deckBack", deckBack);
+  on("deckSkip", closeDeck);
+  on("deckExit", closeDeck);
+  on("revealBtn", function () { setShown(shown + 1, { scrollTo: true }); });
+  on("revealAllBtn", function () { setShown(BEATS, { scrollTo: shown === 0 }); });
+
+  /* "Skip the intro" in the masthead is a plain anchor, so it works with no
+     JavaScript at all. */
+  var skipIntro = document.getElementById("skipIntro");
+  if (skipIntro) {
+    skipIntro.addEventListener("click", function () {
+      var ph = document.getElementById("gridPlaceholder");
+      if (ph) ph.setAttribute("hidden", "");
+    });
+  }
+
+  /* Keyboard: arrows move through the deck, Escape leaves it. Scoped to the
+     deck, so the arrow keys keep their normal meaning on the page. */
+  document.addEventListener("keydown", function (ev) {
+    if (!deckOpen) return;
+    if (ev.key === "ArrowRight" || ev.key === "PageDown") {
+      if (ev.target && /^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName)) return;
+      ev.preventDefault(); deckNext();
+    } else if (ev.key === "ArrowLeft" || ev.key === "PageUp") {
+      if (ev.target && /^(INPUT|SELECT|TEXTAREA)$/.test(ev.target.tagName)) return;
+      ev.preventDefault(); deckBack();
+    } else if (ev.key === "Escape") {
+      ev.preventDefault(); closeDeck();
+    }
   });
+
+  /* Click anywhere on the slide surface to advance — but never when the click
+     landed on a control, a link, or text the reader may be selecting. */
+  var deckBodyEl = document.getElementById("deckBody");
+  if (deckBodyEl) {
+    deckBodyEl.addEventListener("click", function (ev) {
+      if (!deckOpen) return;
+      if (ev.target.closest("a, button, summary, input, select, textarea")) return;
+      if (window.getSelection && String(window.getSelection()).length > 0) return;
+      deckNext();
+    });
+  }
 
   setShown(0);
   wireRunEx();
   window.__setBeats = setShown;      // harness hooks only
+  window.__openDeck = openDeck;      // harness hooks only
+  window.__closeDeck = closeDeck;
+  window.__deckState = function () {
+    return { open: deckOpen, slide: slide, shown: shown,
+             gridInDeck: !!document.querySelector("#deckMount #thegridPage") };
+  };
   window.__runEx = { get run() { return run; }, attemptOne: attemptOne, reset: resetRunEx };
 })();
 </script>

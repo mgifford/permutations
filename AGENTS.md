@@ -189,6 +189,7 @@ node page-one.mjs                                       # npm run page-one
 node popmodel.mjs                                       # npm run popmodel
 node layout-check.mjs                                   # npm run layout
 node run-example-check.mjs                              # npm run run-example
+node deck-check.mjs                                     # npm run deck
 ```
 
 - `verify.mjs` — 250 simulated runs plus population-model assertions (tables populated, published
@@ -200,6 +201,11 @@ node run-example-check.mjs                              # npm run run-example
   Chrome/Chromium (override with `CHROME_BIN`); skips cleanly if absent.
 - `run-example-check.mjs` — **real browser.** Asserts the running example lays out, logs a stated
   outcome for every step, and does not overflow at 360 px.
+- `deck-check.mjs` — **real browser.** Asserts the full-screen six-beat deck: it opens, covers the
+  viewport, shows exactly one beat, advances by click and by arrow key, goes back, finishes, both
+  skip exits work, the grid is returned to the page, and — the reason it exists — that the overlay
+  leaks no focus and exposes nothing behind it. Both of those defects were live and axe reported
+  zero violations. See §4's note on what jsdom cannot see.
 - `readability.mjs` — measures each beat cell's word count, sentence length, Flesch Reading Ease
   and Flesch-Kincaid grade. Fails on a cell over 95 words, a sentence over 45 words, or a cell
   under 25 words.

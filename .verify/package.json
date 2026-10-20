@@ -11,7 +11,8 @@
     "run-example": "node run-example-check.mjs",
     "a11y": "node a11y-gate.mjs",
     "readability": "node readability.mjs",
-    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run readability && npm run layout && npm run run-example && npm run a11y"
+    "deck": "node deck-check.mjs",
+    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run readability && npm run layout && npm run run-example && npm run deck && npm run a11y"
   },
   "dependencies": {
     "axe-core": "^4.14.0",
