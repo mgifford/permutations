@@ -143,6 +143,44 @@ illustrative, that no real service was audited, and that 1 % is the *optimistic*
 WebAIM Million 2026 crawl found 56.1 detectable errors on the average home page, and the report
 attributes the year-on-year worsening to rising page complexity.
 
+**The risk reading appears inside every step entry, not only in the header.** The header holds a
+single running total, so a reader stepping through had to scroll back up to see whether it had
+moved — and the most counter-intuitive fact in the example is that it *moves even when the step
+passes*. Each entry therefore ends with the same sentence, computed from the same helper the
+header uses, so the two figures cannot disagree:
+
+> **Risk of failing somewhere on this journey: 7.73 %** after 8 of 8 steps (was 6.79 % before
+> this step). Every step raises it, even when the step passes.
+
+The parenthetical is deliberate: it shows the *movement*, not just the new total, because a static
+percentage buried in a log of clear results does not communicate compounding. `risk-line-check.mjs`
+asserts the figure at every one of the eight steps against `1 − 0.99ⁿ`, that it differs at each
+step, and that a failing step states it too.
+
+### The independence assumption, and what happens without it
+
+Beat 4 uses the word *independent* and flags it in passing. The section that follows the beats,
+**"Is it 30 coins, or one coin used 30 times?"**, is where that assumption is examined.
+
+The reason it matters is that it moves the headline figure more than any other input. Every step
+being its own coin gives **26.03 %** at 30 steps and 1 %. Counting a shared element once — the
+common "repeated elements count once" reading — gives **1.00 %** when all 30 steps are shared,
+because there is one distinct thing that can fail rather than thirty. Both are computed by
+`computeSharedElementModel` in page two.
+
+**We do not know which reading describes a real service**, and no source states it. The project
+keeps the conservative reading for its published figure, and says so in
+[RESOURCES.md §7.2](RESOURCES.md#72-shared-versus-unique-elements--a-question-with-no-source).
+
+**A claim was withdrawn here, and the withdrawal is recorded.** An earlier draft of this section
+asserted a *third* reading — that a shared element is worse than independent because it fails on
+every use, taking the all-shared case to 100 %. That is wrong: "counted once" and "same coin used
+repeatedly" are the same algebra, `1 − 0.99^(N − g + 1)`, confirmed against a 200,000-trial
+simulation to within 0.17 percentage points at every level of sharing. The bad number came from
+applying a per-use probability to a single element. It was caught by checking the two expressions
+against each other **before** any of it reached prose, and it is documented rather than deleted,
+because silently removing an error is how the next one gets made.
+
 ### Page two — `cumulative-accessibility-risk-simulator.html` (the evidence)
 
 Two distinct models live in this file, and they answer different questions.

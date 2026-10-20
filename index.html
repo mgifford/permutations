@@ -217,6 +217,13 @@
   .runex-log .entry.terminal { border-left-color:#a3271d; background:#fdf3f2; }
   .runex-log .entry .who { font-weight:700; }
   .runex-log .entry p { margin:.2rem 0 0; }
+  /* The recurring risk reading inside a log entry. Visually separated from the
+     explanation so it is scannable while stepping, and never colour-only —
+     the figure and the words carry it. */
+  .runex-log .entry p.riskline {
+    margin-top:.5rem; padding-top:.4rem; border-top:1px dashed var(--line);
+    font-size:.9rem;
+  }
 
   @media (max-width:600px) {
     .runex-steps li { grid-template-columns:1.4rem 1fr; }
@@ -354,6 +361,28 @@
      relative breadth only and is labelled as such, because no tool publishes
      a tested fraction of each layer. */
   .layers { list-style:none; margin:1rem 0 .2rem; padding:0; display:grid; gap:.75rem; }
+
+  /* Shared-element comparison table. Wrapped so it can scroll on narrow
+     screens without pushing the page wide — the same reason every other table
+     on this site sits in a .table-scroll. */
+  .shared-table {
+    width:100%; border-collapse:collapse; margin:1rem 0 0; font-size:.92rem;
+  }
+  .shared-table caption {
+    text-align:left; font-size:.92rem; color:var(--muted); padding:0 0 .5rem;
+  }
+  .shared-table th, .shared-table td {
+    border:1px solid var(--line); padding:.55rem .7rem; text-align:left;
+    vertical-align:top;
+  }
+  .shared-table thead th { background:var(--card); font-size:.86rem; }
+  .shared-table tbody th { font-weight:600; }
+  .shared-table td.num { text-align:right; font-variant-numeric:tabular-nums; }
+
+  @media (max-width:600px) {
+    .shared-table { font-size:.86rem; }
+    .shared-table th, .shared-table td { padding:.4rem .5rem; }
+  }
   .layers > li {
     border:1px solid var(--line); border-radius:12px; padding:.8rem .9rem;
     background:var(--card);
@@ -667,6 +696,8 @@
           <h3>The same rule, all the way up</h3>
           <p>The rule does not change as things get bigger. For any number of independent steps,
           you multiply their chances together.</p>
+          <p>Notice that word <em>independent</em> — each step its own coin. Thirty steps, thirty
+          coins. Whether a real form works that way is the question a later section asks.</p>
           <p>The more steps, the faster it drops. Going from 99&nbsp;% per step to 99.9&nbsp;% —
           a ten-fold improvement — lifts the whole 30-step journey from <strong>74&nbsp;%</strong>
           to <strong>97&nbsp;%</strong>.</p>
@@ -984,6 +1015,83 @@
   </section>
 
   <!-- ============================================================ -->
+  <section class="panel" aria-labelledby="h-shared">
+    <h2 id="h-shared">Is it 30 coins, or one coin used 30 times?</h2>
+    <p>
+      Beat 4 used the word <em>independent</em>: each step its own coin. That is an assumption, and
+      it is worth showing what it is worth, because this one question changes the answer more than
+      any other input on this site.
+    </p>
+    <p>
+      Real services reuse things. A footer, a navigation block, a page template, a component from a
+      design system — the same code, on many steps. Shared code can mean a shared defect. No source
+      in this project measures how often that happens, so treat the sharing levels below as
+      illustrations of a question rather than estimates of a real service.
+    </p>
+
+    <table class="shared-table">
+      <caption>What 1&nbsp;% per step gives at 30 steps, under three readings</caption>
+      <thead>
+        <tr>
+          <th scope="col">Reading</th>
+          <th scope="col">Distinct coins</th>
+          <th scope="col">Risk of failing somewhere</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Every step its own coin <span class="muted">(as published)</span></th>
+          <td class="num">30</td>
+          <td class="num mono">26.03&nbsp;%</td>
+        </tr>
+        <tr>
+          <th scope="row">10 steps shared, 20 unique</th>
+          <td class="num">21</td>
+          <td class="num mono">19.03&nbsp;%</td>
+        </tr>
+        <tr>
+          <th scope="row">All 30 steps shared</th>
+          <td class="num">1</td>
+          <td class="num mono">1.00&nbsp;%</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Counting a shared element once — which is what "repeated elements count once" means — drops
+      the figure from 26&nbsp;% to 1&nbsp;%. That is not a rounding difference. It is a different
+      question: <em>how many distinct things can fail?</em> rather than <em>how many chances does
+      this journey give failure to happen?</em>
+    </p>
+
+    <details>
+      <summary>Which reading is right — and what we could not find out</summary>
+      <p>
+        <strong>We do not know, and neither does anyone else.</strong> No published source states
+        what fraction of a real service's steps are served by shared code, so the number cannot be
+        looked up. That is why the site keeps the more conservative reading: a service that reuses
+        one broken component across 30 steps has not thereby become safer for the person who meets
+        it 30 times.
+      </p>
+      <p>
+        <strong>A correction worth recording.</strong> The first version of the arithmetic behind
+        this section also claimed a <em>third</em> reading — that a shared element was worse still,
+        because once broken it fails on every use. That claim was wrong. "Counted once" and "same
+        coin used many times" are the same algebra: both give
+        <span class="mono">1 − 0.99<sup>(N − g + 1)</sup></span>. A 200,000-trial simulation
+        agreed with the closed form to within 0.17 percentage points at every level of sharing. The
+        invented third reading was removed rather than shipped, because a number that cannot be
+        derived is exactly the kind of thing this site exists to argue against.
+      </p>
+      <p class="muted">
+        The simulation on the next page carries this as a stated assumption. See
+        <span class="mono">computeSharedElementModel</span> in
+        <span class="mono">cumulative-accessibility-risk-simulator.html</span>.
+      </p>
+    </details>
+  </section>
+
+  <!-- ============================================================ -->
   <section class="panel" aria-labelledby="h-next">
     <h2 id="h-next">Where to go next</h2>
     <p>
@@ -1174,6 +1282,31 @@
     d.className = "entry " + (mech || "");
     d.innerHTML = html;
     e.log.appendChild(d);
+    return d;
+  }
+
+  /* The risk reading, stated the same way in the header and in the step log.
+     Both read the SAME arithmetic (1 - 0.99^n over steps attempted), so the
+     two figures can never disagree. Returns null when nothing is attempted yet. */
+  function riskNow() {
+    var n = run.outcomes.filter(function (o) { return o !== undefined; }).length;
+    if (n === 0) return null;
+    return { n: n, clear: Math.pow(1 - P, n), risk: 1 - Math.pow(1 - P, n) };
+  }
+
+  /* One line, appended to every outcome, so a reader stepping through can see
+     the figure move without scrolling back to the header. It rises with each
+     attempted step, including steps that pass — which is the whole point.
+     `before` is the previous risk, captured before this step was recorded. */
+  function riskLine(before) {
+    var r = riskNow();
+    if (!r) return "";
+    var delta = (typeof before === "number" && r.n > 1)
+      ? " (was " + pct(before) + " before this step)"
+      : "";
+    return "<p class='riskline'><strong>Risk of failing somewhere on this journey: " +
+      pct(r.risk) + "</strong> after " + r.n + " of " + RUN_STEPS.length +
+      " steps" + delta + ". Every step raises it, even when the step passes.</p>";
   }
 
   function attemptOne() {
@@ -1182,21 +1315,26 @@
     var s = RUN_STEPS[idx];
     run.attempts++;
 
+    /* The risk before this step, so the log can show the movement rather than
+       just the new total. Read from the same helper the header uses. */
+    var beforeRisk = riskNow();
+    beforeRisk = beforeRisk ? beforeRisk.risk : 0;
+
     /* A genuine independent draw at 1 %. */
     var hit = Math.random() < P;
     var outcome = { hit: hit };
+    var entry = null;
 
     if (!hit) {
       outcome.label = "✓ clear"; outcome.cls = "pass";
-      logEntry("pass", "<span class='who'>Step " + (idx + 1) + " passed.</span>" +
-        "<p>No defect this time. A 1 % rate mostly passes — which is the point. " +
-        "The risk figure above still did not go down.</p>");
+      entry = logEntry("pass", "<span class='who'>Step " + (idx + 1) + " passed.</span>" +
+        "<p>No defect this time. A 1 % rate mostly passes — which is the point.</p>");
     } else {
       switch (s.mech) {
         case "terminal":
           outcome.label = "✕ BLOCKED"; outcome.cls = "stop";
           run.ended = true; run.endReason = "walled";
-          logEntry("terminal",
+          entry = logEntry("terminal",
             "<span class='who'>Step " + (idx + 1) + " — the journey stops here.</span>" +
             "<p>This is a <strong>total blocker</strong> for " + s.who + ". There is no alternative " +
             "path, so it is not a lower score and not a retry — it is a full stop. " +
@@ -1209,14 +1347,14 @@
           if (run.spoons <= 0) {
             run.spoons = 0; run.ended = true; run.endReason = "spent";
             outcome.label = "◐ gave up"; outcome.cls = "spent";
-            logEntry("spoon",
+            entry = logEntry("spoon",
               "<span class='who'>Step " + (idx + 1) + " — capacity exhausted. The person stops.</span>" +
               "<p>Nothing " + s.who + " encountered was impassable. But each barrier drew on a " +
               "finite pool of capacity, and the pool ran out. This ending — <em>gave up</em> — " +
               "appears in no conformance report at all, because every individual criterion may " +
               "have been satisfied.</p>");
           } else {
-            logEntry("spoon",
+            entry = logEntry("spoon",
               "<span class='who'>Step " + (idx + 1) + " — " + s.spoon + " spoons spent.</span>" +
               "<p>" + s.who + " gets through, at a real cost. Spoon Theory: capacity is finite, " +
               "and a service that spends it on barriers has less left for the actual task.</p>");
@@ -1225,7 +1363,7 @@
         case "effort":
           outcome.label = "↻ retried"; outcome.cls = "hurt";
           run.minutes += 6; run.spoons -= s.spoon;
-          logEntry("effort",
+          entry = logEntry("effort",
             "<span class='who'>Step " + (idx + 1) + " — recovered by " + s.who + ", at a price.</span>" +
             "<p>An alternative path existed, so the journey continues — six extra minutes and " +
             s.spoon + " spoons spent working around the service instead of using it. " +
@@ -1234,7 +1372,7 @@
         default:
           outcome.label = "△ friction"; outcome.cls = "hurt";
           run.minutes += 2;
-          logEntry("friction",
+          entry = logEntry("friction",
             "<span class='who'>Step " + (idx + 1) + " — a real violation that stops nobody.</span>" +
             "<p>This is a genuine WCAG failure and worth fixing. It is also not why anyone fails. " +
             "Conflating this with the blockers above is how a build gets described as 99 %.</p>");
@@ -1244,18 +1382,30 @@
     run.outcomes[idx] = outcome;
     run.i++;
     renderRunEx();
+
+    /* Attach the risk reading now that the step is recorded, so it matches the
+       header exactly. Appended to EVERY outcome — pass, block, spoon, retry and
+       friction — because the arithmetic is the same regardless of what happened. */
+    if (entry) entry.insertAdjacentHTML("beforeend", riskLine(beforeRisk));
+
     if (run.ended) endRunEx();
   }
-
   function endRunEx() {
     var e = runExEls();
     var msg = run.endReason === "walled"
       ? "The journey ended: the person was blocked and there is no way forward."
       : "The journey ended: the person gave up. Nobody was blocked — the capacity simply ran out.";
-    logEntry(run.endReason === "walled" ? "terminal" : "spoon",
+    var entry = logEntry(run.endReason === "walled" ? "terminal" : "spoon",
       "<span class='who'>Run finished.</span><p>" + msg +
       " Click <em>Start again</em> and try another run — at 1 % per step, the outcome changes " +
       "every time, and that variability is itself the finding.</p>");
+    var r = riskNow();
+    if (r) {
+      entry.insertAdjacentHTML("beforeend",
+        "<p class='riskline'><strong>Risk at the point the journey stopped: " + pct(r.risk) +
+        "</strong> after " + r.n + " of " + RUN_STEPS.length + " steps. A failed journey at this " +
+        "stage is the 1 % per step compounding — no single step was bad.</p>");
+    }
   }
 
   function resetRunEx() {

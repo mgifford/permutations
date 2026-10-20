@@ -1718,6 +1718,86 @@
     };
   }
 
+  /* ------------------------------------------------------------------ *
+   * 1b. Shared elements — the same coin, flipped many times
+   *
+   * STATED LIMIT, read this before quoting any number below.
+   *
+   * `computePopulationModel` treats all N steps as independent draws. That is
+   * a modelling choice, not a measurement: no data exists on what fraction of
+   * a service's interaction steps are served by shared elements (a footer, a
+   * nav block, a template, a component library). This function does not
+   * replace that model or its published figure. It answers a question the
+   * model cannot: what changes if some of the N steps hit the SAME element?
+   *
+   * A CORRECTION, RECORDED DELIBERATELY.
+   * A first version of this function claimed a 99-point spread between two
+   * readings — "counted once" and "the same coin is worse because it fails on
+   * every use". That claim was wrong. Both cases reduce to the same algebra,
+   * 1 − (1 − p)^(N − g + 1), and a 200,000-trial simulation agrees with the
+   * closed form to within 0.17 percentage points at every g. Correlation
+   * between the repeated uses adds nothing once the shared element is counted
+   * as one coin; the two are the same statement. The earlier figure came from
+   * a formula that applied a per-use probability to a single element, which
+   * measures a different quantity. It was caught by checking the two
+   * expressions against each other before any of it reached prose.
+   *
+   * WHAT ACTUALLY DIFFERS is the COUNT of distinct coins, and nothing else:
+   *
+   *   INDEPENDENT (as published) — every step is its own coin, so N coins
+   *     and a failure probability of 1 − (1 − p)^N. This is what the page
+   *     reports, and it is the conservative reading: it treats a repeated
+   *     element as N independent opportunities to fail.
+   *
+   *   COUNTED ONCE — a shared element is ONE coin however many times it is
+   *     used, so N − g + 1 coins and 1 − (1 − p)^(N − g + 1). This is the
+   *     reading behind "repeated elements count once". It is correct as a
+   *     count of distinct failing things, and it LOWERS the journey-failure
+   *     figure substantially: at 1 % quality, all 30 steps shared gives 1.00 %
+   *     against the published 26.03 %.
+   *
+   * Neither is "the" answer. They answer different questions: "how many
+   * distinct things can fail?" versus "how many chances does this journey
+   * give failure to happen?". The published figure takes the second, more
+   * conservative reading deliberately, because a service that reuses one
+   * broken component across 30 steps has not thereby become safer for the
+   * person who meets it 30 times.
+   *
+   * The open question — and it is genuinely open, not a modelling choice we
+   * can resolve from the literature — is what value of g a real service has.
+   * No source states it. See RESOURCES.md; this is listed as an assumption
+   * with no measurement behind it.
+   * ------------------------------------------------------------------ */
+  function computeSharedElementModel(componentP, sharedSteps) {
+    var g = Math.max(0, Math.min(N, Math.round(sharedSteps)));
+    var unique = N - g;
+
+    /* Reading 1 — counted once. A shared element is ONE coin however many
+       times it is used, so 1 + unique distinct coins. With no shared steps
+       the shared bucket does not exist at all, and this reduces to the
+       published model rather than adding a phantom coin. */
+    var countedOnce = g === 0
+      ? 1 - Math.pow(1 - componentP, N)
+      : 1 - Math.pow(1 - componentP, 1 + unique);
+
+    /* Reading 2 — the published model. Every step is its own draw. */
+    var independent = 1 - Math.pow(1 - componentP, N);
+
+    return {
+      sharedSteps: g,
+      uniqueSteps: unique,
+      /* Distinct coins under each reading. */
+      coinsCounted: g === 0 ? N : 1 + unique,
+      coinsIndependent: N,
+      countedOnce: countedOnce,
+      independent: independent,
+      /* How far the two readings are apart, in percentage points. Grows with
+         how much of the service is shared. Not a range to be averaged: it is
+         the size of the disagreement between two different questions. */
+      spread: independent - countedOnce
+    };
+  }
+
   var MILESTONES = [1, 5, 10, 20, 30];
   var MILESTONE_NAMES = { 1: "Step 1", 5: "Step 5", 10: "Step 10", 20: "Step 20", 30: "Step 30" };
 

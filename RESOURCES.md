@@ -232,7 +232,38 @@ WCAG 3.0 is a published Recommendation. It is noted here because contrast requir
 change — particularly for dark mode, data visualisation, and low-vision use cases, all of which
 this project touches.
 
-### 7.2 Sources with AI-use restrictions
+### 7.2 Shared versus unique elements — a question with no source
+
+**There is no published figure for what proportion of a real service's interaction steps are served
+by shared elements** (a footer, a navigation block, a template, a component library). This project
+searched and did not find one. It is listed here as an **unresolved assumption**, not a measurement.
+
+The question matters because it changes the arithmetic materially. If every step is its own
+independent draw, 30 steps at 1 % give **26.03 %**. If a shared element is counted once rather
+than once per use, the same service gives **1.00 %** (30 steps, all shared) — because there is one
+distinct thing that can fail instead of thirty. Both are computed by
+`computeSharedElementModel` in `cumulative-accessibility-risk-simulator.html`.
+
+**This project keeps the more conservative reading** — every step a separate draw — for the
+published headline figure, and says so. That is a defensible choice rather than a derived one: a
+service that reuses one broken component across 30 steps has not thereby become safer for the
+person who meets it 30 times. Nothing here should be read as a claim about how much sharing real
+services have.
+
+**A claim that was made and then withdrawn.** An earlier draft of this section asserted a third
+reading: that a shared element was *worse than independent*, failing on every use and pushing the
+all-shared case to 100 %. That is wrong. "Counted once" and "the same coin used repeatedly" are
+the **same algebra** — both give `1 − 0.99^(N − g + 1)` for g shared steps among N — and a
+200,000-trial simulation agreed with the closed form to within 0.17 percentage points at every
+level of sharing. The withdrawn claim came from applying a per-use probability to a single
+element, which measures a different quantity. It never reached a public artefact; it is recorded
+here because a number that cannot be derived is the failure mode this project exists to argue
+against, and silently deleting it would hide the reasoning.
+
+`shared-element-check.mjs` asserts that the page-one table and the page-two function agree, and
+that the withdrawn 100 % figure does not reappear.
+
+### 7.3 Sources with AI-use restrictions
 
 > [!CAUTION]
 > **Respect stated AI-use restrictions. Link, do not reproduce.**

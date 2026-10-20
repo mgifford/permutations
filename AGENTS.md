@@ -201,6 +201,17 @@ node deck-check.mjs                                     # npm run deck
   Chrome/Chromium (override with `CHROME_BIN`); skips cleanly if absent.
 - `run-example-check.mjs` — **real browser.** Asserts the running example lays out, logs a stated
   outcome for every step, and does not overflow at 360 px.
+- `risk-line-check.mjs` — **real browser.** Asserts the risk reading inside each step entry:
+  at every one of the eight steps it matches `1 − 0.99ⁿ` and matches the header exactly, the
+  figure differs at each step, and a *failing* step states it too. It exists because the example's
+  most counter-intuitive fact is that the risk rises on steps that pass, and the header alone did
+  not show that without scrolling back.
+- `shared-element-check.mjs` — reads **both** artefacts and asserts they agree: the page-one
+  comparison table must print the figures `computeSharedElementModel` in page two actually
+  derives, the published 30-step figure must still be 26.03 %, and the withdrawn 100 % reading must
+  not reappear. It exists because the page prints a number whose derivation lives in another file,
+  and a page that prints a figure its own model no longer produces is the precise failure this
+  repository warns about.
 - `deck-check.mjs` — **real browser.** Asserts the full-screen six-beat deck: it opens, covers the
   viewport, shows exactly one beat, advances by click and by arrow key, goes back, finishes, both
   skip exits work, the grid is returned to the page, and — the reason it exists — that the overlay
