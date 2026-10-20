@@ -30,6 +30,34 @@ Two self-contained HTML artefacts and the documentation around them, making one 
 
 These are not preferences. A change that violates one of these must not be merged.
 
+### 2.0 Land changes through a pull request — never push to `main`
+
+**Work on a branch and open a pull request. Do not commit to `main` and push.**
+
+This is the default, not a preference for large changes. `main` is what GitHub Pages serves, so a
+direct push publishes immediately to `https://mgifford.github.io/permutations/` with no review step
+in between. That matters more here than in most repositories, because the artefacts *are* the
+product: there is no staging environment, no build to fail, and no test that runs before the bytes
+are public.
+
+The repository has no branch protection, so nothing mechanically prevents a direct push. The rule
+is therefore the only guard, which is exactly why it is stated here rather than assumed.
+
+The pattern:
+
+1. `git switch -c <short-topic-name>` before the first edit.
+2. Commit with a message that states what changed and **why**, including any figure that changed
+   and the old value (see §2.6 — a changed published input must say so).
+3. Run the full suite (`cd .verify && npm run all`). A change that does not pass is not ready to
+   open.
+4. `gh pr create` with a body that summarises the change and names any harness added or extended.
+5. Merge once reviewed. After merge, run `npm run live` deliberately — it is the only check that
+   scans what is actually deployed.
+
+The single exception is an emergency fix to a live accessibility failure, where the choice is
+between an unreviewed fix and a broken public page. Land it directly, then say so in the commit
+message and record it in the `ACCESSIBILITY.md` change log.
+
 ### 2.1 Never fabricate evidence
 
 This is the cardinal rule, and it matters more here than in most repositories because the whole
