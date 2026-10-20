@@ -467,13 +467,17 @@
         <div id="runStateCard" class="run-state">
           <h3 id="runStateHeading">Run state — the citizen's finite capacity</h3>
           <p class="run-state-intro">
-            Spoon Theory: a citizen starts with a finite pool of capacity. Each barrier draws it down.
-            Nothing "fails" them — they run out, and then they stop, which is a different ending.
+            Spoon Theory: a citizen has a finite pool of capacity for one journey. Each barrier draws
+            it down. Nothing "fails" them — they run out, and then they stop, which is a different
+            ending. The pool covers this form, not a whole day.
           </p>
           <ul class="metrics compact">
             <li class="metric">
               <span class="label">Spoons remaining</span>
-              <span class="value" id="mSpoons">100 / 100</span>
+              <!-- Filled from SPOONS_MAX at start-up so the display can never
+                   disagree with the pool the model actually uses. It was
+                   hard-coded "100 / 100" and printed a stale figure. -->
+              <span class="value" id="mSpoons">— / —</span>
               <span class="bar-track small"><span class="bar-fill spoon" id="mSpoonsBar" style="width:100%"></span></span>
             </li>
             <li class="metric">
@@ -1431,9 +1435,45 @@
   }
   recomputeHazards(P_BASE);
 
-  /* Spoon Theory: a citizen starts each day with a finite pool of capacity.
-     Friction and retries draw it down. Nothing "fails" them; they run out. */
-  var SPOONS_MAX = 100;
+  /* Spoon Theory: a citizen has a finite pool of capacity. Friction and
+     retries draw it down. Nothing "fails" them; they run out.
+
+     A PUBLISHED INPUT THAT WAS CHANGED, AND WHY.
+
+     This was 100. It is now 20. The reason is measured, not aesthetic.
+
+     At 1 % per component and 30 steps the expected number of defects per
+     journey is 0.30, because the shell normalises the mean step hazard to
+     exactly 0.01 (sum of hazards = 0.30). A pool of 100 therefore sat unused:
+     across 600,000 simulated journeys the mean draw was 1.8 spoons, the
+     median was 0, the 99th percentile was 20, the worst case seen was 46,
+     and the pool was NEVER exhausted. The "gave up — capacity ran out"
+     ending, which is this model's sharpest point (nobody was blocked, every
+     criterion may have passed, and the person still could not finish), was
+     unreachable in practice. A gauge that never moves teaches that capacity
+     is not a constraint, which is the opposite of Spoon Theory.
+
+     20 gives the intended shape, measured on the same hazard structure:
+
+       pool   runs drawing nothing   exhausted   blocked   completed
+        100          76 %              0.00 %     1.96 %     98.0 %
+         20          76 %              1.51 %     1.96 %     96.5 %
+
+     Exhaustion is now a real but still minority ending — about 1.5 % of
+     journeys, so a reader clicking through a couple of dozen runs will meet
+     it, while 99.9 %-quality runs still almost never do. The two failure
+     endings stay comparable in frequency, which the model needs: if running
+     out dominated, the distinction between "blocked" and "gave up" would
+     stop being visible.
+
+     The 76 % of runs that draw nothing is NOT fixed by this change and is
+     not a defect: it is the 1 % rate doing exactly what the site says it
+     does. Most journeys meet no defect at all. That is the point being made,
+     not a problem with the gauge.
+
+     Changing this number changes what the simulator shows. It does not
+     change the population model, which has no spoon pool and no seed. */
+  var SPOONS_MAX = 20;
 
   /* ------------------------------------------------------------------ *
    * 1b. THE POPULATION MODEL  (deterministic — no random seed)
@@ -3075,6 +3115,12 @@
 
   function boot() {
     cacheEls();
+
+    /* Show the real pool before anything runs. Derived from the constant so
+       the initial reading cannot drift from the value the model uses. */
+    if (el.mSpoons) el.mSpoons.textContent = SPOONS_MAX + " / " + SPOONS_MAX;
+    if (el.mSpoonsBar) el.mSpoonsBar.style.width = "100%";
+
     updateMetrics();
 
     /* --- Run settings: quality --- */

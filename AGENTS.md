@@ -88,6 +88,11 @@ Several values are the result of deliberate, reasoned decisions. Changing them s
 the conclusion. Read the code comments before altering any of:
 
 - `P_BASE = 0.01` and the normalisation such that the mean hazard is exactly 0.01.
+- `SPOONS_MAX = 20` in the simulator. This was **100**, and was changed on 2026-10-20 because 100
+  made the "gave up" ending unreachable: the mean draw was 1.8 spoons across 600,000 journeys and
+  the pool was never emptied once. 20 makes exhaustion about 1.5 % of journeys while leaving
+  completion the normal outcome. Changing it again changes what the simulator shows. It does **not**
+  touch the population model, which has no spoon pool and no seed.
 - The **union, not sum** logic in `computePopulationModel`. Removal is non-additive: a citizen
   lost at an early step cannot also be lost at a later one. Summing produced saturating nonsense
   that made the quality dial meaningless. Do not reintroduce it.
@@ -212,6 +217,10 @@ node deck-check.mjs                                     # npm run deck
   not reappear. It exists because the page prints a number whose derivation lives in another file,
   and a page that prints a figure its own model no longer produces is the precise failure this
   repository warns about.
+- `spoon-pool-check.mjs` — asserts the shown spoon pool is the enforced one, that the population
+  model is untouched by it, and that the "gave up" ending is **reachable**. It exists because the
+  pool was 100 against a mean draw of 1.8, so exhaustion could not be reached at all and the panel
+  read `100 / 100` while its own constant said something else.
 - `deck-check.mjs` — **real browser.** Asserts the full-screen six-beat deck: it opens, covers the
   viewport, shows exactly one beat, advances by click and by arrow key, goes back, finishes, both
   skip exits work, the grid is returned to the page, and — the reason it exists — that the overlay

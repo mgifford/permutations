@@ -263,7 +263,29 @@ against, and silently deleting it would hide the reasoning.
 `shared-element-check.mjs` asserts that the page-one table and the page-two function agree, and
 that the withdrawn 100 % figure does not reappear.
 
-### 7.3 Sources with AI-use restrictions
+### 7.3 Spoon capacity — an assumed input, not a measured one
+
+**No source states how many accessibility barriers exhaust a real person's finite capacity for a
+task.** Spoon Theory (Christine Miserandino, 2003 — link, do not reproduce; see the AI-use note
+below) describes the phenomenon but publishes no unit budget, because it is not a quantitative
+instrument.
+
+The simulator therefore carries the capacity pool as a **stated assumption**: `SPOONS_MAX`, which is
+**20** as of 2026-10-20 and was **100** before that. The change is recorded because the original
+value silently disabled the mechanic:
+
+- At 1 % per component and 30 steps, the expected defects per journey is **0.30**, so a journey
+  draws a mean of **1.8 spoons**.
+- Against a pool of 100 that left the pool **never emptied**, in 600,000 simulated journeys. The
+  "gave up" ending — the model's sharpest point, where nobody is blocked yet the task is still
+  unfinished — was unreachable.
+- Against 20, exhaustion is roughly **1.5 %** of journeys and completion remains 96.5 %.
+
+This is an input chosen so the mechanic is demonstrable. It is **not** an estimate of real
+capacity, and it should not be quoted as one. If a source is ever found that quantifies capacity
+demand, this number should be replaced and the change recorded here.
+
+### 7.4 Sources with AI-use restrictions
 
 > [!CAUTION]
 > **Respect stated AI-use restrictions. Link, do not reproduce.**

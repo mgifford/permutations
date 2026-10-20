@@ -196,6 +196,25 @@ four different mechanics, because they do not stop people in the same way:
 | **Effort** | Recoverable, at a price in time, attempts and confidence. | A retryable validation failure with a poor error message |
 | **Friction** | A genuine violation that stops nobody. | Low contrast — the most common failure on the web, and the most survivable |
 
+**The spoon pool is 20, and it was 100 until 2026-10-20.** The change is worth recording because
+the old value quietly disabled the ending the mechanic exists to demonstrate. At 1 % per component
+and 30 steps the expected number of defects per journey is 0.30, so across 600,000 simulated
+journeys the mean draw was **1.8 spoons**, the median was **0**, the 99th percentile was 20 — and
+the pool of 100 was **never emptied once**. The "gave up" ending was unreachable in practice, and
+the gauge sat at `100 / 100` doing nothing, which teaches that capacity is not a constraint: the
+opposite of Spoon Theory.
+
+At 20 the shape is what the mechanic intends. Exhaustion is about **1.5 %** of journeys, so a reader
+clicking through a couple of dozen runs will meet it, while completion stays the normal outcome at
+96.5 % and the two failure endings stay comparable (blocked ≈ 2.0 %) rather than one swallowing the
+other. `verify.mjs` now reports the "gave up" ending in its 250-run sample; before the change it
+almost never appeared.
+
+**76 % of journeys still draw no spoons at all**, and that is not fixed by the pool — it is the 1 %
+rate doing exactly what this project says it does. Most journeys meet no defect. That is the claim,
+not a flaw in the gauge. The pool change is confined to the simulator: the population model has no
+spoon pool and no seed, and `spoon-pool-check.mjs` asserts that it is unaffected.
+
 Barriers that sit **entirely outside WCAG 2.2** are first-class citizens in the model, tagged
 `SYSTEMIC`: a phone-only service channel, a mandatory online account, English-only content, a
 service that presumes a smartphone, no authorised-proxy path, a utility bill that must be in the
