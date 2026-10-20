@@ -146,7 +146,22 @@ Each entry in the `DEFECTS` registry declares `mech`, `origin`, `domain`, `spoon
    group, it is a partial blocker or a degrader.
 4. **State the assumption and its range** if the severity relies on one.
 
-### 3.3 Adding a systemic barrier
+### 3.3 The step count is a published figure, not a dial
+
+The model carries **30 interactions across 4 stages**. The project's headline finding —
+**26.03 % failure at 99 % per step** — is `1 − 0.99³⁰`. The exponent *is* the claim.
+
+If a preset, a preset selector, or any future feature needs a different interaction count, that is
+a change to the published result and must be made as one: state the old figure, the new figure, and
+why, and update every harness assertion that depends on it. **Never add a second step count
+alongside the first** — two numbers on the same page contradicting each other would undermine the
+argument more than either number ever could.
+
+A 40-step "high complexity" preset was proposed during planning and rejected in favour of the
+existing 30, on exactly this basis. See `README.md` → "Roadmap and deliberate deferrals". The
+decision is expected to be revisited once presets exist; if the count changes, it changes openly.
+
+### 3.4 Adding a systemic barrier
 
 `SYSTEMIC_BARRIERS` entries require an `applies(ctx)` predicate. A barrier qualifies only if it
 is genuinely outside WCAG 2.2 — no success criterion is violated. If an SC does cover it, it is

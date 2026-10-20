@@ -245,6 +245,73 @@ model be calibrated, that is the highest-value contribution available.
 
 Before contributing, read [ACCESSIBILITY.md](ACCESSIBILITY.md) and [AGENTS.md](AGENTS.md).
 
+---
+
+## Roadmap and deliberate deferrals
+
+Ideas that are wanted but **not yet built**, recorded so the reasoning is reviewable rather than
+remembered. A deferral here is a decision, not an oversight.
+
+### Planned: Top Tasks presets and a "bureaucracy" toggle
+
+Gerry McGovern's *Top Tasks* framework makes an argument this project's arithmetic can already
+demonstrate: that auditing thousands of low-impact pages while neglecting the primary journey is a
+mathematical error, not merely a prioritisation mistake. Adding non-essential interactions to a
+journey — redundant disclaimers, pre-survey prompts, duplicate address verification — increases the
+exponent in `P = 1 − (1 − p)ⁿ` and therefore the failure rate, without adding a single new defect.
+
+Two things are wanted:
+
+- **Presets** across real service archetypes of differing size (micro, low, medium, high
+  complexity), to show that the same per-step rate produces very different journey outcomes
+  depending on how many steps the service has.
+- **A clutter toggle** that injects non-essential steps and moves the failure curve live.
+
+**Decision: the high-complexity preset uses the existing 30-step model, not 40.** A 40-interaction
+preset was proposed, but the project's headline result — 26.03 % failure at 99 % per step — *is*
+`0.99³⁰`. A 40-step version of the same journey would read **33.10 %**, so publishing both would put
+two contradicting failure figures on the same page. `AGENTS.md` §3.3 states that the step count is a
+published figure rather than a dial. This is expected to be revisited once the presets exist and can
+be judged as built; if the counts do change, every harness assertion built on the 30-step model
+changes with them, openly and in one commit.
+
+Two citations proposed alongside this work — "Digital Journey Coach" and "Daily DAP" — are **not
+yet sourced**. They cannot appear in an artefact until they have a real, citable reference, per
+`RESOURCES.md`.
+
+### Deferred: in-browser SLM journey inference
+
+A proposal to distil a page's DOM in the browser and use a small language model (WebLLM, or the
+native Prompt API) to infer the primary task and a predicted interaction chain, then feed that step
+count into the compounding model.
+
+**Deferred, deliberately.** Three reasons, in order of weight:
+
+1. **It would be self-refuting.** The model would produce an inferred step count and present it
+   with the same visual authority as the cited inputs beside it. This project's entire argument is
+   that unvalidated inference must not be dressed as measurement. A 1B-parameter model guessing a
+   citizen's primary task from a DOM dump has no validation story, and inventing one would violate
+   `AGENTS.md` §2.1.
+2. **It breaks a load-bearing constraint.** WebLLM downloads model weights on first use, which
+   contradicts §2.5 — no external requests, no CDN, each file opens correctly from the local
+   filesystem. That property is why a reviewer can open one file and see the whole argument.
+3. **The value is unproven.** The presets above deliver the same teaching — that step count drives
+   failure — with cited inputs and no dependency.
+
+Revisit only with a validation plan that says what the inference is and is not, and how a reader
+would know which is which.
+
+### Deferred: automated journey testing in CI
+
+A Playwright runner stepping through a real multi-page service flow, firing `axe-core` on each
+state transition, exporting completion curves, and publishing reports on a daily schedule.
+
+This is sound but is **infrastructure rather than an educational artefact**, and it needs a real
+target service, storage and a schedule. The `axe`-to-FPC mapping portion is the valuable half and
+does not need the runner; it can be built against the existing defect registry.
+
+---
+
 ## Licence
 
 AGPL-3.0. See [LICENSE](LICENSE).
