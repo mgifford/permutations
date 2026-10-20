@@ -1,99 +1,226 @@
 # Permutations & Digital Accessibility
 
-Evidence artefacts for a single argument:
+> A service can report **99 % accessibility** and still fail a quarter of the people who try to
+> use it. This repository exists to show that this is arithmetic, not opinion — and to teach the
+> arithmetic to people who were never shown it.
 
-> A service can report **99 % accessibility** and still fail a large share of the people who
-> try to use it. That is arithmetic, not opinion.
+**Live site: <https://mgifford.github.io/permutations/>**
 
-A public-service journey — here, *Applying for an Emergency Heating Assistance Benefit* — is a
-**serial system**. Thirty interactions happen in sequence, and the task works only if every one
-of them works, for the person using it. Component reliabilities therefore **multiply**; they do
-not average. A per-step pass rate of `0.99` across 30 steps gives:
+---
 
-```
-P(whole journey succeeds) = 0.99³⁰ ≈ 0.7397   →   ≈ 26 % journey failure
-```
+## The vision of this project
 
-Monitoring that checks each page separately reports 99 %. The citizen experiences the product.
+Most accessibility communication fails for one of two reasons.
 
-## What is in here
+**It assumes the audience already thinks in systems.** We say "a journey is a serial system, so
+component reliabilities multiply" to people who have never been taught that independent
+probabilities combine by multiplication. The sentence is true and it lands on nothing.
+
+**It assumes the audience already accepts the premise.** We say "99 % is not good enough" to
+people whose entire mental model of accessibility is a Lighthouse score, a green badge, and a
+press release. Without the arithmetic behind the claim, it reads as an opinion — and opinions
+about accessibility are cheap.
+
+This project addresses both, in that order.
+
+### The argument, in five steps
+
+1. **A permutation is what you get when independent things combine.** The count multiplies.
+   Two coins give four outcomes; ten coins give 1,024. This is a teachable idea in isolation,
+   with no accessibility content at all.
+
+2. **Independence means probabilities multiply, not average.** If each of two independent things
+   succeeds with probability `p`, both succeeding together is `p²`. This is also teachable in
+   isolation.
+
+3. **A public-service task is a serial system.** *Applying for an Emergency Heating Assistance
+   Benefit* is 30 interactions across 4 sequential stages. You cannot skip a step and still be
+   approved. The journey works only if every step works — for the person using it.
+
+4. **Therefore the vendor's number and the citizen's experience are different numbers.**
+   Monitoring that checks each step reports **99 %**. The citizen experiences `0.99³⁰ ≈ 0.7397` —
+   **73.97 % completion, 26.03 % failure** — before any disability-specific effect is considered.
+
+5. **Disability turns out to be the normal case, not the edge case.** Roughly 1 in 4 US adults
+   reports a disability (CDC, 28.7 %). Census measures more narrowly and finds 13.6 % of all
+   ages. Prevalence rises with age: 12 % of adults 18–64, 24 % of those 65–74, **46 % of those 75
+   and older**. The population that meets these barriers is not a fixed minority; it is a growing
+   share of everyone, and every person passes through it — temporarily, situationally or
+   permanently.
+
+### What we are trying to change
+
+The project's target is not a bad vendor. It is a **measurement failure**.
+
+Component-level monitoring answers *"is this page broken?"* It is a good question and it is not
+the question that matters. The question that matters is *"can this person finish the task?"* —
+and that question cannot be answered by a per-page score, because the task has an exponent in it.
+
+The punchline is uncomfortable and it is why the artefacts are built the way they are:
+
+> Improving component quality from 99 % to 99.9 % — a **tenfold reduction in defect rate** —
+> moves population-level journey completion by roughly 19 points, and leaves the blind,
+> low-vision and mobility groups in the model at or near **zero completion**.
+
+Quality improvement cannot reach the people the walls exclude. A drag-only upload with no
+keyboard path is not a lower score. It is a full stop for a specific group of people, and no
+amount of contrast fixing addresses it.
+
+---
+
+## What is in this repository
 
 | File | What it is |
 |---|---|
-| `two-ideas.html` | **Page one.** Teaches the two ideas side by side, beat by beat: permutations on the left, digital accessibility (POUR, the Persona Spectrum, prevalence data) on the right. Each row is the same idea seen twice. Optional to read — a knowledgeable reader skips straight on. |
-| `cumulative-accessibility-risk-simulator.html` | **Page two.** The evidence. An interactive 30-step, 4-stage journey simulation with selectable persona, component quality, and difficulty; four distinct defect mechanics; and a deterministic, cited population-level calculation. |
-| `.verify/` | Node + jsdom harnesses that assert the pages actually work. See below. |
+| **[index.html](index.html)** | **The front door — page one.** Teaches the two ideas side by side, beat by beat: permutations on the left, digital accessibility on the right. Each row is the same idea seen twice. Optional to read in full; a knowledgeable reader skips on. |
+| **[cumulative-accessibility-risk-simulator.html](cumulative-accessibility-risk-simulator.html)** | **Page two — the evidence.** An interactive 30-step, 4-stage journey simulation with selectable persona, component quality and difficulty, four distinct defect mechanics, first-class non-WCAG systemic barriers, and a deterministic cited population-level calculation. |
+| [README.md](README.md) | This file — the vision and the argument. |
+| [AGENTS.md](AGENTS.md) | Instructions for AI coding agents working in this repository. |
+| [ACCESSIBILITY.md](ACCESSIBILITY.md) | The project's accessibility commitment: scope, conformance status, testing strategy, known limitations. |
+| [RESOURCES.md](RESOURCES.md) | Sources, standards references, and prior art behind the claims. |
+| [.verify/](.verify/) | Node + jsdom harnesses asserting the pages and the maths actually work. |
 
-Both HTML files are **self-contained**: no build step, no external requests, no server. Open them
-directly in a browser.
+Both HTML files are **self-contained**: no build step, no external requests, no server, no
+framework. Open them directly from disk, or from the published site. Nothing about them depends
+on GitHub Pages being available.
 
-## The two artefacts in more detail
+---
 
-### `two-ideas.html` — the conceptual page
+## Reading the two pages
 
-Six beats, revealed one at a time (with a "reveal everything" control; nothing is withheld).
+### Page one — `index.html` (the conceptual page)
 
-| Beat | Permutations | Digital accessibility |
+Six beats, revealed one at a time, with a "reveal everything" control. **Nothing is withheld** —
+the content follows in order whether or not you press anything.
+
+| Beat | Permutations — the mathematics | Digital accessibility — the domain |
 |---|---|---|
 | 1 | What a permutation is; the count multiplies | Who is affected; why CDC (28.7 %) and Census (13.6 %) disagree |
-| 2 | Independence: `P(A and B) = P(A) × P(B)` | **POUR** — four principles that must all hold — the same "and" |
+| 2 | **Independence:** `P(A and B) = P(A) × P(B)` | **POUR** — four principles that must all hold — the same "and" |
 | 3 | `0.99³⁰ ≈ 0.7397` | A journey is a serial system |
 | 4 | Permutations of *kind*: 4 axes × 3 levels | Disability is not fixed: 12 % / 24 % / 46 % by age |
 | 5 | Chain of 30 at three quality levels | Automation decides ~30–40 % of the standard |
-| 6 | The same arithmetic, applied to people | Total / partial blockers and degraders |
+| 6 | The same arithmetic, applied to people | Total blockers, partial blockers, degraders |
 
-### `cumulative-accessibility-risk-simulator.html` — the evidence
+Beat 2 is the hinge. "Two independent things must both happen" and "POUR's four principles must
+all hold" are the same logical shape. Once a reader accepts that, everything after is
+bookkeeping — and the claim "99 % isn't good enough" stops being an opinion and becomes a
+consequence.
 
-Two things live in this file, answering different questions:
+### Page two — `cumulative-accessibility-risk-simulator.html` (the evidence)
 
-- **The simulation** — the game. Persona, component quality, and recovery difficulty are
-  selectable and random by default. Defects resolve through four mechanics:
-  **terminal** (a wall), **spoon** (drain on a finite energy pool — Spoon Theory),
-  **effort** (recoverable at a cost in time and confidence), and **friction** (a real
-  violation that stops nobody). Barriers outside WCAG 2.2 entirely — a phone-only channel, a
-  mandatory account, English-only content — are first-class and tagged `SYSTEMIC`.
-- **The population model** — the defensible calculation. **No random draw.** Every figure is
-  either a published statistic with a citation or an explicitly labelled assumption with a range,
-  so re-running gives the same answer and a reviewer can attack the inputs rather than a dice roll.
+Two distinct models live in this file, and they answer different questions.
+
+**The simulation — the game.** Persona, component quality and recovery difficulty are selectable,
+random by default, with manual override available per capability axis. Defects resolve through
+four different mechanics, because they do not stop people in the same way:
+
+| Mechanic | What it does | Example |
+|---|---|---|
+| **Terminal** | Pass or fail. The journey ends. | Drag-only upload with no single-pointer or keyboard alternative |
+| **Spoon** | Drains a finite capacity pool. Enough of them and the person gives up — an ending no conformance report records. | An unannounced radio-group question that must be re-derived several times |
+| **Effort** | Recoverable, at a price in time, attempts and confidence. | A retryable validation failure with a poor error message |
+| **Friction** | A genuine violation that stops nobody. | Low contrast — the most common failure on the web, and the most survivable |
+
+Barriers that sit **entirely outside WCAG 2.2** are first-class citizens in the model, tagged
+`SYSTEMIC`: a phone-only service channel, a mandatory online account, English-only content, a
+service that presumes a smartphone, no authorised-proxy path, a utility bill that must be in the
+applicant's name, a deadline with no extension. No success criterion is violated and the person
+is still stopped. This is the direct answer to *"not all WCAG errors block people, and not all
+things that block people are WCAG errors."*
+
+**The population model — the defensible calculation.** This half contains **no random draw at
+all.** Every figure is either a published statistic with a citation or an explicitly labelled
+assumption with a stated range. Re-running it produces the same answer, so a reviewer can attack
+the inputs rather than argue with a dice roll.
+
+Three severities, each resolving differently in the arithmetic:
+
+- **Total blocker** — no path exists. Removes 100 % of the affected Functional Performance
+  Criteria group. Needs no assumption: the absence of a path is observable.
+- **Partial blocker** — a path exists for part of the group. Removes the share with no
+  alternative route, taken from survey data where one exists.
+- **Degrader** — blocks nobody outright. Raises error and abandonment rate, which compounds
+  through the remaining steps.
+
+---
+
+## Headline results
+
+Unaffected-user serial reliability (the vendor's figure) versus population completion, computed
+over the Section 508 / EN 301 549 Functional Performance Criteria partition:
+
+| Component quality | Unaided users (vendor figure) | Population, 30–50 % automated catch |
+|---|---|---|
+| 99.9 % per component | 2.96 % journey failure | **26.9 – 27.0 % failure** |
+| **99 % per component (the brief's baseline)** | **26.03 % journey failure** | **45.2 – 46.0 % failure** |
+| 97 % per component | 59.90 % journey failure | 70.9 – 71.3 % failure |
+| 95 % per component | 78.54 % journey failure | 84.6 – 84.7 % failure |
+
+Per-group completion at baseline, showing what quality improvement cannot reach:
+
+| FPC group | US adult prevalence | Group completion |
+|---|---|---|
+| Blind / no vision (302.1) | 5.5 % | 13.5 % |
+| Limited vision (302.2) | 18.0 % | 13.5 % |
+| Deaf / no hearing (302.4) | 6.2 % | 15.0 % |
+| Limited manipulation (302.7) | 12.2 % | **none — unrecoverable wall** |
+| Limited cognition (302.9) | 13.9 % | 30.0 % |
+
+---
 
 ## Running the verification harnesses
 
-Requires Node (tested on current LTS) and jsdom.
+`README` claims are cheap. These harnesses run the pages headlessly and assert the numbers.
 
 ```bash
 cd .verify
 npm install
 node --expose-gc --max-old-space-size=3000 verify.mjs   # 250 simulated runs + population model
 node calib.mjs                                          # quality / difficulty / pinning controls
-node two.mjs                                            # page-one reveal mechanics and content
-node popmodel.mjs                                       # population-model numbers at each quality level
+node page-one.mjs                                       # page-one reveal mechanics and content
+node popmodel.mjs                                       # population numbers at each quality level
 ```
 
 `verify.mjs` drives the page's `boot()` explicitly, because jsdom's `runScripts: "outside-only"`
 mode never fires `DOMContentLoaded`.
 
+---
+
 ## The honest limits
 
-These are stated in the artefacts themselves, not buried here:
+These are stated in the artefacts themselves, not buried here. If you intend to attack the
+conclusion, this is where to aim — the model wants you to.
 
 - **No standards body publishes partial-blocker fractions** — the share of a disability group with
   no alternative path to a given widget. Every such figure is a labelled assumption with a stated
-  range. Total blockers need no such assumption: the absence of a path is observable.
-- The **automated-catch-rate range (≈30–50 %)** is carried as a range because it is the widest
-  single lever on the output.
-- The population model uses published prevalence figures (CDC DHDS/BRFSS, Census ACS) and the
-  Section 508 / EN 301 549 **Functional Performance Criteria** as its population partition.
+  range, marked *Assumption* in the interface. Total blockers need no such assumption: the absence
+  of a path is observable.
+- **The automated-catch-rate range (≈30–50 %)** is carried as a range because it is the widest
+  single lever on the output. GSA puts it near 30 % of success criteria; Deque near 40 % of issues.
+- **Two credible official sources disagree by more than a factor of two** on disability prevalence
+  (28.7 % vs 13.6 %) because they ask different questions. The model states its source and
+  definition for every figure rather than picking the convenient one.
+- **The population model is a model, not a measurement.** It has not been validated against real
+  task-completion data for this or any service. That validation is the obvious next step and it
+  has not been done. See [ACCESSIBILITY.md §13](ACCESSIBILITY.md#13-known-limitations).
+- **The journey is a worked example, not an audit.** The 30 interactions and their defects are
+  constructed to be realistic and citable; they are not the result of testing a specific live
+  service.
+- **SC 2.5.7 Dragging Movements and SC 2.5.8 Target Size (Minimum) have no published ACT rule.**
+  This is a real structural gap in the standardised test surface, cited throughout rather than
+  worked around.
 
-## Sources
+---
 
-- CDC, *Disability Impacts All of Us* / DHDS (BRFSS 2022) — 28.7 % of US adults.
-- US Census Bureau, American Community Survey 2024 — 13.6 % of all ages (45,846,700 people).
-- Census ACS / Pew Research 2023 — 12 % (18–64), 24 % (65–74), 46 % (75+).
-- Microsoft Inclusive Design, Persona Spectrum.
-- W3C, WCAG 2.2 and the W3C ACT Rules.
-- Section 508 Appendix C / EN 301 549 Clause 4 — Functional Performance Criteria.
-- GSA (≈30 % of success criteria automatable); Deque (≈40 % of issues).
-- WebAIM Million 2025 — 51 detectable errors per home page; 94.8 % of pages with WCAG 2 failures.
+## Contributing
+
+This is currently a solo-maintained public artefact under AGPL-3.0. Contributions, corrections
+and — especially — **attacks on the model's inputs** are welcome through the issue queue. If you
+have a better source for a partial-blocker fraction, or task-completion data that would let the
+model be calibrated, that is the highest-value contribution available.
+
+Before contributing, read [ACCESSIBILITY.md](ACCESSIBILITY.md) and [AGENTS.md](AGENTS.md).
 
 ## Licence
 

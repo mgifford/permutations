@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { JSDOM } from "jsdom";
-const html = fs.readFileSync("../two-ideas.html","utf8");
+const html = fs.readFileSync("../index.html","utf8");
 const dom = new JSDOM(html,{runScripts:"dangerously",pretendToBeVisual:true});
 const d = dom.window.document;
 let fails=0; const msgs=new Set();
