@@ -259,7 +259,23 @@
     .setup-row { grid-template-columns: 11.5rem 1fr; align-items: center; gap: .2rem .7rem; }
   }
   .setup-row label { font-size: .88rem; font-weight: 600; color: var(--ink-2); }
-  .setup-row select { font: inherit; padding: .4rem .5rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); min-height: 40px; }
+  /* min-width:0 is load-bearing, not tidying.
+     A <select> reports an intrinsic minimum width taken from its longest
+     <option>. The longest option here is "Hostile — deadline pressure, no
+     channel (1.6× cost)", which is wide enough to set a floor that propagated
+     up through .setup-row and .grid-2 and pushed the whole page wider than the
+     viewport — so the page scrolled sideways below ~820 px. Measured: at 360 px
+     document.scrollWidth was 479 against a 360 viewport (+119 px), a real
+     SC 1.4.10 Reflow failure.
+     The floor came from the SELECT, not from the grid. That is why the obvious
+     fix — min-width:0 on the .grid-2 children — is wrong: it made the overflow
+     WORSE at 820 px (53 px -> 233 px), because it let the grid track shrink
+     while the select inside it kept its intrinsic width. Fixing it at the
+     source, here, clears the overflow at all 11 widths tested from 320 to
+     1280 px, with no select text clipped (scrollWidth === clientWidth on
+     every one). min-height:40px above is untouched, so SC 2.5.8 Target Size
+     still holds. */
+  .setup-row select { font: inherit; padding: .4rem .5rem; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); min-height: 40px; min-width: 0; max-width: 100%; }
   .setup-note { font-size: .84rem; color: var(--muted); margin: .3rem 0 .8rem; }
   .setup-actions { margin-top: .3rem; }
 

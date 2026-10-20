@@ -15,8 +15,9 @@
     "risk-line": "node risk-line-check.mjs",
     "shared": "node shared-element-check.mjs",
     "spoon-pool": "node spoon-pool-check.mjs",
+    "reflow": "node reflow-check.mjs",
     "live": "node live-check.mjs",
-    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run readability && npm run layout && npm run run-example && npm run deck && npm run risk-line && npm run shared && npm run spoon-pool && npm run a11y"
+    "all": "npm run verify && npm run calib && npm run page-one && npm run popmodel && npm run readability && npm run layout && npm run run-example && npm run deck && npm run risk-line && npm run shared && npm run spoon-pool && npm run reflow && npm run a11y"
   },
   "dependencies": {
     "axe-core": "^4.14.0",

@@ -249,6 +249,12 @@ node deck-check.mjs                                     # npm run deck
   model is untouched by it, and that the "gave up" ending is **reachable**. It exists because the
   pool was 100 against a mean draw of 1.8, so exhaustion could not be reached at all and the panel
   read `100 / 100` while its own constant said something else.
+- `reflow-check.mjs` — **real browser.** Asserts page two does not scroll horizontally at **13
+  widths from 320 to 1280 px**, and that no `<select>` overflows its own cell with option text
+  clipped. It exists because page two had **no geometric guard at all**, which is how an SC 1.4.10
+  Reflow failure shipped: at 360 px the page scrolled sideways by 119 px. It asserts the cause as
+  well as the symptom, because a fix that only moves the overflow elsewhere would satisfy a
+  symptom-only check.
 - `deck-check.mjs` — **real browser.** Asserts the full-screen six-beat deck: it opens, covers the
   viewport, shows exactly one beat, advances by click and by arrow key, goes back, finishes, both
   skip exits work, the grid is returned to the page, and — the reason it exists — that the overlay
@@ -339,6 +345,22 @@ gracefully when no Chrome binary is present, so a machine without one still runs
 - **Grid and flex items default to `min-width:auto`**, so one unbreakable descendant — a long
   token, a `<pre>`, a wide table, an SVG's intrinsic width — sets a floor on the whole track. If a
   column refuses to shrink, this is the first thing to check.
+- **A `<select>` carries an intrinsic minimum width from its longest `<option>`**, and it propagates
+  that floor up through every ancestor. The accessible-looking fix — `min-width:0` on the grid
+  children — is **wrong**, because it lets the track shrink while the select inside keeps its own
+  width; that attempt made page two *worse* at 820 px (53 px → 233 px of overflow). Fix it on the
+  select itself.
+- **The biggest overflow is not the cause.** Ranking elements by how far they overflow points at
+  the widest element, which is usually a *scroller that is working correctly*. On page two the
+  tables appeared to be the problem and were entirely innocent — `.table-scroll` had
+  `clientWidth 280` and `scrollWidth 507`, i.e. doing its job. Classify every candidate as
+  absorbed-by-an-ancestor-scroller or not before blaming any of them.
+- **A width-dependent defect needs width-dependent assertions.** The page-two reflow was clean at
+  480 px and 768 px while failing at 360 px and 820 px — it disappeared and reappeared across the
+  breakpoints. Testing one width would have passed it. `reflow-check.mjs` samples 13.
+- **Assert the cause, not only the symptom.** `document.scrollWidth` staying put can be achieved by
+  moving the overflow somewhere else, or by truncating the text that caused it. The reflow guard
+  also asserts that no `<select>` overflows its own cell, and that the longest option still exists.
 
 ### jsdom gotchas already discovered — do not rediscover them
 
